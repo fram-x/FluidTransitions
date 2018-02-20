@@ -38,15 +38,19 @@ class Transition extends React.Component {
 	}
 	componentDidMount() {
 		const register = this.context.register;
-		if(register && this.props.shared){
-			this._route = this.context.route;
-			register(new TransitionItem(this.props.shared, this.context.route, this));
+		if(register) {
+			if(this.props.shared){
+				this._route = this.context.route;
+				register(new TransitionItem(this.props.shared, this.context.route, this));
+			}
 		}
 	}
 	componentWillUnmount() {
 		const unregister = this.context.unregister;
-		if(unregister && this.props.shared)
-			unregister(this.props.shared, this._route)
+		if(unregister) {
+			if(this.props.shared)
+				unregister(this.props.shared, this._route);
+		}
 	}
 	getInnerViewRef() {
 		return this._innerViewRef;
