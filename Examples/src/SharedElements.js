@@ -25,9 +25,15 @@ const styles = StyleSheet.create({
 		padding: 20,
 	},
 	circle: {
-		width: 50,
-		height: 50,
-		borderRadius: 25,
+		width: 20,
+		height: 20,
+		borderRadius: 20,
+		backgroundColor: '#EF4444'
+	},
+	circle2: {
+		width: 100,
+		height: 100,
+		borderRadius: 100,
 		backgroundColor: '#EF4444'
 	}
 });
@@ -52,7 +58,7 @@ const Screen2 = (props) => (
 		<Text>Screen 2</Text>
 		<View style={styles.screen2}>
 			<Transition shared='circle'>
-				<View style={styles.circle}/>
+				<View style={styles.circle2}/>
 			</Transition>
 		</View>
 		<Button
