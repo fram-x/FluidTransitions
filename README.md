@@ -16,7 +16,7 @@ To start the example, navigate to the examples folder and run the following comm
 `react-native run-ios|run-android`
 
 ### Shared Element Transitions
-This example shows how to elements can be set up to automatically transition between each other when navigating between screens. The example can be found in the file [ShareElements.js](./Examples/src/SharedElements.js).
+This example shows how to elements can be set up to automatically transition between each other when navigating between screens. The example can be found in the file [SharedElements.js](./Examples/src/SharedElements.js).
 
 ```javascript
 const Screen1 = (props) => (
