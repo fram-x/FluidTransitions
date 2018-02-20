@@ -20,38 +20,38 @@ This example shows how to elements can be set up to automatically transition bet
 
 ```javascript
 const Screen1 = (props) => (
-    <View style={styles.container}>
-        <Text>Screen 1</Text>
-        <View style={styles.screen1}>
-            <Transition shared='circle'>
-                <View style={styles.circle}/>
-            </Transition>
-        </View>
-        <Button
-            title='Next'
-            onPress={() => props.navigation.navigate('screen2')}
-        />
+  <View style={styles.container}>
+    <Text>Screen 1</Text>
+    <View style={styles.screen1}>
+      <Transition shared='circle'>
+        <View style={styles.circle}/>
+      </Transition>
     </View>
+    <Button
+      title='Next'
+      onPress={() => props.navigation.navigate('screen2')}
+    />
+  </View>
 );
 
 const Screen2 = (props) => (
-    <View style={styles.container}>
-        <Text>Screen 2</Text>
-        <View style={styles.screen2}>
-            <Transition shared='circle'>
-                <View style={styles.circle}/>
-            </Transition>
-        </View>
-        <Button
-            title='Back'
-            onPress={() => props.navigation.goBack()}
-        />
+  <View style={styles.container}>
+    <Text>Screen 2</Text>
+    <View style={styles.screen2}>
+      <Transition shared='circle'>
+        <View style={styles.circle}/>
+      </Transition>
     </View>
+    <Button
+      title='Back'
+      onPress={() => props.navigation.goBack()}
+    />
+  </View>
 );
 
 const Navigator = FluidNavigator({
-    screen1: { screen: Screen1 },
-    screen2: { screen: Screen2 },
+  screen1: { screen: Screen1 },
+  screen2: { screen: Screen2 },
 });
 
 ```
