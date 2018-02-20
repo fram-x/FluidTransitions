@@ -1,69 +1,29 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { View, StyleSheet, Animated } from 'react-native';
 
-import TransitionItem from './TransitionItem';
+import SharedTransition from './Transitions/SharedTransition';
+import BaseTransition from './Transitions/BaseTransition';
 
 class Transition extends React.Component {
-	constructor(props, context){
-		super(props, context);
-	}
-	_innerViewRef
-	_route
 	render() {
-		
-		const opacityNegValue = Animated.multiply(
-			this.context.progress, this.context.progressDirection);
-
-		const opacityValue = Animated.add(this.context.progress, opacityNegValue);
-		const swapStyle = {
-			opacity: opacityValue.interpolate({
-				inputRange: [0, 0.5, 0.5, 1],
-				outputRange: [1, 1, 0, 0],
-			}),
-		};
-
-		const element = React.Children.only(this.props.children);
-		const animatedComp = Animated.createAnimatedComponent(element.type);
-		const style =  [swapStyle, element.props.style];
-
-		const props = {
-			...element.props,
-			collapsable: false,
-			style: style,
-			ref: ref => this._innerViewRef = ref
-		};
-
-		return React.createElement(animatedComp, props);
-	}
-	componentDidMount() {
-		const register = this.context.register;
-		if(register) {
-			if(this.props.shared){
-				this._route = this.context.route;
-				register(new TransitionItem(this.props.shared, this.context.route, this));
+		let component;
+		// Find correct name
+		if(this.props.shared){
+			component = React.createElement(SharedTransition, this.props);
+		}
+		else {
+			if(this.props.appear){
+				switch(this.props.appear){
+					case 'top':
+					case 'bottom':
+					case 'left':
+					case 'right':
+					case 'scale':
+				}
 			}
+			component = React.createElement(BaseTransition, this.props);
 		}
-	}
-	componentWillUnmount() {
-		const unregister = this.context.unregister;
-		if(unregister) {
-			if(this.props.shared)
-				unregister(this.props.shared, this._route);
-		}
-	}
-	getInnerViewRef() {
-		return this._innerViewRef;
-	}
-	getReactElement() {
-		return React.Children.only(this.props.children);
-	}
-	static contextTypes = {
-		register: PropTypes.func,
-		unregister: PropTypes.func,
-		progress: PropTypes.object,
-		progressDirection: PropTypes.object,
-		route: PropTypes.string,
+
+		return component;
 	}
 }
 

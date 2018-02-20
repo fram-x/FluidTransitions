@@ -2,18 +2,18 @@ import React from 'react';
 import { UIManager, findNodeHandle } from 'react-native';
 
 export default class TransitionItem {
-	constructor(name, route, reactElement, nodeHandle, metrics) {
+	constructor(name, route, reactElement, isShared, metrics) {
 		this.name = name;
 		this.route = route;
 		this.reactElement = reactElement;
-		this.nodeHandle = nodeHandle;
-		this.metrics = metrics;
+		this.isShared = isShared;		
+		this.metrics = metrics;		
 	}
 	name
 	route
 	reactElement
-	metrics
-	nodeHandle
+	metrics	
+	isShared
 	scaleRelativeTo(other) {
 		const validate = i => {
 			if (!i.metrics) {
@@ -31,14 +31,14 @@ export default class TransitionItem {
 		return this.reactElement.getReactElement();
 	}
 	measure(parentNodeHandle) {
-		const self = this;
-		if(this.nodeHandle === undefined)
-			this.nodeHandle = findNodeHandle(this.reactElement.getInnerViewRef());
+		const nodeHandle = findNodeHandle(this.reactElement.getInnerViewRef());
 		return new Promise((resolve, reject) => {
 			UIManager.measureLayout(
-				self.nodeHandle,
+				nodeHandle,
 				parentNodeHandle,
-				() => {},
+				() => {
+					reject();
+				},
 				(x, y, width, height) => {
 					resolve({ x, y, width, height });
 				}
@@ -47,6 +47,6 @@ export default class TransitionItem {
 	}
 	clone() {
 		return new TransitionItem(
-			this.name, this.route, this.reactElement, this.nodeHandle, this.metrics);
+			this.name, this.route, this.reactElement, this.isShared, this.metrics);
 	}
 }

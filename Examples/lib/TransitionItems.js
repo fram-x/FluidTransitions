@@ -30,12 +30,17 @@ export default class TransitionItems {
 		const newItems = [...this.getItems(), item];
 		this.setItems(newItems);
 
-		const matchingItem = this._findMatchByName(item.name, item.route);
+		if(item.isShared){
+			const matchingItem = this._findMatchByName(item.name, item.route);
 
-		// schedule to measure (on layout) if another view with the same name is mounted
-		if (matchingItem) {
-			this.setItemsToMeasure([...this.getItemsToMeasure(), item, matchingItem]);
-		};
+			// schedule to measure (on layout) if another view with the same name is mounted
+			if (matchingItem) {
+				this.setItemsToMeasure([...this.getItemsToMeasure(), item, matchingItem]);
+			}		
+		}
+		else {
+			this.setItemsToMeasure([...this.getItemsToMeasure(), item]);
+		}
 
 		return true;
 	}
@@ -44,7 +49,9 @@ export default class TransitionItems {
 		if (index >= 0) {
 			const newItems = [...this.getItems().slice(0, index), ...this.getItems().slice(index + 1)];
 			this.setItems(newItems);
-		}
+			return true;
+		}		
+		return false;		
 	}
 	setItems(newItems) {
 		this._items = newItems;

@@ -8,7 +8,6 @@ export default class TransitionItemsView extends React.Component {
 	constructor(props) {
 		super(props);
 		this._progress = new Animated.Value(0);
-		this._progressDirection = new Animated.Value(0);
 		this._transitionItems = new TransitionItems(
 			newState => this._isMounted ? this.setState({...this.state, ...newState}) : 0,
 			_ => this.state);
@@ -19,19 +18,21 @@ export default class TransitionItemsView extends React.Component {
 	}
 	_transitionItems
 	_progress
-	_progressDirection
 	_layoutDoneResolve
 	_inTransition
 	_isMounted
 	_viewReference
-	async onTransitionStart(props, prevProps, config) {
 
+	async onTransitionStart(props, prevProps, config) {
 		this._inTransition = true;
+
+		// Set up promise to wait for layout cycles.
+		const promise = new Promise((resolve, reject) => this._layoutDoneResolve = resolve);
 
 		// Calling set state here ensures we re-render and generate all the
 		// shared elements
 		this.setState({...this.state, currentTransition: {props, prevProps}});
-		await new Promise((resolve, reject) => this._layoutDoneResolve = resolve);
+		await promise;
 
 		// Run swap animation
 		let swapAnimationDone = null;
@@ -66,8 +67,8 @@ export default class TransitionItemsView extends React.Component {
 	render() {
 		const overlay = this.renderOverlay();
 		return(
-			<Animated.View 
-				style={[this.props.style]} 
+			<Animated.View
+				style={[this.props.style]}
 				onLayout={this.onLayout.bind(this)}
 				ref={ref => this._viewReference = ref}
 			>
@@ -79,6 +80,7 @@ export default class TransitionItemsView extends React.Component {
 	renderOverlay() {
 		if(!this.state.currentTransition)
 			return;
+
 		const { props, prevProps } = this.state.currentTransition;
 		const fromRoute = prevProps ? prevProps.scene.route.routeName : 'unknownRoute';
 		const toRoute = props.scene.route.routeName;
@@ -109,7 +111,7 @@ export default class TransitionItemsView extends React.Component {
 		return (
 			<Animated.View
 				style={[styles.overlay]}
-				onLayout={this.onLayout.bind(this)}				
+				onLayout={this.onLayout.bind(this)}
 			>
 				{sharedElements}
 			</Animated.View>
@@ -170,7 +172,6 @@ export default class TransitionItemsView extends React.Component {
 		register: PropTypes.func,
 		unregister: PropTypes.func,
 		progress: PropTypes.object,
-		progressDirection: PropTypes.object
 	}
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.state != nextState;
@@ -184,9 +185,8 @@ export default class TransitionItemsView extends React.Component {
 	getChildContext() {
 		return {
 			register: (item) => this._transitionItems.add(item),
-			unregister: (item) => this._transitionItems.remove(item),
-			progress: this._progress,
-			progressDirection: this._progressDirection
+			unregister: (name, route) => this._transitionItems.remove(name, route),
+			progress: this._progress
 		};
 	}
 }
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
 	sharedElement: {
 		position: 'absolute',
 		// borderColor: '#34CE34',
-		// borderWidth: 2,		
+		// borderWidth: 2,
 		margin: 0,
 		left: 0,
 		top: 0,
