@@ -8,10 +8,9 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		justifyContent: 'center',
-		alignItems: 'center',		
-		margin: 80,
-		backgroundColor: '#FFF',
-	},	
+		alignItems: 'center',
+		padding: 80,
+	},
 	screen1: {
 		flex: 1,
 		flexDirection: 'row',

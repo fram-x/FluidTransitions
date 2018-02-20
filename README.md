@@ -16,7 +16,7 @@ To start the example, navigate to the examples folder and run the following comm
 `react-native run-ios|run-android`
 
 ### Shared Element Transitions
-This example shows how to elements can be set up to automatically transition between each other when navigating between screens. The example can be found in the file [SharedElements.js](./Examples/src/SharedElements.js).
+This example shows how to elements can be set up to automatically transition between each other when navigating between screens. The example can be found in the file [SharedElements.js](./Examples/src/SharedElements.js). Note also that the two circles have different sizes that is part of the transition.
 
 ```javascript
 const Screen1 = (props) => (
@@ -39,7 +39,7 @@ const Screen2 = (props) => (
     <Text>Screen 2</Text>
     <View style={styles.screen2}>
       <Transition shared='circle'>
-        <View style={styles.circle}/>
+        <View style={styles.circle2}/>
       </Transition>
     </View>
     <Button

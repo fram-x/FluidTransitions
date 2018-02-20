@@ -10,17 +10,19 @@ export default class TransitionItemsView extends React.Component {
 		this._progress = new Animated.Value(0);
 		this._progressDirection = new Animated.Value(0);
 		this._transitionItems = new TransitionItems(
-			newState => this.setState({...this.state, ...newState}),
+			newState => this._isMounted ? this.setState({...this.state, ...newState}) : 0,
 			_ => this.state);
 
 		this.state = { currentTransition: null };
 		this._inTransition = false;
+		this._isMounted = false;
 	}
 	_transitionItems
 	_progress
 	_progressDirection
 	_layoutDoneResolve
 	_inTransition
+	_isMounted
 	async onTransitionStart(props, prevProps, config) {
 
 		this._inTransition = true;
@@ -168,6 +170,12 @@ export default class TransitionItemsView extends React.Component {
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.state != nextState;
 	}
+	componentDidMount() {
+		this._isMounted = true;
+	}
+	componentWillUnmount() {
+		this._isMounted = false;
+	}
 	getChildContext() {
 		return {
 			register: (item) => this._transitionItems.add(item),
@@ -189,7 +197,7 @@ const styles = StyleSheet.create({
 	sharedElement: {
 		position: 'absolute',
 		// borderColor: '#34CE34',
-		// borderWidth: 2,
+		// borderWidth: 2,		
 		margin: 0,
 		left: 0,
 		top: 0,

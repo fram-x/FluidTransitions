@@ -7,12 +7,15 @@ import TransitionItemsView from './TransitionItemsView';
 
 class FluidTransitioner extends Component {
 	constructor(props) {
-		super(props);		
+		super(props);
 	}
+
 	_transitionItemsView
+	
 	static childContextTypes = {
-		route: PropTypes.string		
+		route: PropTypes.string
 	}
+	
 	getChildContext() {
 		const self = this;
 		return {
@@ -20,6 +23,7 @@ class FluidTransitioner extends Component {
 				this.props.navigation.state.index].routeName,
 		};
 	}
+	
 	render() {
 		return (
 			<Transitioner
@@ -31,21 +35,22 @@ class FluidTransitioner extends Component {
 			/>
 		);
 	}
+	
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.props !== nextProps;
 	}
+	
 	componentDidMount() {
 		// Add appear transitions here
 		const config = this._configureTransition();
 	}
 
 	async _onTransitionStart (props, prevProps) {
-				
 		const config = this._configureTransition();
 		await this._transitionItemsView.onTransitionStart(props, prevProps, config);
 	}
-	_onTransitionEnd(props, prevProps) {
 
+	_onTransitionEnd(props, prevProps) {
 		const config = this._configureTransition();
 		this._transitionItemsView.onTransitionEnd(props, prevProps, config);
 
@@ -54,6 +59,7 @@ class FluidTransitioner extends Component {
 		if(this._configureTransition().useNativeDriver)
 			props.position.setValue(props.navigation.state.index);
 	}
+
 	_configureTransition(transitionProps, prevTransitionProps) {
 		return {
 			timing: Animated.spring,
@@ -67,6 +73,7 @@ class FluidTransitioner extends Component {
 			useNativeDriver : true
 		}
 	}
+
 	_render(props, prevProps) {
 		const scenes = props.scenes.map(scene => this._renderScene({ ...props, scene }, prevProps));
 		return (
@@ -79,6 +86,7 @@ class FluidTransitioner extends Component {
 			</TransitionItemsView>
 		)
 	}
+
 	_renderScene(transitionProps, prevProps) {
 		const { position, scene } = transitionProps;
 		const { index } = scene;
@@ -107,6 +115,7 @@ class FluidTransitioner extends Component {
 			</Animated.View>
 		);
 	}
+
 	_getChildNavigation = (scene) => {
 		if (!this._childNavigationProps) this._childNavigationProps = {};
 		let navigation = this._childNavigationProps[scene.key];
@@ -118,7 +127,6 @@ class FluidTransitioner extends Component {
 		}
 		return navigation;
 	}
-
 }
 
 const styles = StyleSheet.create({
@@ -127,6 +135,7 @@ const styles = StyleSheet.create({
 	},
 	scene: {
 		position: 'absolute',
+		backgroundColor: '#FFF',
 		top: 0,
 		left: 0,
 		right: 0,
