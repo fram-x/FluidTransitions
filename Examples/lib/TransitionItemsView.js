@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Easing, Animated } from 'react-native';
+import { View, StyleSheet, Easing, Animated, findNodeHandle } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItems from './TransitionItems';
@@ -23,6 +23,7 @@ export default class TransitionItemsView extends React.Component {
 	_layoutDoneResolve
 	_inTransition
 	_isMounted
+	_viewReference
 	async onTransitionStart(props, prevProps, config) {
 
 		this._inTransition = true;
@@ -65,7 +66,11 @@ export default class TransitionItemsView extends React.Component {
 	render() {
 		const overlay = this.renderOverlay();
 		return(
-			<Animated.View style={[this.props.style]} onLayout={this.onLayout.bind(this)}>
+			<Animated.View 
+				style={[this.props.style]} 
+				onLayout={this.onLayout.bind(this)}
+				ref={ref => this._viewReference = ref}
+			>
 				{this.props.children}
 				{overlay}
 			</Animated.View>
@@ -104,7 +109,7 @@ export default class TransitionItemsView extends React.Component {
 		return (
 			<Animated.View
 				style={[styles.overlay]}
-				onLayout={this.onLayout.bind(this)}
+				onLayout={this.onLayout.bind(this)}				
 			>
 				{sharedElements}
 			</Animated.View>
@@ -113,10 +118,10 @@ export default class TransitionItemsView extends React.Component {
 	async onLayout() {
 		const itemsToMeasure = this._transitionItems.getItemsToMeasure();
 		const toUpdate = [];
-
+		const viewNodeHandle = findNodeHandle(this._viewReference);
 		for(let i=0; i<itemsToMeasure.length; i++){
 			const item = itemsToMeasure[i];
-			const metrics = await item.measure();
+			const metrics = await item.measure(viewNodeHandle);
 			toUpdate.push({ name: item.name, route: item.route, metrics });
 		};
 

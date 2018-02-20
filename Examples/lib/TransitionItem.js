@@ -30,13 +30,15 @@ export default class TransitionItem {
 	getReactElement() {
 		return this.reactElement.getReactElement();
 	}
-	measure() {
+	measure(parentNodeHandle) {
 		const self = this;
 		if(this.nodeHandle === undefined)
 			this.nodeHandle = findNodeHandle(this.reactElement.getInnerViewRef());
 		return new Promise((resolve, reject) => {
-			UIManager.measureInWindow(
+			UIManager.measureLayout(
 				self.nodeHandle,
+				parentNodeHandle,
+				() => {},
 				(x, y, width, height) => {
 					resolve({ x, y, width, height });
 				}
