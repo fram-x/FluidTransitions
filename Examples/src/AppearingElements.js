@@ -11,65 +11,44 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 80,
 	},
-	screen1: {
+	screen: {
 		flex: 1,
 		flexDirection: 'row',
-		alignItems: 'flex-start',
 		padding: 20,
-	},
-	screen2: {
-		flex: 1,
-		flexDirection: 'row',
-		alignItems: 'flex-end',
-		padding: 20,
-	},
-	circle: {
-		width: 20,
-		height: 20,
-		borderRadius: 20,
+    },
+    circle: {
+		width: 40,
+		height: 40,
+        borderRadius: 40,
+        margin: 10,
 		backgroundColor: '#EF4444'
 	},
-	circle2: {
-		width: 100,
-		height: 100,
-		borderRadius: 100,
-		backgroundColor: '#EF4444'
-	}
 });
 
-const Screen1 = (props) => (
+const Screen = (props) => (
 	<View style={styles.container}>
-		<Text>Screen 1</Text>
-		<View style={styles.screen1}>
-			<Transition shared='circle'>
+        <Transition appear='scale'>
+		    <Text>Screen</Text>
+        </Transition>
+		<View style={styles.screen}>
+            <Transition appear='top'>
 				<View style={styles.circle}/>
-			</Transition>
+            </Transition>
+            <Transition appear='top'>
+                <View style={styles.circle}/>
+            </Transition>
+            <Transition appear='top'>
+                <View style={styles.circle}/>
+            </Transition>
 		</View>
-		<Button
-			title='Next'
-			onPress={() => props.navigation.navigate('screen2')}
-		/>
-	</View>
-);
-
-const Screen2 = (props) => (
-	<View style={styles.container}>
-		<Text>Screen 2</Text>
-		<View style={styles.screen2}>
-			<Transition shared='circle'>
-				<View style={styles.circle2}/>
-			</Transition>
-		</View>
-		<Button
-			title='Back'
-			onPress={() => props.navigation.goBack()}
-		/>
+        <Transition appear='bottom'>
+		    <Button title='Nothing' onPress={()=>{}}/>
+        </Transition>
 	</View>
 );
 
 const Navigator = FluidNavigator({
-	screen1: { screen: Screen1 },
-	screen2: { screen: Screen2 },
+	screen: { screen: Screen },
 });
 
 export default () => (

@@ -13,7 +13,7 @@ import SharedElements from './src/SharedElements';
 import AppearingElements from './src/AppearingElements';
 
 const ExampleNavigator = StackNavigator({
-	home: { screen: HomeScreen },
+	home: { screen: HomeScreen, navigationOptions: { title: 'Fluid Transitions' }},
 	shared: { screen: SharedElements },
 	appear: { screen: AppearingElements },
 });
