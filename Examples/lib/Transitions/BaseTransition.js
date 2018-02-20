@@ -15,25 +15,35 @@ class BaseTransition extends React.Component {
 	constructor(props, context){
 		super(props, context);
 		this._name = generateKey();
+		this._progress = Animated.add(
+			this.context.transitionDirection,
+			Animated.multiply(-1, this.context.transitionProgress));
 	}
+
 	_innerViewRef
 	_route
 	_name
 	_innerViewRef
+	_progress
+
 	render() {
 
 		const element = React.Children.only(this.props.children);
 		const animatedComp = Animated.createAnimatedComponent(element.type);
 		const style =  [element.props.style];
+		const transitionStyle = this.getTransitionStyle(this._progress);
 
 		const props = {
 			...element.props,
 			collapsable: false,
-			style: style,
+			style: [style, transitionStyle],
 			ref: ref => this._innerViewRef = ref
 		};
 
 		return React.createElement(animatedComp, props);
+	}
+	getTransitionStyle() {
+		return {};
 	}
 	componentDidMount() {
 		const register = this.context.register;
@@ -73,7 +83,9 @@ class BaseTransition extends React.Component {
 	static contextTypes = {
 		register: PropTypes.func,
 		unregister: PropTypes.func,
-		progress: PropTypes.object,
+		appearProgress: PropTypes.object,
+		transitionProgress: PropTypes.object,
+		transitionDirection: PropTypes.object,
 		route: PropTypes.string,
 	}
 }

@@ -2,6 +2,7 @@ import React from 'react';
 
 import SharedTransition from './Transitions/SharedTransition';
 import BaseTransition from './Transitions/BaseTransition';
+import ScaleTransition from './Transitions/ScaleTransitions';
 
 class Transition extends React.Component {
 	render() {
@@ -17,10 +18,15 @@ class Transition extends React.Component {
 					case 'bottom':
 					case 'left':
 					case 'right':
+						component = React.createElement(BaseTransition, this.props);
+						break;
 					case 'scale':
+						component = React.createElement(ScaleTransition, this.props);
+						break;
 				}
 			}
-			component = React.createElement(BaseTransition, this.props);
+			else
+				component = React.createElement(BaseTransition, this.props);			
 		}
 
 		return component;

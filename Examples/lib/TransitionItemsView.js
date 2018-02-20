@@ -7,7 +7,11 @@ import TransitionItems from './TransitionItems';
 export default class TransitionItemsView extends React.Component {
 	constructor(props) {
 		super(props);
-		this._progress = new Animated.Value(0);
+		
+		this._appearProgress = new Animated.Value(0);
+		this._transitionProgress = new Animated.Value(0);
+		this._transitionDirection = new Animated.Value(1);
+
 		this._transitionItems = new TransitionItems(
 			newState => this._isMounted ? this.setState({...this.state, ...newState}) : 0,
 			_ => this.state);
@@ -17,7 +21,10 @@ export default class TransitionItemsView extends React.Component {
 		this._isMounted = false;
 	}
 	_transitionItems
-	_progress
+	_appearProgress
+	_transitionProgress
+	_transitionProgressListener
+	_transitionDirection
 	_layoutDoneResolve
 	_inTransition
 	_isMounted
@@ -25,10 +32,9 @@ export default class TransitionItemsView extends React.Component {
 
 	async onTransitionStart(props, prevProps, config) {
 		this._inTransition = true;
-
 		// Set up promise to wait for layout cycles.
 		const promise = new Promise((resolve, reject) => this._layoutDoneResolve = resolve);
-
+		
 		// Calling set state here ensures we re-render and generate all the
 		// shared elements
 		this.setState({...this.state, currentTransition: {props, prevProps}});
@@ -40,9 +46,12 @@ export default class TransitionItemsView extends React.Component {
 			swapAnimationDone = resolve);
 
 		// Begin swap animation on shared elements - they are faded in
-		this._progress.setValue(0);
+		this._appearProgress.setValue(0);
+		this._transitionDirection.setValue(props.index > prevProps.index ? 1 : 0);
+		this._transitionProgressListener = props.progress.addListener(
+			Animated.event([{value: this._transitionProgress}]));
 
-		Animated.timing(this._progress, {
+		Animated.timing(this._appearProgress, {
 			toValue: 1.0,
 			duration: 25,
 			easing: Easing.linear,
@@ -52,8 +61,11 @@ export default class TransitionItemsView extends React.Component {
 		return swapPromise;
 	}
 	onTransitionEnd(props, prevProps, config) {
+		props.progress.removeListener(this._transitionProgressListener);
+		this._transitionProgressListener = null;
+
 		// Begin swap animation on shared elements - they are faded in
-		Animated.timing(this._progress, {
+		Animated.timing(this._appearProgress, {
 			toValue: 0.0,
 			duration: 25,
 			easing: Easing.linear,
@@ -93,7 +105,7 @@ export default class TransitionItemsView extends React.Component {
 
 			const animatedStyle = this._getAnimatedStyle(props.progress, fromItem, toItem);
 			const swapStyle = {
-				opacity: this._progress.interpolate({
+				opacity: this._appearProgress.interpolate({
 					inputRange: [0, 0.5, 0.5, 1],
 					outputRange: [0, 0, 1, 1],
 				}),
@@ -171,7 +183,9 @@ export default class TransitionItemsView extends React.Component {
 	static childContextTypes = {
 		register: PropTypes.func,
 		unregister: PropTypes.func,
-		progress: PropTypes.object,
+		appearProgress: PropTypes.object,
+		transitionProgress: PropTypes.object,
+		transitionDirection: PropTypes.object,
 	}
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.state != nextState;
@@ -186,7 +200,9 @@ export default class TransitionItemsView extends React.Component {
 		return {
 			register: (item) => this._transitionItems.add(item),
 			unregister: (name, route) => this._transitionItems.remove(name, route),
-			progress: this._progress
+			appearProgress: this._appearProgress,
+			transitionProgress: this._transitionProgress,
+			transitionDirection: this._transitionDirection
 		};
 	}
 }

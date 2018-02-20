@@ -4,31 +4,20 @@ import { View, StyleSheet, Animated } from 'react-native';
 
 import BaseTransition from './BaseTransition';
 
-class SharedTransition extends BaseTransition {
+class ScaleTransition extends BaseTransition {
 	constructor(props, context){
-		super(props, context);
+		super(props, context);		
     }
-
-	render() {
-		const scaleStyle = {
+	getTransitionStyle(progress) {
+		return {				
             transform: [{
-                scale: this.context.progress
+                scale: progress.interpolate({
+					inputRange: [0, 1],
+					outputRange: [0, 1]
+				})
             }]
 		};
-
-		const element = React.Children.only(this.props.children);
-		const animatedComp = Animated.createAnimatedComponent(element.type);
-		const style =  [scaleStyle, element.props.style];
-
-		const props = {
-			...element.props,
-			collapsable: false,
-			style: style,
-			ref: ref => this._innerViewRef = ref
-		};
-
-		return React.createElement(animatedComp, props);
-	}
+	}	
 }
 
-export default SharedTransition;
+export default ScaleTransition;
