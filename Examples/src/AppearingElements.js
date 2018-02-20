@@ -25,6 +25,12 @@ const styles = StyleSheet.create({
 	},
 });
 
+const InitialScreen = (props) => (
+    <View style={styles.container}>
+        <Button title='Next' onPress={() => props.navigation.navigate('screen')} />
+	</View>
+);
+
 const Screen = (props) => (
 	<View style={styles.container}>
         <Transition appear='scale'>
@@ -42,13 +48,14 @@ const Screen = (props) => (
             </Transition>
 		</View>
         <Transition appear='bottom'>
-		    <Button title='Nothing' onPress={()=>{}}/>
+		    <Button title='Back' onPress={() => props.navigation.goBack()} />
         </Transition>
 	</View>
 );
 
 const Navigator = FluidNavigator({
-	screen: { screen: Screen },
+    home: { screen: InitialScreen },
+    screen: { screen: Screen },
 });
 
 export default () => (
