@@ -14,25 +14,27 @@ function generateKey() {
 class BaseTransition extends React.Component {
 	constructor(props, context){
 		super(props, context);
-		this._name = generateKey();		
+		this._name = generateKey();
+		this._transitionProgress = new Animated.Value(0);
+		this.state = {
+			transitionConfiguration: null
+		};
 	}
 
+	_transitionProgress
 	_innerViewRef
 	_route
 	_name
-	_innerViewRef	
+	_innerViewRef
 
 	render() {
 
 		const element = React.Children.only(this.props.children);
 		const animatedComp = Animated.createAnimatedComponent(element.type);
-		const style =  [element.props.style];
-
-		let progress = this.context.transitionProgress;
-		if(this.context.transitionDirection === 1)
-			progress = Animated.add(1, Animated.multiply(-1, this.context.transitionDirection));
-
-		const transitionStyle = this.getTransitionStyle(progress);		
+		
+		const style =  [element.props.style];		
+		const transitionStyle = 
+			this.getTransitionStyle(this.state.transitionConfiguration);
 
 		const props = {
 			...element.props,
@@ -43,8 +45,25 @@ class BaseTransition extends React.Component {
 
 		return React.createElement(animatedComp, props);
 	}
-	getTransitionStyle(progress) {
+	getTransitionStyle(transitionConfiguration) {
 		return {};
+	}
+	shouldComponentUpdate(nextProps, nextState){
+		return nextState != this.state;
+	}
+	getAnimation(start, end, index, timing, config, metrics) {
+		this.setState({...this.state, transitionConfiguration: {
+			metrics,
+			progress: this._transitionProgress
+		}})
+
+		this._transitionProgress.setValue(start);
+		const animation = timing(this._transitionProgress, {
+			toValue: end,
+			...config,
+			delay: index * 80,
+		});
+		return animation;
 	}
 	componentDidMount() {
 		const register = this.context.register;
@@ -85,8 +104,7 @@ class BaseTransition extends React.Component {
 		register: PropTypes.func,
 		unregister: PropTypes.func,
 		appearProgress: PropTypes.object,
-		transitionProgress: PropTypes.object,
-		transitionDirection: PropTypes.number,
+		transitionProgress: PropTypes.object,		
 		route: PropTypes.string,
 	}
 }

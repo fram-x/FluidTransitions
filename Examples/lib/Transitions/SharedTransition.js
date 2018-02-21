@@ -5,10 +5,7 @@ import { View, StyleSheet, Animated } from 'react-native';
 import BaseTransition from './BaseTransition';
 
 class SharedTransition extends BaseTransition {
-	constructor(props, context){
-		super(props, context);
-    }
-    getTransitionStyle() {
+	getTransitionStyle() {
         return {
 			opacity: this.context.appearProgress.interpolate({
 				inputRange: [0, 0.5, 0.5, 1],

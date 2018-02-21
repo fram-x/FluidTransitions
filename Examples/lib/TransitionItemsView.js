@@ -7,11 +7,9 @@ import TransitionItems from './TransitionItems';
 export default class TransitionItemsView extends React.Component {
 	constructor(props) {
 		super(props);
-		
+
 		this._appearProgress = new Animated.Value(0);
 		this._transitionProgress = new Animated.Value(0);
-		this._transitionDirection = 1;
-
 		this._transitionItems = new TransitionItems(
 			newState => this._isMounted ? this.setState({...this.state, ...newState}) : 0,
 			_ => this.state);
@@ -23,18 +21,18 @@ export default class TransitionItemsView extends React.Component {
 	_transitionItems
 	_appearProgress
 	_transitionProgress
-	_transitionProgressListener
-	_transitionDirection
 	_layoutDoneResolve
 	_inTransition
 	_isMounted
 	_viewReference
+	_appearTransitionPromise
+	_appearTransitionPromiseDone
 
 	async onTransitionStart(props, prevProps, config) {
 		this._inTransition = true;
 		// Set up promise to wait for layout cycles.
 		const promise = new Promise((resolve, reject) => this._layoutDoneResolve = resolve);
-		
+
 		// Calling set state here ensures we re-render and generate all the
 		// shared elements
 		this.setState({...this.state, currentTransition: {props, prevProps}});
@@ -45,11 +43,11 @@ export default class TransitionItemsView extends React.Component {
 		const swapPromise = new Promise((resolve, reject) =>
 			swapAnimationDone = resolve);
 
+		// Begin appear transitions for elements not in shared
+		this.beginAppearTransitions(props, prevProps, config);
+
 		// Begin swap animation on shared elements - they are faded in
 		this._appearProgress.setValue(0);
-		this._transitionDirection = props.index > prevProps.index ? 1 : 0;
-		this._transitionProgressListener = props.progress.addListener(
-			Animated.event([{value: this._transitionProgress}]));
 
 		Animated.timing(this._appearProgress, {
 			toValue: 1.0,
@@ -60,11 +58,13 @@ export default class TransitionItemsView extends React.Component {
 
 		return swapPromise;
 	}
-	onTransitionEnd(props, prevProps, config) {
-		props.progress.removeListener(this._transitionProgressListener);
-		this._transitionProgressListener = null;
 
-		// Begin swap animation on shared elements - they are faded in
+	async onTransitionEnd(props, prevProps, config) {
+
+		if(this._appearTransitionPromise)
+			await this._appearTransitionPromise;
+		
+		// End swap animation on shared elements - they are faded in
 		Animated.timing(this._appearProgress, {
 			toValue: 0.0,
 			duration: 25,
@@ -73,6 +73,38 @@ export default class TransitionItemsView extends React.Component {
 		}).start(()=> {
 			this._inTransition = false;
 			this.setState({currentTransition: null});
+		});
+	}
+
+	beginAppearTransitions(props, prevProps, config) {
+		this._appearTransitionPromise = new Promise((resolve, reject) => 
+			this._appearTransitionPromiseDone = resolve);
+
+		const start = props.index > prevProps.index ? 0 : 1;
+		const end = props.index > prevProps.index ? 1 : 0;
+		this._transitionProgress.setValue(start);
+
+		const route = start < end ? props.scene.route.routeName : prevProps.scene.route.routeName;
+		const appearElements = this._transitionItems.getAppearElements(route);
+
+		transitionSpec = {...config};
+		const { timing } = transitionSpec;
+		delete transitionSpec.timing;
+			
+		const animations = [];
+		let index = 0;
+		for(let i=0; i<appearElements.length; i++){
+			const item = appearElements[i];
+			const animation = item.reactElement.getAnimation(
+				start, end, index, timing, transitionSpec, item.metrics);
+
+			index++;
+			animations.push(animation);
+		}
+		Animated.parallel(animations).start(() => {
+			this._appearTransitionPromiseDone();
+			this._appearTransitionPromiseDone = null;
+			this._appearTransitionPromise = null;
 		});
 	}
 
@@ -185,7 +217,6 @@ export default class TransitionItemsView extends React.Component {
 		unregister: PropTypes.func,
 		appearProgress: PropTypes.object,
 		transitionProgress: PropTypes.object,
-		transitionDirection: PropTypes.number,
 	}
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.state != nextState;
@@ -202,7 +233,6 @@ export default class TransitionItemsView extends React.Component {
 			unregister: (name, route) => this._transitionItems.remove(name, route),
 			appearProgress: this._appearProgress,
 			transitionProgress: this._transitionProgress,
-			transitionDirection: this._transitionDirection
 		};
 	}
 }

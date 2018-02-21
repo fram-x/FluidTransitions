@@ -5,13 +5,13 @@ import { View, StyleSheet, Animated } from 'react-native';
 import BaseTransition from './BaseTransition';
 
 class ScaleTransition extends BaseTransition {
-	constructor(props, context){
-		super(props, context);		
-    }
-	getTransitionStyle(progress) {
+	getTransitionStyle(transitionConfiguration) {
+		if(!transitionConfiguration)
+			return {};
+
 		return {				
             transform: [{
-                scale: progress.interpolate({
+                scale: transitionConfiguration.progress.interpolate({
 					inputRange: [0, 1],
 					outputRange: [0, 1]
 				})
