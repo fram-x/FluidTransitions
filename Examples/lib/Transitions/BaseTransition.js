@@ -14,24 +14,25 @@ function generateKey() {
 class BaseTransition extends React.Component {
 	constructor(props, context){
 		super(props, context);
-		this._name = generateKey();
-		this._progress = Animated.add(
-			this.context.transitionDirection,
-			Animated.multiply(-1, this.context.transitionProgress));
+		this._name = generateKey();		
 	}
 
 	_innerViewRef
 	_route
 	_name
-	_innerViewRef
-	_progress
+	_innerViewRef	
 
 	render() {
 
 		const element = React.Children.only(this.props.children);
 		const animatedComp = Animated.createAnimatedComponent(element.type);
 		const style =  [element.props.style];
-		const transitionStyle = this.getTransitionStyle(this._progress);
+
+		let progress = this.context.transitionProgress;
+		if(this.context.transitionDirection === 1)
+			progress = Animated.add(1, Animated.multiply(-1, this.context.transitionDirection));
+
+		const transitionStyle = this.getTransitionStyle(progress);		
 
 		const props = {
 			...element.props,
@@ -42,7 +43,7 @@ class BaseTransition extends React.Component {
 
 		return React.createElement(animatedComp, props);
 	}
-	getTransitionStyle() {
+	getTransitionStyle(progress) {
 		return {};
 	}
 	componentDidMount() {
@@ -85,7 +86,7 @@ class BaseTransition extends React.Component {
 		unregister: PropTypes.func,
 		appearProgress: PropTypes.object,
 		transitionProgress: PropTypes.object,
-		transitionDirection: PropTypes.object,
+		transitionDirection: PropTypes.number,
 		route: PropTypes.string,
 	}
 }
