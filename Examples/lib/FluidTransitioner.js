@@ -68,9 +68,9 @@ class FluidTransitioner extends Component {
 			stiffness: 140,
 			damping: 8.5,
 			mass: 0.5,			
-			// timing: Animated.timing,
-			// duration: 1000,
-			// easing: Easing.elastic(1.2),
+			timing: Animated.timing,
+			duration: 400,
+			easing: Easing.inOut(Easing.ease),
 			isInteraction: true,
 			useNativeDriver : true
 		}
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
 	},
 	scene: {
 		position: 'absolute',
-		backgroundColor: '#FFF',
+		// backgroundColor: '#FFF',
 		top: 0,
 		left: 0,
 		right: 0,

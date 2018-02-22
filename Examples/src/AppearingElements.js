@@ -25,11 +25,12 @@ const styles = StyleSheet.create({
 	},
 	text: {
 		textAlign: 'center',
-		paddingBottom: 40,
+		paddingBottom: 40,		
 	},
-	text2: {
-		backgroundColor: '#FF0000',
+	textContainer: {
+		backgroundColor: '#AFECEC',
 		padding: 20,
+		borderRadius: 20,
 	}
 });
 
@@ -47,7 +48,9 @@ const InitialScreen = (props) => (
 const Screen = (props) => (
 	<View style={styles.container}>
         <Transition appear='scale'>
-		    <Text style={styles.text2}>Screen</Text>
+			<View style={styles.textContainer}>		
+		    	<Text>Screen</Text>
+			</View>
         </Transition>
 		<View style={styles.screen}>
             <Transition appear='left'>

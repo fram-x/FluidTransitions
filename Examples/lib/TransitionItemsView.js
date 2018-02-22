@@ -54,7 +54,7 @@ export default class TransitionItemsView extends React.Component {
 
 		Animated.timing(this._appearProgress, {
 			toValue: 1.0,
-			duration: 25,
+			duration: 55,
 			easing: Easing.linear,
 			useNativeDriver : config.useNativeDriver,
 		}).start(swapAnimationDone);
@@ -71,7 +71,7 @@ export default class TransitionItemsView extends React.Component {
 		// End swap animation on shared elements - they are faded in
 		Animated.timing(this._appearProgress, {
 			toValue: 0.0,
-			duration: 25,
+			duration: 55,
 			easing: Easing.linear,
 			useNativeDriver : config.useNativeDriver
 		}).start(()=> {
@@ -142,7 +142,7 @@ export default class TransitionItemsView extends React.Component {
 		delete transitionSpec.timing;
 
 		for(let i=0; i<appearElements.length; i++){
-			const item = appearElements[i];			
+			const item = appearElements[i];
 			const animation = item.reactElement.getAnimation({
 				start,
 				end,
@@ -152,7 +152,7 @@ export default class TransitionItemsView extends React.Component {
 				config: transitionSpec,
 				metrics: item.metrics
 			});
-			
+
 			if(!item.immedate)
 				index++;
 
@@ -196,8 +196,11 @@ export default class TransitionItemsView extends React.Component {
 					outputRange: [0, 0, 1, 1],
 				}),
 			};
-			// Buttons needs to be wrapped in a view to work properly. 
-			let element = fromItem.getReactElement();
+			// Buttons needs to be wrapped in a view to work properly.
+			let element = toItem.getReactElement();
+			if(fromItem.metrics.width > toItem.metrics.width && fromItem.metrics.height > toItem.metrics.height)
+				element = fromItem.getReactElement();
+
 			if(element.type.name === 'Button')
 				element = (<View>{element}</View>);
 

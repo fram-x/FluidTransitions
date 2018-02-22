@@ -12,7 +12,7 @@ class SharedTransition extends BaseTransition {
 				outputRange: [1, 1, 0, 0],
 			}),
 		};
-    }	
+    }
 }
 
 export default SharedTransition;

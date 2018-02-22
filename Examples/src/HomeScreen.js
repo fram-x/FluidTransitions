@@ -32,5 +32,6 @@ export default (props) => (
     <ScrollView contentContainerStyle={styles.container}>
         <ItemButton backgroundColor='#CECECE' text='Shared Elements' nav={props.navigation} target='shared'/>
         <ItemButton backgroundColor='#DEDEDE' text='Appearing Elements' nav={props.navigation} target='appear'/>
+        <ItemButton backgroundColor='#BEBEBE' text='Image Transitions' nav={props.navigation} target='image'/>
     </ScrollView>
 );
