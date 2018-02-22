@@ -148,17 +148,20 @@ export default class TransitionItemsView extends React.Component {
 
 		for(let i=0; i<appearElements.length; i++){
 			const item = appearElements[i];
+			const isImmediate = item.reactElement.props.immedate !== undefined;
 			const animation = item.reactElement.getAnimation({
 				start,
 				end,
-				delay: index * 75,
+				delay: isImmediate ? 0 : index * 75,
 				timing,
 				direction,
 				config: transitionSpec,
 				metrics: item.metrics
 			});
-
+			
+			if(!isImmediate)
 				index++;
+
 			animations.push(animation);
 		}
 
