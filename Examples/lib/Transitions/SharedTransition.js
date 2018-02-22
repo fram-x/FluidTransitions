@@ -15,7 +15,7 @@ class SharedTransition extends BaseTransition {
 			};
 		else
 			return { opacity: 1.0 };
-    }
+	}	
 }
 
 export default SharedTransition;
