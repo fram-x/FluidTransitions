@@ -8,7 +8,7 @@ import React, { Component } from 'react';
 import { View, Button, Text, StyleSheet } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 
-import HomeScreen from './HomeScreen';
+import HomeScreen from './src/HomeScreen';
 import SharedElements from './src/SharedElements';
 import AppearingElements from './src/AppearingElements';
 

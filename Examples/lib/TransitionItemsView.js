@@ -115,22 +115,17 @@ export default class TransitionItemsView extends React.Component {
 
 		}
 
-		const self = this;
-		const runAnimations = ()=> {
-			Animated.parallel(animations).start(() => {
-				if(self._appearTransitionPromiseDone)
-					self._appearTransitionPromiseDone();
-
-				self._appearTransitionPromiseDone = null;
-				self._appearTransitionPromise = null;
-			});
-		};
-
 		if(waitForInteractions){
 			await new Promise((resolve, reject) => setTimeout(resolve, 175));
 		}
 
-		runAnimations();
+		Animated.parallel(animations).start(() => {
+			if(this._appearTransitionPromiseDone)
+				this._appearTransitionPromiseDone();
+
+			this._appearTransitionPromiseDone = null;
+			this._appearTransitionPromise = null;
+		});
 
 		// If moving back - wait for half of the delay before committing
 		// to the final transition.
@@ -147,19 +142,18 @@ export default class TransitionItemsView extends React.Component {
 		delete transitionSpec.timing;
 
 		for(let i=0; i<appearElements.length; i++){
-			const item = appearElements[i];
-			const isImmediate = item.reactElement.props.immedate !== undefined;
+			const item = appearElements[i];			
 			const animation = item.reactElement.getAnimation({
 				start,
 				end,
-				delay: isImmediate ? 0 : index * 75,
+				delay: item.immedate ? 0 : index * 75,
 				timing,
 				direction,
 				config: transitionSpec,
 				metrics: item.metrics
 			});
 			
-			if(!isImmediate)
+			if(!item.immedate)
 				index++;
 
 			animations.push(animation);
@@ -202,6 +196,7 @@ export default class TransitionItemsView extends React.Component {
 					outputRange: [0, 0, 1, 1],
 				}),
 			};
+			// Buttons needs to be wrapped in a view to work properly. 
 			let element = fromItem.getReactElement();
 			if(element.type.name === 'Button')
 				element = (<View>{element}</View>);

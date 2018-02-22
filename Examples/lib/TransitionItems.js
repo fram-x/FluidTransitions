@@ -30,7 +30,7 @@ export default class TransitionItems {
 		const newItems = [...this.getItems(), item];
 		this.setItems(newItems);
 
-		if(item.isShared){
+		if(item.shared){
 			const matchingItem = this._findMatchByName(item.name, item.route);
 
 			// schedule to measure (on layout) if another view with the same name is mounted

@@ -9,7 +9,7 @@ class ScaleTransition extends BaseTransition {
 		if(!transitionConfiguration)
 			return {};
 
-		return {				
+		return {
             transform: [{
                 scale: transitionConfiguration.progress.interpolate({
 					inputRange: [0, 1],
@@ -17,15 +17,15 @@ class ScaleTransition extends BaseTransition {
 				})
             }]
 		};
-	}	
+	}
 	getAnimationSpecs(animationSpecs){
 		return {
 			...animationSpecs,
 			config : {
 				...animationSpecs.config,
 				damping: 25,
-				mass: 0.1
-			}			
+				mass: 1
+			}
 		}
 	}
 }

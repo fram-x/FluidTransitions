@@ -34,9 +34,9 @@ class BaseTransition extends React.Component {
 			element = (<View>{element}</View>);
 
 		const animatedComp = Animated.createAnimatedComponent(element.type);
-		
-		const style =  [element.props.style];		
-		const transitionStyle = 
+
+		const style =  [element.props.style];
+		const transitionStyle =
 			this.getTransitionStyle(this.state.transitionConfiguration);
 
 		const props = {
@@ -58,10 +58,10 @@ class BaseTransition extends React.Component {
 		return animationSpecs;
 	}
 	getAnimation(animationSpecs) {
-		const { start, end, delay, timing, config, metrics, direction } = 
+		const { start, end, delay, timing, config, metrics, direction } =
 			this.getAnimationSpecs(animationSpecs);
 
-		this.setState({...this.state, 
+		this.setState({...this.state,
 			transitionConfiguration: {
 			direction,
 			metrics,
@@ -81,14 +81,8 @@ class BaseTransition extends React.Component {
 		const register = this.context.register;
 		if(register) {
 			this._route = this.context.route;
-			if(this.props.shared){
-				register(new TransitionItem(this.props.shared, this.context.route,
-					this, true, this.props.appear));
-			}
-			else {
-				register(new TransitionItem(this._name, this.context.route,
-					this, false, this.props.appear));
-			}
+			register(new TransitionItem(this.props.shared ? this.props.shared : this._name, this.context.route,
+				this, this.props.shared, this.props.appear, this.props.immediate));
 		}
 	}
 	componentWillUnmount() {
@@ -116,7 +110,7 @@ class BaseTransition extends React.Component {
 		register: PropTypes.func,
 		unregister: PropTypes.func,
 		appearProgress: PropTypes.object,
-		transitionProgress: PropTypes.object,		
+		transitionProgress: PropTypes.object,
 		route: PropTypes.string,
 	}
 }
