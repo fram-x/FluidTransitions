@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Easing, InteractionManager, Animated, findNodeHandle } from 'react-native';
+import { View, StyleSheet, Easing, UIManager, InteractionManager, Animated, findNodeHandle } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItems from './TransitionItems';
@@ -17,7 +17,12 @@ export default class TransitionItemsView extends React.Component {
 		this.state = { currentTransition: null };
 		this._inTransition = false;
 		this._isMounted = false;
+		this._overlay = null;
+		this._fadeTransitionTime = 25;
 	}
+
+	_fadeTransitionTime
+	_overlay
 	_transitionItems
 	_appearProgress
 	_transitionProgress
@@ -39,28 +44,34 @@ export default class TransitionItemsView extends React.Component {
 		this.setState({...this.state, currentTransition: {props, prevProps}});
 		await promise;
 
+		this.resetSharedTransitions();
+
+		// Get routes
+		const fromRoute = props.scene.route.routeName;
+		const toRoute = prevProps.scene.route.routeName;
+
+		// Start shared elements
+		this.beginSharedTransitions(fromRoute, toRoute);
+
 		// Run swap animation
 		let swapAnimationDone = null;
 		const swapPromise = new Promise((resolve, reject) =>
 			swapAnimationDone = resolve);
-
-		// Begin appear transitions for elements not in shared
-		const fromRoute = props.scene.route.routeName;
-		const toRoute = prevProps.scene.route.routeName;
-		await this.beginAppearTransitions(props.index, prevProps.index, fromRoute, toRoute, config);
 
 		// Begin swap animation on shared elements - they are faded in
 		this._appearProgress.setValue(0);
 
 		Animated.timing(this._appearProgress, {
 			toValue: 1.0,
-			duration: 55,
+			duration: this._fadeTransitionTime,
 			easing: Easing.linear,
 			useNativeDriver : config.useNativeDriver,
 		}).start(swapAnimationDone);
 
 		await swapPromise;
 
+		// Begin appear transitions for elements not in shared
+		await this.beginAppearTransitions(props.index, prevProps.index, fromRoute, toRoute, config);
 	}
 
 	async onTransitionEnd(props, prevProps, config) {
@@ -71,13 +82,28 @@ export default class TransitionItemsView extends React.Component {
 		// End swap animation on shared elements - they are faded in
 		Animated.timing(this._appearProgress, {
 			toValue: 0.0,
-			duration: 55,
+			duration: this._fadeTransitionTime,
 			easing: Easing.linear,
 			useNativeDriver : config.useNativeDriver
 		}).start(()=> {
 			this._inTransition = false;
 			this.setState({currentTransition: null});
 		});
+	}
+
+	beginSharedTransitions(fromRoute, toRoute){
+		const pairs = this._transitionItems.getMeasuredItemPairs(fromRoute, toRoute);
+		const self = this;
+
+		const sharedElements = pairs.map((pair, idx) => {
+			const {fromItem, toItem} = pair;
+			toItem.reactElement.setInTransition(true);
+			fromItem.reactElement.setInTransition(true);
+		});
+	}
+
+	resetSharedTransitions(){
+		this._transitionItems.resetSharedTransitions();
 	}
 
 	async beginAppearTransitions(index, prevIndex, fromRoute, toRoute, config, waitForInteractions = false) {
@@ -173,6 +199,7 @@ export default class TransitionItemsView extends React.Component {
 				{this.props.children}
 				{overlay}
 			</Animated.View>
+
 		);
 	}
 	renderOverlay() {
@@ -197,9 +224,7 @@ export default class TransitionItemsView extends React.Component {
 				}),
 			};
 			// Buttons needs to be wrapped in a view to work properly.
-			let element = toItem.getReactElement();
-			if(fromItem.metrics.width > toItem.metrics.width && fromItem.metrics.height > toItem.metrics.height)
-				element = fromItem.getReactElement();
+			let element = fromItem.getReactElement();
 
 			if(element.type.name === 'Button')
 				element = (<View>{element}</View>);
@@ -217,6 +242,7 @@ export default class TransitionItemsView extends React.Component {
 			<Animated.View
 				style={[styles.overlay]}
 				onLayout={this.onLayout.bind(this)}
+				ref={ref => this._overlay}
 			>
 				{sharedElements}
 			</Animated.View>
@@ -226,9 +252,19 @@ export default class TransitionItemsView extends React.Component {
 		const itemsToMeasure = this._transitionItems.getItemsToMeasure();
 		const toUpdate = [];
 		const viewNodeHandle = findNodeHandle(this._viewReference);
+		
+		let b = null;
+		let size = {};
+		const p = new Promise((resolve, reject) => b = resolve);
+		UIManager.measureInWindow(viewNodeHandle, (x, y, width, height)=>{
+			size = {x, y, width, height};
+			b();
+		})
+		await p;
+
 		for(let i=0; i<itemsToMeasure.length; i++){
 			const item = itemsToMeasure[i];
-			const metrics = await item.measure(viewNodeHandle);
+			const metrics = await item.measure(size);
 			toUpdate.push({ name: item.name, route: item.route, metrics });
 		};
 

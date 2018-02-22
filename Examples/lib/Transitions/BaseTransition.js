@@ -17,8 +17,9 @@ class BaseTransition extends React.Component {
 		this._name = generateKey();
 		this._transitionProgress = new Animated.Value(0);
 		this.state = {
-			transitionConfiguration: null
-		};
+			transitionConfiguration: null,
+			inTransition: false
+		};		
 	}
 
 	_transitionProgress
@@ -26,6 +27,10 @@ class BaseTransition extends React.Component {
 	_route
 	_name
 	_innerViewRef
+
+	setInTransition(value){
+		this.setState({...this.state, inTransition: value});
+	}
 
 	render() {
 
@@ -93,10 +98,7 @@ class BaseTransition extends React.Component {
 			else
 				unregister(this._name, this._route);
 		}
-	}
-	getInnerViewRef() {
-		return this._innerViewRef;
-	}
+	}	
 	getReactElement() {
 		return React.Children.only(this.props.children);
 	}

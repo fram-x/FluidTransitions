@@ -24,6 +24,7 @@ const styles = StyleSheet.create({
     },
     detailsView: {
         padding: 10,
+        backgroundColor: '#ECECEC'
     },
     text: {
         paddingBottom:40,

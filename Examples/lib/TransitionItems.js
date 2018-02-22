@@ -73,6 +73,9 @@ export default class TransitionItems {
 		const itemPairs = this._getItemPairs(fromRoute, toRoute);
 		return itemPairs.filter(this._isMeasured);
 	}
+	resetSharedTransitions(){
+		this._items.forEach(item => item.reactElement.setInTransition(false));
+	}
 	updateMetrics(requests) {
 		const indexedRequests = requests.map(r => ({
 			...r,

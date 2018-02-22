@@ -11,11 +11,11 @@ class FluidTransitioner extends Component {
 	}
 
 	_transitionItemsView
-	
+
 	static childContextTypes = {
 		route: PropTypes.string
 	}
-	
+
 	getChildContext() {
 		const self = this;
 		return {
@@ -23,7 +23,7 @@ class FluidTransitioner extends Component {
 				this.props.navigation.state.index].routeName,
 		};
 	}
-	
+
 	render() {
 		return (
 			<Transitioner
@@ -35,13 +35,13 @@ class FluidTransitioner extends Component {
 			/>
 		);
 	}
-	
+
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.props !== nextProps;
 	}
-	
+
 	componentDidMount() {
-		// Add appear transitions here		
+		// Add appear transitions here
 		const config = this._configureTransition();
 		const state = this.props.navigation.state;
 		this._transitionItemsView.beginAppearTransitions(0, -1, state.routes[state.index].routeName, null, config, true);
@@ -67,10 +67,10 @@ class FluidTransitioner extends Component {
 			timing: Animated.spring,
 			stiffness: 140,
 			damping: 8.5,
-			mass: 0.5,			
-			timing: Animated.timing,
-			duration: 400,
-			easing: Easing.inOut(Easing.ease),
+			mass: 0.5,
+			// timing: Animated.timing,
+			// duration: 350,
+			// easing: Easing.inOut(Easing.ease),
 			isInteraction: true,
 			useNativeDriver : true
 		}
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
 	},
 	scene: {
 		position: 'absolute',
-		// backgroundColor: '#FFF',
+		backgroundColor: '#FFF',
 		top: 0,
 		left: 0,
 		right: 0,
