@@ -1,26 +1,36 @@
 import React, { Component } from 'react';
-import { View, Text, Button, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, Button, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		justifyContent: 'center',
-		alignItems: 'center',		
+		alignItems: 'center',
+    },
+    buttonContainer: {
+        alignSelf: 'stretch',
     },
     button: {
-        alignSelf: 'stretch',        
-        padding: 10,
+        padding: 20
+    },
+    buttonText: {
+        textAlign: 'center',
+        fontSize: 16
     }
 });
 
-export default (props) => (	
+const ItemButton = (props) => (
+    <TouchableOpacity onPress={() => props.nav.navigate(props.target)} style={styles.buttonContainer}>
+        <View style={styles.button} backgroundColor={props.backgroundColor}>
+            <Text style={styles.buttonText}>{props.text}</Text>
+        </View>
+    </TouchableOpacity>
+);
+
+export default (props) => (
     <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.button} backgroundColor='#CECECE'>
-		    <Button title='Shared Elements' onPress={() => props.navigation.navigate('shared')}/>
-        </View>
-        <View style={styles.button} backgroundColor='#DEDEDE'>
-            <Button title='Appearing Elements' onPress={() => props.navigation.navigate('appear')}/>
-        </View>
-    </ScrollView>	
+        <ItemButton backgroundColor='#CECECE' text='Shared Elements' nav={props.navigation} target='shared'/>
+        <ItemButton backgroundColor='#DEDEDE' text='Appearing Elements' nav={props.navigation} target='appear'/>
+    </ScrollView>
 );

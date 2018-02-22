@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
 
 const InitialScreen = (props) => (
 		<View style={styles.container}>
-			<Transition appear='bottom'>
+			<Transition appear='horizontal'>
 				<Text style={styles.text}>Click toggle to see appearance animations.</Text>
 			</Transition>
 			<Transition shared='button' appear='top'>

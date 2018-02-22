@@ -101,17 +101,17 @@ export default class TransitionItemsView extends React.Component {
 
 		if(start < end){
 			delayIndex = this.beginAppearTransitionsForRoute(startRoute,
-				animations, delayIndex, end, start, config);
+				animations, delayIndex, end, start, config, 1);
 
 			delayIndex = this.beginAppearTransitionsForRoute(endRoute,
-				animations, delayIndex, start, end, config);
+				animations, delayIndex, start, end, config, -1);
 		}
 		else {
 			delayIndex = this.beginAppearTransitionsForRoute(endRoute,
-				animations, delayIndex, start, end, config);
+				animations, delayIndex, start, end, config, -1);
 
 			delayIndex = this.beginAppearTransitionsForRoute(startRoute,
-				animations, delayIndex + 1, end, start, config);
+				animations, delayIndex + 1, end, start, config, 1);
 
 		}
 
@@ -139,7 +139,7 @@ export default class TransitionItemsView extends React.Component {
 				setTimeout(resolve, delayIndex * 40));
 	}
 
-	beginAppearTransitionsForRoute(route, animations, delayIndex, start, end, config){
+	beginAppearTransitionsForRoute(route, animations, delayIndex, start, end, config, direction = 1){
 		const appearElements = this._transitionItems.getAppearElements(route);
 		let index = delayIndex;
 		transitionSpec = {...config};
@@ -153,6 +153,7 @@ export default class TransitionItemsView extends React.Component {
 				end,
 				delay: index * 75,
 				timing,
+				direction,
 				config: transitionSpec,
 				metrics: item.metrics
 			});

@@ -55,8 +55,10 @@ class BaseTransition extends React.Component {
 		return nextState != this.state;
 	}
 	getAnimation(animationSpecs) {
-		const { start, end, delay, timing, config, metrics } = animationSpecs;
-		this.setState({...this.state, transitionConfiguration: {
+		const { start, end, delay, timing, config, metrics, direction } = animationSpecs;
+		this.setState({...this.state, 
+			transitionConfiguration: {
+			direction,
 			metrics,
 			progress: this._transitionProgress
 		}})
@@ -67,7 +69,7 @@ class BaseTransition extends React.Component {
 			...config,
 			delay: delay,
 		});
-		
+
 		return animation;
 	}
 	componentDidMount() {
