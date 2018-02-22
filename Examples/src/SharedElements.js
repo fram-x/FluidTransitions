@@ -15,12 +15,16 @@ const styles = StyleSheet.create({
 		flex: 1,
 		flexDirection: 'row',
 		alignItems: 'flex-start',
+		justifyContent: 'center',
+		alignSelf: 'stretch',		
 		padding: 20,
 	},
 	screen2: {
 		flex: 1,
 		flexDirection: 'row',
 		alignItems: 'flex-end',
+		alignSelf: 'stretch',
+		justifyContent: 'center',
 		padding: 20,
 	},
 	circle: {

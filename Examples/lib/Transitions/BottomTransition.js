@@ -3,13 +3,13 @@ import { Dimensions, Animated } from 'react-native';
 
 import BaseTransition from './BaseTransition';
 
-class TopTransition extends BaseTransition {
+class BottomTransition extends BaseTransition {
 	getTransitionStyle(transitionConfiguration) {
 		if(!transitionConfiguration)
 			return {};
 
 		const { y, height } = transitionConfiguration.metrics;
-		const distanceValue = -(height + y + 25);		
+		const distanceValue = Dimensions.get('window').height - (y + 25);
 		const progress = transitionConfiguration.progress.interpolate({
 			inputRange: [0, 1],
 			outputRange: [distanceValue, 0]
@@ -23,4 +23,4 @@ class TopTransition extends BaseTransition {
 	}
 }
 
-export default TopTransition;
+export default BottomTransition;

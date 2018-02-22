@@ -4,6 +4,7 @@ import SharedTransition from './Transitions/SharedTransition';
 import BaseTransition from './Transitions/BaseTransition';
 import ScaleTransition from './Transitions/ScaleTransitions';
 import TopTransition from './Transitions/TopTransition';
+import BottomTransition from './Transitions/BottomTransition';
 
 class Transition extends React.Component {
 	render() {
@@ -17,6 +18,7 @@ class Transition extends React.Component {
 				case 'top':
 					return React.createElement(TopTransition, this.props);
 				case 'bottom':
+					return React.createElement(BottomTransition, this.props);
 				case 'left':
 				case 'right':
 				case 'horizontal':

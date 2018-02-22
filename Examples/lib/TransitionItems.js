@@ -67,7 +67,7 @@ export default class TransitionItems {
 		return this._itemsToMeasure;
 	}
 	getAppearElements(route) {
-		return this._items.filter(e => !e.isShared && e.route === route);
+		return this._items.filter(e => e.appear && e.route === route);
 	}
 	getMeasuredItemPairs(fromRoute, toRoute) {
 		const itemPairs = this._getItemPairs(fromRoute, toRoute);

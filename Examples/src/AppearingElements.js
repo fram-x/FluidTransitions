@@ -23,12 +23,21 @@ const styles = StyleSheet.create({
         margin: 10,
 		backgroundColor: '#EF4444'
 	},
+	text: {
+		textAlign: 'center',
+		paddingBottom: 40,
+	}
 });
 
 const InitialScreen = (props) => (
-    <View style={styles.container}>
-        <Button title='Next' onPress={() => props.navigation.navigate('screen')} />
-	</View>
+		<View style={styles.container}>
+			<Transition appear='bottom'>
+				<Text style={styles.text}>Click toggle to see appearance animations.</Text>
+			</Transition>
+			<Transition shared='button' appear='top'>
+				<Button title='Toggle' onPress={() => props.navigation.navigate('screen')} />
+			</Transition>
+		</View>
 );
 
 const Screen = (props) => (
@@ -47,8 +56,8 @@ const Screen = (props) => (
                 <View style={styles.circle}/>
             </Transition>
 		</View>
-        <Transition appear='bottom'>
-		    <Button title='Back' onPress={() => props.navigation.goBack()} />
+        <Transition shared='button'>
+			<Button title='Toggle' onPress={() => props.navigation.goBack()} />
         </Transition>
 	</View>
 );

@@ -29,7 +29,10 @@ class BaseTransition extends React.Component {
 
 	render() {
 
-		const element = React.Children.only(this.props.children);
+		let element = React.Children.only(this.props.children);
+		if(element.type.name==='Button')
+			element = (<View>{element}</View>);
+
 		const animatedComp = Animated.createAnimatedComponent(element.type);
 		
 		const style =  [element.props.style];		
@@ -51,7 +54,8 @@ class BaseTransition extends React.Component {
 	shouldComponentUpdate(nextProps, nextState){
 		return nextState != this.state;
 	}
-	getAnimation(start, end, index, timing, config, metrics) {
+	getAnimation(animationSpecs) {
+		const { start, end, delay, timing, config, metrics } = animationSpecs;
 		this.setState({...this.state, transitionConfiguration: {
 			metrics,
 			progress: this._transitionProgress
@@ -61,8 +65,9 @@ class BaseTransition extends React.Component {
 		const animation = timing(this._transitionProgress, {
 			toValue: end,
 			...config,
-			delay: index * 80,
+			delay: delay,
 		});
+		
 		return animation;
 	}
 	componentDidMount() {
@@ -71,11 +76,11 @@ class BaseTransition extends React.Component {
 			this._route = this.context.route;
 			if(this.props.shared){
 				register(new TransitionItem(this.props.shared, this.context.route,
-					this, true));
+					this, true, this.props.appear));
 			}
 			else {
 				register(new TransitionItem(this._name, this.context.route,
-					this, false));
+					this, false, this.props.appear));
 			}
 		}
 	}

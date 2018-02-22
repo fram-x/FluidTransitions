@@ -41,8 +41,10 @@ class FluidTransitioner extends Component {
 	}
 	
 	componentDidMount() {
-		// Add appear transitions here
+		// Add appear transitions here		
 		const config = this._configureTransition();
+		const state = this.props.navigation.state;
+		this._transitionItemsView.beginAppearTransitions(0, -1, state.routes[state.index].routeName, null, config, true);
 	}
 
 	async _onTransitionStart (props, prevProps) {
