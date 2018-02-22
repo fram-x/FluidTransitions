@@ -56,7 +56,7 @@ export default class TransitionItemsView extends React.Component {
 			toValue: 1.0,
 			duration: 25,
 			easing: Easing.linear,
-			useNativeDriver : config.useNativeDriver
+			useNativeDriver : config.useNativeDriver,
 		}).start(swapAnimationDone);
 
 		await swapPromise;
@@ -86,7 +86,7 @@ export default class TransitionItemsView extends React.Component {
 			const promise = new Promise((resolve, reject) => this._layoutDoneResolve = resolve);
 			await promise;
 		}
-		
+
 		this._appearTransitionPromise = new Promise((resolve, reject) =>
 			this._appearTransitionPromiseDone = resolve);
 
@@ -100,19 +100,19 @@ export default class TransitionItemsView extends React.Component {
 		const endRoute = start < end ? fromRoute : toRoute;
 
 		if(start < end){
-			delayIndex = this.beginAppearTransitionsForRoute(startRoute, 
+			delayIndex = this.beginAppearTransitionsForRoute(startRoute,
 				animations, delayIndex, end, start, config);
 
-			delayIndex = this.beginAppearTransitionsForRoute(endRoute, 
+			delayIndex = this.beginAppearTransitionsForRoute(endRoute,
 				animations, delayIndex, start, end, config);
 		}
 		else {
-			delayIndex = this.beginAppearTransitionsForRoute(endRoute, 
+			delayIndex = this.beginAppearTransitionsForRoute(endRoute,
 				animations, delayIndex, start, end, config);
 
-			delayIndex = this.beginAppearTransitionsForRoute(startRoute, 
+			delayIndex = this.beginAppearTransitionsForRoute(startRoute,
 				animations, delayIndex + 1, end, start, config);
-	
+
 		}
 
 		const self = this;
@@ -126,10 +126,11 @@ export default class TransitionItemsView extends React.Component {
 			});
 		};
 
-		if(waitForInteractions)
-			InteractionManager.runAfterInteractions(runAnimations);
-		else
-			runAnimations();
+		if(waitForInteractions){
+			await new Promise((resolve, reject) => setTimeout(resolve, 175));
+		}
+
+		runAnimations();
 
 		// If moving back - wait for half of the delay before committing
 		// to the final transition.
@@ -144,15 +145,15 @@ export default class TransitionItemsView extends React.Component {
 		transitionSpec = {...config};
 		const { timing } = transitionSpec;
 		delete transitionSpec.timing;
-		
+
 		for(let i=0; i<appearElements.length; i++){
 			const item = appearElements[i];
 			const animation = item.reactElement.getAnimation({
-				start, 
-				end, 
-				delay: index * 75, 
-				timing, 
-				config: transitionSpec, 
+				start,
+				end,
+				delay: index * 75,
+				timing,
+				config: transitionSpec,
 				metrics: item.metrics
 			});
 
