@@ -18,6 +18,16 @@ class ScaleTransition extends BaseTransition {
             }]
 		};
 	}	
+	getAnimationSpecs(animationSpecs){
+		return {
+			...animationSpecs,
+			config : {
+				...animationSpecs.config,
+				damping: 25,
+				mass: 0.1
+			}			
+		}
+	}
 }
 
 export default ScaleTransition;

@@ -46,7 +46,7 @@ const Screen = (props) => (
 		    <Text>Screen</Text>
         </Transition>
 		<View style={styles.screen}>
-            <Transition appear='top'>
+            <Transition appear='left'>
 				<View style={styles.circle}/>
             </Transition>
             <Transition appear='left'>
@@ -55,7 +55,7 @@ const Screen = (props) => (
             <Transition appear='right'>
                 <View style={styles.circle}/>
             </Transition>
-			<Transition appear='bottom'>
+			<Transition appear='right'>
                 <View style={styles.circle}/>
             </Transition>
 		</View>
