@@ -10,7 +10,7 @@ class VerticalTransition extends BaseTransition {
         
         const { y, height } = transitionConfiguration.metrics;
         const distanceValue = transitionConfiguration.direction === 1 ? 
-            -(height + y + 25) : Dimensions.get('window').height - (y + 25);
+            -(height + y + 25) : Dimensions.get('window').height - (y - 25);
 
 		const progress = transitionConfiguration.progress.interpolate({
 			inputRange: [0, 1],

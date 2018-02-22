@@ -54,8 +54,13 @@ class BaseTransition extends React.Component {
 	shouldComponentUpdate(nextProps, nextState){
 		return nextState != this.state;
 	}
+	getAnimationSpecs(animationSpecs){
+		return animationSpecs;
+	}
 	getAnimation(animationSpecs) {
-		const { start, end, delay, timing, config, metrics, direction } = animationSpecs;
+		const { start, end, delay, timing, config, metrics, direction } = 
+			this.getAnimationSpecs(animationSpecs);
+
 		this.setState({...this.state, 
 			transitionConfiguration: {
 			direction,

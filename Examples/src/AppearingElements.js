@@ -49,10 +49,13 @@ const Screen = (props) => (
             <Transition appear='top'>
 				<View style={styles.circle}/>
             </Transition>
-            <Transition appear='top'>
+            <Transition appear='left'>
                 <View style={styles.circle}/>
             </Transition>
-            <Transition appear='top'>
+            <Transition appear='right'>
+                <View style={styles.circle}/>
+            </Transition>
+			<Transition appear='bottom'>
                 <View style={styles.circle}/>
             </Transition>
 		</View>

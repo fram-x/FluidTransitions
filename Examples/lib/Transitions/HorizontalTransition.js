@@ -10,7 +10,7 @@ class HorizontalTransition extends BaseTransition {
         
         const { x, width } = transitionConfiguration.metrics;
         const distanceValue = transitionConfiguration.direction === 1 ? 
-            -(width + x + 25) : Dimensions.get('window').width - (x + 25);
+            -(width + x + 25) : Dimensions.get('window').width - (x - 25);
 
 		const progress = transitionConfiguration.progress.interpolate({
 			inputRange: [0, 1],
