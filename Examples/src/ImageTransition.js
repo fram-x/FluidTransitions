@@ -18,6 +18,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#ECECEC',
         flex: 1,
     },
+    buttonContainer: {
+        flex: 1,
+        justifyContent: 'flex-end'
+    },
     text: {
         paddingBottom:40,
     },
@@ -68,8 +72,10 @@ class ImageDetailsScreen extends React.Component{
                 </Transition>
                 <Transition appear='bottom' nodelay>
                     <View style={styles.detailsView}>
-                        <Text style={styles.text}>This is image number {params.itemId}</Text>
-                        <Button title='Back' onPress={() => this.props.navigation.goBack()} />
+                        <Text style={styles.text}>{params.url}</Text>
+                        <View style={styles.buttonContainer}>
+                            <Button title='Back' onPress={() => this.props.navigation.goBack()} />
+                        </View>
                     </View>
                 </Transition>
             </View>
@@ -137,9 +143,7 @@ const Navigator = FluidNavigator({
     imageDetails: { screen: ImageDetailsScreen },
 }, {
     transitionConfig: {
-        timing: Animated.timing,
-		duration: 350,
-		easing: Easing.inOut(Easing.ease),
+        timing: Animated.timing		
     }
 });
 
