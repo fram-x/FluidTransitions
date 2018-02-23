@@ -42,7 +42,7 @@ class ImageListScreen extends React.Component {
     componentDidMount() {
         const items = [];
         const size = Dimensions.get('window').width;
-        for(let i=0; i<10; i++)
+        for(let i=0; i<2; i++)
             items.push('https://picsum.photos/' + size + '/' + size + '?image=' + i);
 
         this.setState({...this.state, items})

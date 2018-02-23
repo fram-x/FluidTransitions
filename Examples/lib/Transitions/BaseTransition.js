@@ -28,13 +28,17 @@ class BaseTransition extends React.Component {
 	_innerViewRef
 
 	setTransitionSpec(value){
-		if(value === null)
+		if(value === null && this.state.transitionConfiguration !== null)
 			this.setState({...this.state, transitionConfiguration: value});
-		else
+		else if(value !== null && this.state.transitionConfiguration === null)
 			this.setState({...this.state, transitionConfiguration: {
 				...value, 
 				progress: this._transitionProgress}
 			});
+	}
+
+	getTransitionSpec() {
+		return this.state.transitionConfiguration;
 	}
 
 	render() {

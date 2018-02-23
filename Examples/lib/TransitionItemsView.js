@@ -48,6 +48,8 @@ export default class TransitionItemsView extends React.Component {
 		const fromRoute = props.scene.route.routeName;
 		const toRoute = prevProps.scene.route.routeName;
 
+		this.resetSharedTransitions(fromRoute, toRoute);
+
 		// Start shared elements
 		this.beginSharedTransitions(fromRoute, toRoute);
 
@@ -88,8 +90,7 @@ export default class TransitionItemsView extends React.Component {
 			useNativeDriver : config.useNativeDriver
 		}).start(()=> {
 			this._inTransition = false;
-			this.setState({currentTransition: null});
-			this.resetSharedTransitions(fromRoute, toRoute);
+			this.setState({currentTransition: null});			
 		});
 	}
 
@@ -99,8 +100,11 @@ export default class TransitionItemsView extends React.Component {
 
 		const sharedElements = pairs.map((pair, idx) => {
 			const {fromItem, toItem} = pair;
-			toItem.reactElement.setTransitionSpec({ metrics: fromItem.metrics });
-			fromItem.reactElement.setTransitionSpec({ metrics: fromItem.metrics });
+			if(toItem.reactElement.getTransitionSpec() !== { metrics: toItem.metrics })
+				toItem.reactElement.setTransitionSpec({ metrics: toItem.metrics });
+			
+			if(fromItem.reactElement.getTransitionSpec() !== { metrics: fromItem.metrics })
+				fromItem.reactElement.setTransitionSpec({ metrics: fromItem.metrics });
 		});
 	}
 

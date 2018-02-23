@@ -75,9 +75,16 @@ export default class TransitionItems {
 	}
 	resetSharedTransitions(fromRoute, toRoute){
 		const itemsInNextTransition = this.getMeasuredItemPairs(fromRoute, toRoute);
-		this._items
-			.filter(item => (item.route === fromRoute || item.route === toRoute))
-			.forEach(item => item.reactElement.setTransitionSpec(null));
+		let itemsToReset = this._items.filter(item => (item.route === fromRoute || item.route === toRoute))
+			.filter(item => item.shared)
+			.filter(item => 
+				itemsInNextTransition.findIndex((el) => item.name === el.fromItem.name && 
+					item.route === el.fromItem.route) === -1)
+			.filter(item => 
+				itemsInNextTransition.findIndex((el) => item.name === el.toItem.name && 
+					item.route === el.toItem.route) === -1);
+
+		itemsToReset.forEach(item => item.reactElement.setTransitionSpec(null));
 	}
 	updateMetrics(requests) {
 		const indexedRequests = requests.map(r => ({
