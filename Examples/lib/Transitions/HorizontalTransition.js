@@ -5,7 +5,7 @@ import BaseTransitionHelper from './BaseTransitionHelper';
 
 class HorizontalTransition extends BaseTransitionHelper {
 	getTransitionStyle(transitionConfiguration) {
-		if(!transitionConfiguration)
+		if(!transitionConfiguration || transitionConfiguration.metrics === undefined)
 			return {};
         
         const { x, width } = transitionConfiguration.metrics;

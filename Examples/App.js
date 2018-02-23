@@ -12,12 +12,14 @@ import HomeScreen from './src/HomeScreen';
 import SharedElements from './src/SharedElements';
 import AppearingElements from './src/AppearingElements';
 import ImageTransition from './src/ImageTransition';
+import LayoutTransition from './src/LayoutTransition';
 
 const ExampleNavigator = StackNavigator({
 	home: { screen: HomeScreen, navigationOptions: { title: 'Fluid Transitions' }},
 	shared: { screen: SharedElements },
 	appear: { screen: AppearingElements },
-	image: { screen: ImageTransition }
+	image: { screen: ImageTransition },
+	layout: { screen: LayoutTransition }
 });
 
 class MyApp extends React.Component {
