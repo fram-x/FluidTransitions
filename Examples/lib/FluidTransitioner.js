@@ -64,13 +64,11 @@ class FluidTransitioner extends Component {
 
 	_configureTransition(transitionProps, prevTransitionProps) {
 		return {
-			// timing: Animated.spring,
-			// stiffness: 140,
-			// damping: 8.5,
-			// mass: 0.5,
-			timing: Animated.timing,
-			easing: Easing.elastic(1.2),
-			duration: 350,
+			timing: Animated.spring,
+			stiffness: 140,
+			damping: 8.5,
+			mass: 0.5,			
+			duration: 450,
 			...this.props.transitionConfig,
 			isInteraction: true,
 			useNativeDriver : true,
