@@ -141,17 +141,17 @@ export default class TransitionItemsView extends React.Component {
 		const endRoute = start < end ? fromRoute : toRoute;
 
 		if(start < end){
-			delayIndex = this.beginAppearTransitionsForRoute(startRoute,
+			delayIndex = this.beginAppearTransitionsForRoute(startRoute, endRoute,
 				animations, delayIndex, end, start, config, 1);
 
-			delayIndex = this.beginAppearTransitionsForRoute(endRoute,
+			delayIndex = this.beginAppearTransitionsForRoute(endRoute, startRoute,
 				animations, delayIndex, start, end, config, -1);
 		}
 		else {
-			delayIndex = this.beginAppearTransitionsForRoute(endRoute,
+			delayIndex = this.beginAppearTransitionsForRoute(endRoute, startRoute,
 				animations, delayIndex, start, end, config, -1);
 
-			delayIndex = this.beginAppearTransitionsForRoute(startRoute,
+			delayIndex = this.beginAppearTransitionsForRoute(startRoute, endRoute,
 				animations, delayIndex + 1, end, start, config, 1);
 
 		}
@@ -189,11 +189,11 @@ export default class TransitionItemsView extends React.Component {
 				setTimeout(resolve, this._getDelayFromIndexAndConfig(delayIndex, config.duration)));
 	}
 
-	beginAppearTransitionsForRoute(route, animations, delayIndex, start, end, config, direction = 1){
-		if(route === null)
+	beginAppearTransitionsForRoute(fromRoute, toRoute, animations, delayIndex, start, end, config, direction = 1){
+		if(fromRoute === null)
 			return delayIndex;
 
-		const appearElements = this._transitionItems.getAppearElements(route);
+		const appearElements = this._transitionItems.getAppearElements(fromRoute, toRoute);
 		if(appearElements.length === 0)
 			return delayIndex;
 

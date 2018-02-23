@@ -68,8 +68,16 @@ export default class TransitionItems {
 	getItemsToMeasure() {
 		return this._itemsToMeasure;
 	}
-	getAppearElements(route) {
-		return this._items.filter(e => e.appear === true && e.route === route);
+	getAppearElements(fromRoute, toRoute) {		
+		const itemPairs = this._getItemPairs(fromRoute, toRoute)
+			.filter(pair => pair.toItem !== undefined && pair.fromItem !== undefined);
+
+		let items = this._items.filter(e => e.appear === true && e.route === fromRoute);
+		items = items.filter(e => itemPairs.findIndex(p => 
+			(e.name === p.fromItem.name && e.route === p.fromItem.route) ||
+			(e.name === p.toItem.name && e.route === p.toItem.route)) === -1);
+				
+		return items;
 	}
 	getMeasuredItemPairs(fromRoute, toRoute) {
 		const itemPairs = this._getItemPairs(fromRoute, toRoute);
