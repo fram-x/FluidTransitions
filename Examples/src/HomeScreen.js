@@ -10,6 +10,7 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         alignSelf: 'stretch',
+        margin: 10,
     },
     button: {
         padding: 20
