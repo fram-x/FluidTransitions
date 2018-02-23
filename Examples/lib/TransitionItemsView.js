@@ -1,5 +1,13 @@
 import React from 'react';
-import { View, StyleSheet, Easing, UIManager, InteractionManager, Animated, findNodeHandle } from 'react-native';
+import { 
+	View, 
+	StyleSheet, 
+	Easing, 
+	UIManager, 
+	InteractionManager, 
+	Animated, 
+	findNodeHandle 
+} from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItems from './TransitionItems';
@@ -161,16 +169,16 @@ export default class TransitionItemsView extends React.Component {
 		}
 
 		if(waitForInteractions){
-			await new Promise((resolve, reject) => setTimeout(resolve, 175));
+			InteractionManager.runAfterInteractions(() => Animated.parallel(animations).start(endAnimations));
+		} else {
+			Animated.parallel(animations).start(endAnimations);
 		}
-
-		Animated.parallel(animations).start(endAnimations);
 
 		// If moving back - wait for half of the delay before committing
 		// to the final transition.
 		if(index < prevIndex)
 			return new Promise((resolve, reject)=>
-				setTimeout(resolve, delayIndex * 40));
+				setTimeout(resolve, this._getDelayFromIndexAndConfig(delayIndex, config.duration)));
 	}
 
 	beginAppearTransitionsForRoute(route, animations, delayIndex, start, end, config, direction = 1){
@@ -194,9 +202,9 @@ export default class TransitionItemsView extends React.Component {
 			const item = appearElements[i];
 			item.reactElement.setTransitionSpec({
 				...transitionConfiguration,
-				delay: item.nodelay ? 0 : index * 75,
-				metrics: item.metrics}, true);
-
+				delay: item.nodelay ? 0 : this._getDelayFromIndexAndConfig(index, config.duration),
+				metrics: item.metrics});
+				
 			const animation = item.reactElement.getAnimation();
 
 			if(!item.nodelay)
@@ -206,6 +214,10 @@ export default class TransitionItemsView extends React.Component {
 		}
 
 		return index;
+	}
+
+	_getDelayFromIndexAndConfig(index, duration){
+		return index * (duration * 0.1);
 	}
 
 	render() {
@@ -237,22 +249,16 @@ export default class TransitionItemsView extends React.Component {
 			const {fromItem, toItem} = pair;
 
 			const animatedStyle = this._getAnimatedStyle(props.progress, fromItem, toItem);
-			const swapStyle = {
-				opacity: this._appearProgress.interpolate({
-					inputRange: [0, 0.5, 0.5, 1],
-					outputRange: [0, 0, 1, 1],
-				}),
-			};
+			
 			// Buttons needs to be wrapped in a view to work properly.
 			let element = fromItem.getReactElement();
-
 			if(element.type.name === 'Button')
 				element = (<View>{element}</View>);
 
 			const AnimatedComp = Animated.createAnimatedComponent(element.type);
 
 			const sharedElement = React.createElement(AnimatedComp,
-				{ ...element.props, style: [element.props.style, animatedStyle, swapStyle], key: idx },
+				{ ...element.props, style: [element.props.style, animatedStyle], key: idx },
 				element.props.children);
 
 			return sharedElement;

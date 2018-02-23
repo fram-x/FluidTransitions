@@ -143,7 +143,9 @@ const Navigator = FluidNavigator({
     imageDetails: { screen: ImageDetailsScreen },
 }, {
     transitionConfig: {
-        timing: Animated.timing		
+        timing: Animated.timing,
+        duration: 2250,
+        easing: Easing.inOut(Easing.ease),
     }
 });
 

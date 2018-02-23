@@ -87,7 +87,7 @@ class BaseTransition extends React.Component {
 		const animation = timing(this._transitionProgress, {
 			toValue: end,
 			...config,
-			delay: delay,
+			delay,
 		});
 
 		return animation;

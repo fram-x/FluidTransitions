@@ -72,7 +72,7 @@ const Screen = (props) => (
                 <View style={styles.circle}/>
             </Transition>
 		</View>
-		<Transition appear='scale' nodelay>
+		<Transition appear='scale'>
 			<Image source={{uri: 'https://picsum.photos/200/100?image=12'}} style={styles.image}/>
 		</Transition>
         <Transition shared='button'>

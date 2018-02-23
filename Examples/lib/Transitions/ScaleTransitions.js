@@ -5,29 +5,28 @@ import { View, StyleSheet, Animated } from 'react-native';
 import BaseAppearTransition from './BaseAppearTransition';
 
 class ScaleTransition extends BaseAppearTransition {
+	constructor(props, context){
+		super(props, context);			
+	}
 	getTransitionStyle(transitionConfiguration) {
 		if(!transitionConfiguration)
-			return {};
+			return { };
+			
+		const scaleInterpolation = transitionConfiguration.progress.interpolate({
+			inputRange: [0, 1],
+			outputRange: [0, 1]
+		});
+
+		const opacityInterpolation = transitionConfiguration.progress.interpolate({
+			inputRange: [0, 0.1, 0.9, 1],
+			outputRange: [0, 1, 1, 1]
+		});
 
 		return {
-            transform: [{
-                scale: transitionConfiguration.progress.interpolate({
-					inputRange: [0, 1],
-					outputRange: [0, 1]
-				})
-            }]
+			opacity: opacityInterpolation,
+            transform: [{ scaleX: scaleInterpolation }, { scaleY: scaleInterpolation }]
 		};
-	}
-	getAnimationSpecs(animationSpecs){
-		return {
-			...animationSpecs,
-			config : {
-				...animationSpecs.config,
-				damping: 25,
-				mass: 1
-			}
-		}
-	}
+	}	
 }
 
 export default ScaleTransition;

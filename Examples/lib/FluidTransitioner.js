@@ -64,10 +64,13 @@ class FluidTransitioner extends Component {
 
 	_configureTransition(transitionProps, prevTransitionProps) {
 		return {
-			timing: Animated.spring,
-			stiffness: 140,
-			damping: 8.5,
-			mass: 0.5,
+			// timing: Animated.spring,
+			// stiffness: 140,
+			// damping: 8.5,
+			// mass: 0.5,
+			timing: Animated.timing,
+			easing: Easing.elastic(1.2),
+			duration: 350,
 			...this.props.transitionConfig,
 			isInteraction: true,
 			useNativeDriver : true,
@@ -91,16 +94,16 @@ class FluidTransitioner extends Component {
 		const { position, scene } = transitionProps;
 		const { index } = scene;
 
-		let diff = 0;
-		if(prevProps)
-			diff = (index - prevProps.index);
+		// let diff = 0;
+		// if(prevProps)
+		// 	diff = (index - prevProps.index);
 
 		let opacity = 0.0;
-		if(diff <= 1 && diff >= -1)
-			opacity = position.interpolate({
-				inputRange: [index - 1, index - 0.0001, index, index + 0.9999, index + 1],
-				outputRange: [0, 1, 1, 1, 0],
-			});
+		// if(diff <= 1 && diff >= -1)
+		opacity = position.interpolate({
+			inputRange: [index - 1, index - 0.0001, index, index + 0.9999, index + 1],
+			outputRange: [0, 1, 1, 1, 0],
+		});
 
 		const style = { opacity };
 		const Scene = this.props.router.getComponentForRouteName(scene.route.routeName);
