@@ -44,8 +44,6 @@ export default class TransitionItemsView extends React.Component {
 		this.setState({...this.state, currentTransition: {props, prevProps}});
 		await promise;
 
-		this.resetSharedTransitions();
-
 		// Get routes
 		const fromRoute = props.scene.route.routeName;
 		const toRoute = prevProps.scene.route.routeName;
@@ -79,6 +77,9 @@ export default class TransitionItemsView extends React.Component {
 		if(this._appearTransitionPromise)
 			await this._appearTransitionPromise;
 
+		const fromRoute = props.scene.route.routeName;
+		const toRoute = prevProps.scene.route.routeName;
+
 		// End swap animation on shared elements - they are faded in
 		Animated.timing(this._appearProgress, {
 			toValue: 0.0,
@@ -88,6 +89,7 @@ export default class TransitionItemsView extends React.Component {
 		}).start(()=> {
 			this._inTransition = false;
 			this.setState({currentTransition: null});
+			this.resetSharedTransitions(fromRoute, toRoute);
 		});
 	}
 
@@ -97,13 +99,13 @@ export default class TransitionItemsView extends React.Component {
 
 		const sharedElements = pairs.map((pair, idx) => {
 			const {fromItem, toItem} = pair;
-			toItem.reactElement.setInTransition(true);
-			fromItem.reactElement.setInTransition(true);
+			toItem.reactElement.setTransitionSpec({ metrics: fromItem.metrics });
+			fromItem.reactElement.setTransitionSpec({ metrics: fromItem.metrics });
 		});
 	}
 
-	resetSharedTransitions(){
-		this._transitionItems.resetSharedTransitions();
+	resetSharedTransitions(fromRoute, toRoute){
+		this._transitionItems.resetSharedTransitions(fromRoute, toRoute);
 	}
 
 	async beginAppearTransitions(index, prevIndex, fromRoute, toRoute, config, waitForInteractions = false) {
@@ -141,17 +143,24 @@ export default class TransitionItemsView extends React.Component {
 
 		}
 
-		if(waitForInteractions){
-			await new Promise((resolve, reject) => setTimeout(resolve, 175));
-		}
-
-		Animated.parallel(animations).start(() => {
+		const endAnimations = ()=> {
 			if(this._appearTransitionPromiseDone)
 				this._appearTransitionPromiseDone();
 
 			this._appearTransitionPromiseDone = null;
 			this._appearTransitionPromise = null;
-		});
+		}
+
+		if(animations.length === 0){
+			endAnimations();
+			return;
+		}
+
+		if(waitForInteractions){
+			await new Promise((resolve, reject) => setTimeout(resolve, 175));
+		}
+		
+		Animated.parallel(animations).start(endAnimations);
 
 		// If moving back - wait for half of the delay before committing
 		// to the final transition.
@@ -161,23 +170,34 @@ export default class TransitionItemsView extends React.Component {
 	}
 
 	beginAppearTransitionsForRoute(route, animations, delayIndex, start, end, config, direction = 1){
+		if(route === null)
+			return;
+		
 		const appearElements = this._transitionItems.getAppearElements(route);
+		if(appearElements.length === 0)
+			return delayIndex;
+			
 		let index = delayIndex;
 		transitionSpec = {...config};
 		const { timing } = transitionSpec;
 		delete transitionSpec.timing;
 
+		const transitionConfiguration = {
+			start,
+			end,			
+			timing,
+			direction,
+			config: transitionSpec,			
+		};
+
 		for(let i=0; i<appearElements.length; i++){
 			const item = appearElements[i];
-			const animation = item.reactElement.getAnimation({
-				start,
-				end,
+			item.reactElement.setTransitionSpec({
+				...transitionConfiguration, 
 				delay: item.immedate ? 0 : index * 75,
-				timing,
-				direction,
-				config: transitionSpec,
-				metrics: item.metrics
-			});
+				metrics: item.metrics});
+				
+			const animation = item.reactElement.getAnimation();
 
 			if(!item.immedate)
 				index++;

@@ -69,7 +69,7 @@ class FluidTransitioner extends Component {
 			damping: 8.5,
 			mass: 0.5,
 			// timing: Animated.timing,
-			// duration: 350,
+			// duration: 1350,
 			// easing: Easing.inOut(Easing.ease),
 			isInteraction: true,
 			useNativeDriver : true

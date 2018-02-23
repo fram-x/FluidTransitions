@@ -67,14 +67,17 @@ export default class TransitionItems {
 		return this._itemsToMeasure;
 	}
 	getAppearElements(route) {
-		return this._items.filter(e => e.appear && e.route === route);
+		return this._items.filter(e => e.appear === true && e.route === route);
 	}
 	getMeasuredItemPairs(fromRoute, toRoute) {
 		const itemPairs = this._getItemPairs(fromRoute, toRoute);
 		return itemPairs.filter(this._isMeasured);
 	}
-	resetSharedTransitions(){
-		this._items.forEach(item => item.reactElement.setInTransition(false));
+	resetSharedTransitions(fromRoute, toRoute){
+		const itemsInNextTransition = this.getMeasuredItemPairs(fromRoute, toRoute);
+		this._items
+			.filter(item => (item.route === fromRoute || item.route === toRoute))
+			.forEach(item => item.reactElement.setTransitionSpec(null));
 	}
 	updateMetrics(requests) {
 		const indexedRequests = requests.map(r => ({

@@ -6,9 +6,9 @@ export default class TransitionItem {
 		this.name = name;
 		this.route = route;
 		this.reactElement = reactElement;
-		this.shared = shared !== undefined;		
-		this.appear = appear !== undefined;
-		this.immediate = immediate !== undefined;
+		this.shared = shared;		
+		this.appear = appear;
+		this.immediate = immediate;
 		this.metrics = metrics;				
 	}
 	name

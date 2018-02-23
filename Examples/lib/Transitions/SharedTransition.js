@@ -4,18 +4,20 @@ import { View, StyleSheet, Animated } from 'react-native';
 
 import BaseTransition from './BaseTransition';
 
-class SharedTransition extends BaseTransition {	
+class SharedTransition extends BaseTransition {
 	getTransitionStyle() {
-		if(this.state.inTransition)
+		if(this.state.transitionConfiguration){
 			return {
 				opacity: this.context.appearProgress.interpolate({
 					inputRange: [0, 0.5, 0.5, 1],
 					outputRange: [1, 1, 0, 0],
-				}),
+				})
 			};
-		else
+		}
+		else{
 			return { opacity: 1.0 };
-	}	
+		}
+	}
 }
 
 export default SharedTransition;

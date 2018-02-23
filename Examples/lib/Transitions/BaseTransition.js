@@ -17,9 +17,8 @@ class BaseTransition extends React.Component {
 		this._name = generateKey();
 		this._transitionProgress = new Animated.Value(0);
 		this.state = {
-			transitionConfiguration: null,
-			inTransition: false
-		};		
+			transitionConfiguration: null
+		};
 	}
 
 	_transitionProgress
@@ -28,8 +27,14 @@ class BaseTransition extends React.Component {
 	_name
 	_innerViewRef
 
-	setInTransition(value){
-		this.setState({...this.state, inTransition: value});
+	setTransitionSpec(value){
+		if(value === null)
+			this.setState({...this.state, transitionConfiguration: value});
+		else
+			this.setState({...this.state, transitionConfiguration: {
+				...value, 
+				progress: this._transitionProgress}
+			});
 	}
 
 	render() {
@@ -57,21 +62,18 @@ class BaseTransition extends React.Component {
 		return {};
 	}
 	shouldComponentUpdate(nextProps, nextState){
-		return nextState != this.state;
+		return nextState.transitionConfiguration !== this.state.transitionConfiguration;
 	}
 	getAnimationSpecs(animationSpecs){
 		return animationSpecs;
 	}
-	getAnimation(animationSpecs) {
+	getAnimation() {
+		if(this.state.transitionConfiguration === null)
+			return {};
+
+		const animationSpecs = this.state.transitionConfiguration;
 		const { start, end, delay, timing, config, metrics, direction } =
 			this.getAnimationSpecs(animationSpecs);
-
-		this.setState({...this.state,
-			transitionConfiguration: {
-			direction,
-			metrics,
-			progress: this._transitionProgress
-		}})
 
 		this._transitionProgress.setValue(start);
 		const animation = timing(this._transitionProgress, {
@@ -87,7 +89,8 @@ class BaseTransition extends React.Component {
 		if(register) {
 			this._route = this.context.route;
 			register(new TransitionItem(this.props.shared ? this.props.shared : this._name, this.context.route,
-				this, this.props.shared, this.props.appear, this.props.immediate));
+				this, this.props.shared !== undefined, this.props.appear !== undefined, 
+				this.props.immediate !== undefined));
 		}
 	}
 	componentWillUnmount() {
@@ -98,7 +101,7 @@ class BaseTransition extends React.Component {
 			else
 				unregister(this._name, this._route);
 		}
-	}	
+	}
 	getReactElement() {
 		return React.Children.only(this.props.children);
 	}
