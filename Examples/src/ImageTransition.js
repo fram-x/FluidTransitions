@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Dimensions, Button, TouchableOpacity, FlatList, Image, StyleSheet } from 'react-native';
+import { View, Text, Dimensions, Button, TouchableOpacity, FlatList, Animated, Easing, Image, StyleSheet } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import _ from 'lodash';
 
@@ -15,7 +15,8 @@ const styles = StyleSheet.create({
     },
     detailsView: {
         padding: 10,
-        backgroundColor: '#ECECEC'
+        backgroundColor: '#ECECEC',
+        flex: 1,
     },
     text: {
         paddingBottom:40,
@@ -134,6 +135,12 @@ class ImageGrid extends Component {
 const Navigator = FluidNavigator({
     imageList: { screen: ImageListScreen },
     imageDetails: { screen: ImageDetailsScreen },
+}, {
+    transitionConfig: {
+        timing: Animated.timing,
+		duration: 350,
+		easing: Easing.inOut(Easing.ease),
+    }
 });
 
 export default () => (
