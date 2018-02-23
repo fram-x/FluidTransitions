@@ -24,7 +24,6 @@ export default class TransitionItemsView extends React.Component {
 			_ => this.state);
 
 		this.state = { currentTransition: null };
-		this._inTransition = false;
 		this._isMounted = false;
 		this._overlay = null;
 		this._fadeTransitionTime = 25;
@@ -36,19 +35,17 @@ export default class TransitionItemsView extends React.Component {
 	_appearProgress
 	_transitionProgress
 	_layoutDoneResolve
-	_inTransition
 	_isMounted
 	_viewReference
 	_appearTransitionPromise
-	_appearTransitionPromiseDone
+	_appearTransitionPromiseResolve
 	_viewNodeHandle
 	_viewSize
 
 	async onTransitionStart(props, prevProps, config) {
-		this._inTransition = true;
 
 		// Set up promise to wait for layout cycles.
-		const promise = new Promise((resolve, reject) => this._layoutDoneResolve = resolve);
+		const promise = this.waitForLayout();
 
 		// Calling set state here ensures we re-render and generate all the
 		// shared elements
@@ -88,7 +85,7 @@ export default class TransitionItemsView extends React.Component {
 		await swapPromise;
 
 		// Begin appear transitions for elements not in shared
-		await this.beginAppearTransitions(props.index, prevProps.index, fromRoute, toRoute, config);
+		return this.beginAppearTransitions(props.index, prevProps.index, fromRoute, toRoute, config);
 	}
 
 	async onTransitionEnd(props, prevProps, config) {
@@ -99,16 +96,24 @@ export default class TransitionItemsView extends React.Component {
 		const fromRoute = props.scene.route.routeName;
 		const toRoute = prevProps.scene.route.routeName;
 
+		let animationDoneFunc;
+		const retVal = new Promise((resolve) => animationDoneFunc = resolve);
+
 		// End swap animation on shared elements - they are faded in
 		Animated.timing(this._appearProgress, {
 			toValue: 0.0,
 			duration: this._fadeTransitionTime,
 			easing: Easing.linear,
 			useNativeDriver : config.useNativeDriver
-		}).start(()=> {
-			this._inTransition = false;
-			this.setState({currentTransition: null});
+		}).start(async ()=> {
+			this.setState({...this.state, currentTransition: null});
+			if(this._appearTransitionPromise)
+				await this._appearTransitionPromise;
+
+			animationDoneFunc();
 		});
+
+		return retVal;
 	}
 
 	beginSharedTransitions(fromRoute, toRoute){
@@ -130,19 +135,19 @@ export default class TransitionItemsView extends React.Component {
 	}
 
 	async beginAppearTransitions(index, prevIndex, fromRoute, toRoute, config, needsMeasurement = false) {
+
+		// Set up wait promise for appear transitions
+		this._appearTransitionPromise = new Promise((resolve, reject) =>
+			this._appearTransitionPromiseResolve = resolve);
+
 		if(needsMeasurement){
-			// Set up promise to wait for layout cycles.
-			const promise = new Promise((resolve, reject) => this._layoutDoneResolve = resolve);
-			await promise;
+			await this.waitForLayout();
 
 			const itemsToMeasure = this._transitionItems.getItemsToMeasure()
 				.filter(e => e.route === fromRoute || e.route === toRoute);
 
 			await this.measureItems(itemsToMeasure);
 		}
-
-		this._appearTransitionPromise = new Promise((resolve, reject) =>
-			this._appearTransitionPromiseDone = resolve);
 
 		const animations = [];
 		let delayIndex = 0;
@@ -170,11 +175,10 @@ export default class TransitionItemsView extends React.Component {
 		}
 
 		const endAnimations = ()=> {
-			if(this._appearTransitionPromiseDone)
-				this._appearTransitionPromiseDone();
+			if(this._appearTransitionPromiseResolve)
+				this._appearTransitionPromiseResolve();
 
-			this._appearTransitionPromiseDone = null;
-			this._appearTransitionPromise = null;
+			this._appearTransitionPromiseResolve = null;
 		}
 
 		if(animations.length === 0){
@@ -303,8 +307,7 @@ export default class TransitionItemsView extends React.Component {
 		let b = null;
 		const p = new Promise((resolve, reject) => b = resolve);
 		UIManager.measureInWindow(this._viewNodeHandle, (x, y, width, height)=>{
-			this._viewSize = {x, y, width, height};
-			b();
+			this._viewSize = {x, y, width, height}; b();
 		})
 		await p;
 
@@ -361,6 +364,11 @@ export default class TransitionItemsView extends React.Component {
 			transform: [{ translateX }, { translateY }, { scaleX }, { scaleY }]
 		}];
 	}
+
+	waitForLayout(){
+		return new Promise((resolve, reject) => this._layoutDoneResolve = resolve);
+	}
+
 	static childContextTypes = {
 		register: PropTypes.func,
 		unregister: PropTypes.func,

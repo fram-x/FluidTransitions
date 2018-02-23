@@ -27,6 +27,17 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		padding: 20,
 	},
+	screen3: {
+		flex: 1,
+		flexDirection: 'row',
+		alignItems: 'center',
+		alignSelf: 'stretch',
+		justifyContent: 'center',
+		padding: 20,
+	},
+	buttons: {
+		flexDirection: 'row'
+	},
 	circle: {
 		width: 20,
 		height: 20,
@@ -61,6 +72,27 @@ const Screen2 = (props) => (
 		<Text>Screen 2</Text>
 		<View style={styles.screen2}>
 			<Transition shared='circle'>
+				<View style={styles.circle}/>
+			</Transition>
+		</View>
+		<View style={styles.buttons}>
+			<Button
+				title='Back'
+				onPress={() => props.navigation.goBack()}
+			/>
+			<Button
+				title='Next'
+				onPress={() => props.navigation.navigate('screen3')}
+			/>
+		</View>
+	</View>
+);
+
+const Screen3 = (props) => (
+	<View style={styles.container}>
+		<Text>Screen 3</Text>
+		<View style={styles.screen3}>
+			<Transition shared='circle'>
 				<View style={styles.circle2}/>
 			</Transition>
 		</View>
@@ -74,6 +106,7 @@ const Screen2 = (props) => (
 const Navigator = FluidNavigator({
 	screen1: { screen: Screen1 },
 	screen2: { screen: Screen2 },
+	screen3: { screen: Screen3 }
 });
 
 export default () => (

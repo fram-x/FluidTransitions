@@ -52,9 +52,9 @@ class FluidTransitioner extends Component {
 		await this._transitionItemsView.onTransitionStart(props, prevProps, config);
 	}
 
-	_onTransitionEnd(props, prevProps) {
+	async _onTransitionEnd(props, prevProps) {
 		const config = this._configureTransition();
-		this._transitionItemsView.onTransitionEnd(props, prevProps, config);
+		await this._transitionItemsView.onTransitionEnd(props, prevProps, config);
 
 		// Fix issue with nativeDriver and position
 		// https://github.com/react-navigation/react-navigation/issues/3157

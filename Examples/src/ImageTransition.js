@@ -43,12 +43,17 @@ class ImageListScreen extends React.Component {
     componentDidMount() {
         const items = [];
         const size = Dimensions.get('window').width;
-        for(let i=0; i<10; i++)
-            items.push({ url: 'https://picsum.photos/' + size + '/' + size + '?image=' + Math.floor((Math.random() * 100) + 1)});
+        for(let i=0; i<10; i++){
+            let randomNumber = Math.floor((Math.random() * 250) + 1);
+            while(items.findIndex(e => e.id === randomNumber) > -1){
+                randomNumber = Math.floor((Math.random() * 250) + 1);
+            }
 
-        this.setState({...this.state, items})   
+            items.push({ url: 'https://picsum.photos/' + size + '/' + size + '?image=' + randomNumber, id: randomNumber});
+        }
+        this.setState({...this.state, items})
     }
-    
+
     render() {
         return (
             <View style={styles.container}>
@@ -146,7 +151,7 @@ const Navigator = FluidNavigator({
     transitionConfig: {
         timing: Animated.timing,
         duration: 350,
-        easing: Easing.inOut(Easing.ease),
+        easing: Easing.cubic,
     }
 });
 
