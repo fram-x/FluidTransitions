@@ -41,6 +41,8 @@ export default class TransitionItemsView extends React.Component {
 	_viewReference
 	_appearTransitionPromise
 	_appearTransitionPromiseDone
+	_viewNodeHandle
+	_viewSize
 
 	async onTransitionStart(props, prevProps, config) {
 		this._inTransition = true;
@@ -56,6 +58,12 @@ export default class TransitionItemsView extends React.Component {
 		// Get routes
 		const fromRoute = props.scene.route.routeName;
 		const toRoute = prevProps.scene.route.routeName;
+
+		// Get items and measure those participating in this thingie
+		const itemsToMeasure = this._transitionItems.getItemsToMeasure()
+			.filter(e => e.route === fromRoute || e.route === toRoute);
+
+		await this.measureItems(itemsToMeasure);
 
 		this.resetSharedTransitions(fromRoute, toRoute);
 
@@ -121,11 +129,16 @@ export default class TransitionItemsView extends React.Component {
 		this._transitionItems.resetSharedTransitions(fromRoute, toRoute);
 	}
 
-	async beginAppearTransitions(index, prevIndex, fromRoute, toRoute, config, waitForInteractions = false) {
-		if(waitForInteractions){
+	async beginAppearTransitions(index, prevIndex, fromRoute, toRoute, config, needsMeasurement = false) {
+		if(needsMeasurement){
 			// Set up promise to wait for layout cycles.
 			const promise = new Promise((resolve, reject) => this._layoutDoneResolve = resolve);
 			await promise;
+
+			const itemsToMeasure = this._transitionItems.getItemsToMeasure()
+				.filter(e => e.route === fromRoute || e.route === toRoute);
+
+			await this.measureItems(itemsToMeasure);
 		}
 
 		this._appearTransitionPromise = new Promise((resolve, reject) =>
@@ -169,7 +182,7 @@ export default class TransitionItemsView extends React.Component {
 			return;
 		}
 
-		if(waitForInteractions){
+		if(needsMeasurement){
 			if(Platform.OS == 'Android')
 				InteractionManager.runAfterInteractions(() => Animated.parallel(animations).start(endAnimations));
 			else {
@@ -275,37 +288,40 @@ export default class TransitionItemsView extends React.Component {
 		return (
 			<Animated.View
 				style={[styles.overlay]}
-				onLayout={this.onLayout.bind(this)}
 				ref={ref => this._overlay}
+				onLayout={this.onLayout.bind(this)}
 			>
 				{sharedElements}
 			</Animated.View>
 		);
 	}
-	async onLayout() {
-		const itemsToMeasure = this._transitionItems.getItemsToMeasure();
-		const toUpdate = [];
-		const viewNodeHandle = findNodeHandle(this._viewReference);
+	async onLayout(event) {
+
+		if(!this._viewNodeHandle)
+			this._viewNodeHandle = findNodeHandle(this._viewReference);
 
 		let b = null;
-		let size = {};
 		const p = new Promise((resolve, reject) => b = resolve);
-		UIManager.measureInWindow(viewNodeHandle, (x, y, width, height)=>{
-			size = {x, y, width, height};
+		UIManager.measureInWindow(this._viewNodeHandle, (x, y, width, height)=>{
+			this._viewSize = {x, y, width, height};
 			b();
 		})
 		await p;
 
+		this._layoutResolved();
+	}
+	async measureItems(itemsToMeasure) {
+		const toUpdate = [];
+
 		for(let i=0; i<itemsToMeasure.length; i++){
 			const item = itemsToMeasure[i];
-			const metrics = await item.measure(size);
+			const metrics = await item.measure(this._viewSize);
 			toUpdate.push({ name: item.name, route: item.route, metrics });
 		};
 
 		if (toUpdate.length > 0) {
 			this._transitionItems.updateMetrics(toUpdate);
 		}
-		this._layoutResolved();
 	}
 	_layoutResolved() {
 		if(this._layoutDoneResolve) {

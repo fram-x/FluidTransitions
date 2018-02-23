@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     },
     cell: {
         margin: 2,
-    },   
+    },
 });
 
 class ImageListScreen extends React.Component {
@@ -39,25 +39,26 @@ class ImageListScreen extends React.Component {
         this.state= {
             items: []
         }
-    }    
+    }
     componentDidMount() {
         const items = [];
         const size = Dimensions.get('window').width;
-        for(let i=0; i<80; i++)
-            items.push({ url: 'https://picsum.photos/' + size + '/' + size + '?image=' + i});
+        for(let i=0; i<10; i++)
+            items.push({ url: 'https://picsum.photos/' + size + '/' + size + '?image=' + Math.floor((Math.random() * 100) + 1)});
 
-        this.setState({...this.state, items})
+        this.setState({...this.state, items})   
     }
-    render() {        
+    
+    render() {
         return (
             <View style={styles.container}>
-                <ImageGrid images={this.state.items} imageSelected={(image) => 
+                <ImageGrid images={this.state.items} imageSelected={(image) =>
                     this.props.navigation.navigate('imageDetails', {
                     url: image.url,
                 })}
             />
             </View>);
-    }    
+    }
 }
 
 class ImageDetailsScreen extends React.Component{
@@ -89,10 +90,10 @@ class ImageGrid extends Component {
         this._colCount = 3;
         const { width: windowWidth } = Dimensions.get("window");
         this._margin = 2;
-        this._photoSize = (windowWidth - this._margin * this._colCount * 2) / this._colCount;        
-        this.state = { chunkedImages : _.chunk(props.images, this._colCount) }        
+        this._photoSize = (windowWidth - this._margin * this._colCount * 2) / this._colCount;
+        this.state = { chunkedImages : _.chunk(props.images, this._colCount) }
     }
-    
+
     _colCount
     _photoSize
     _margin
@@ -107,7 +108,7 @@ class ImageGrid extends Component {
             <FlatList
                 data={this.state.chunkedImages}
                 keyExtractor={this.keyExtractor}
-                renderItem={this.renderItem.bind(this)}                
+                renderItem={this.renderItem.bind(this)}
             />);
     }
 
@@ -122,13 +123,13 @@ class ImageGrid extends Component {
             </View>
         )
     }
-    
+
     renderCell(image) {
         return (
             <TouchableOpacity onPress={() => this.props.imageSelected(image)} key={image.url}>
                 <View style={styles.cell}>
                     <Transition shared={image.url}>
-                        <Image source={{uri: image.url}} 
+                        <Image source={{uri: image.url}}
                             style={{width: this._photoSize, height: this._photoSize}}
                         />
                     </Transition>
