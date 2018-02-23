@@ -1,11 +1,11 @@
 import React from 'react';
-import { 
-	View, 
-	StyleSheet, 
-	Easing, 
-	UIManager, 
-	InteractionManager, 
-	Animated, 
+import {
+	View,
+	StyleSheet,
+	Easing,
+	UIManager,
+	InteractionManager,
+	Animated,
 	findNodeHandle,
 	Platform,
 } from 'react-native';
@@ -174,7 +174,7 @@ export default class TransitionItemsView extends React.Component {
 				InteractionManager.runAfterInteractions(() => Animated.parallel(animations).start(endAnimations));
 			else {
 				await new Promise((resolve, reject)=>
-					setTimeout(resolve, this._getDelayFromIndexAndConfig(delayIndex, config.duration)));			
+					setTimeout(resolve, this._getDelayFromIndexAndConfig(delayIndex, config.duration)));
 
 				Animated.parallel(animations).start(endAnimations);
 			}
@@ -202,7 +202,7 @@ export default class TransitionItemsView extends React.Component {
 		const { timing } = transitionSpec;
 		delete transitionSpec.timing;
 
-		const transitionConfiguration = { start, end, timing, direction, 
+		const transitionConfiguration = { start, end, timing, direction,
 			config: transitionSpec,
 		};
 
@@ -212,7 +212,7 @@ export default class TransitionItemsView extends React.Component {
 				...transitionConfiguration,
 				delay: item.nodelay ? 0 : this._getDelayFromIndexAndConfig(index, config.duration),
 				metrics: item.metrics});
-				
+
 			const animation = item.reactElement.getAnimation();
 
 			if(!item.nodelay)
@@ -257,7 +257,7 @@ export default class TransitionItemsView extends React.Component {
 			const {fromItem, toItem} = pair;
 
 			const animatedStyle = this._getAnimatedStyle(props.progress, fromItem, toItem);
-			
+
 			// Buttons needs to be wrapped in a view to work properly.
 			let element = fromItem.getReactElement();
 			if(element.type.name === 'Button')

@@ -3,24 +3,27 @@ import PropTypes from 'prop-types';
 import { View, StyleSheet, Animated } from 'react-native';
 
 import TransitionItem from './../TransitionItem';
+import ScaleTransition from './ScaleTransitions';
+import TopTransition from './TopTransition';
+import BottomTransition from './BottomTransition';
+import LeftTransition from './LeftTransition';
+import RightTransition from './RightTransition';
+import HorizontalTransition from './HorizontalTransition';
+import VerticalTransition from './VerticalTransition';
 
 let uniqueBaseId = `transitionCompId-${Date.now()}`;
 let uuidCount = 0;
 
-function generateKey() {
-    return `${uniqueBaseId}-${uuidCount++}`;
-}
-
 class BaseTransition extends React.Component {
 	constructor(props, context){
 		super(props, context);
-		this._name = generateKey();
+		this._name = `${uniqueBaseId}-${uuidCount++}`;
 		this._transitionProgress = new Animated.Value(0);
-		this.state = {
-			transitionConfiguration: null
-		};
+		this.state = { transitionConfiguration: null };
+		this._transitionHelper = null;
 	}
 
+	_transitionHelper
 	_transitionProgress
 	_innerViewRef
 	_route
@@ -119,6 +122,38 @@ class BaseTransition extends React.Component {
 	getReactElement() {
 		return React.Children.only(this.props.children);
 	}
+
+	getTransitionHelper(appear){
+		if(this._transitionHelper === null) {
+			switch(appear){
+				case 'top':
+					this._transitionHelper = new TopTransition();
+					break;
+				case 'bottom':
+					this._transitionHelper = new BottomTransition();
+					break;
+				case 'left':
+					this._transitionHelper = new LeftTransition();
+					break;
+				case 'right':
+					this._transitionHelper = new RightTransition();
+					break;
+				case 'horizontal':
+					this._transitionHelper = new HorizontalTransition();
+					break;
+				case 'vertical':
+					this._transitionHelper = new VerticalTransition();
+					break;
+				case 'scale':
+					this._transitionHelper = new ScaleTransition();
+					break;
+				default:
+					break;
+			}
+		}
+		return this._transitionHelper;
+	}
+
 	static contextTypes = {
 		register: PropTypes.func,
 		unregister: PropTypes.func,
@@ -126,6 +161,7 @@ class BaseTransition extends React.Component {
 		transitionProgress: PropTypes.object,
 		route: PropTypes.string,
 	}
+	
 }
 
 export default BaseTransition;

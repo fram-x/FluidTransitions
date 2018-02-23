@@ -36,6 +36,8 @@ export default class TransitionItems {
 			// schedule to measure (on layout) if another view with the same name is mounted
 			if (matchingItem) {
 				this.setItemsToMeasure([...this.getItemsToMeasure(), item, matchingItem]);
+			} else {
+				this.setItemsToMeasure([...this.getItemsToMeasure(), item]);
 			}		
 		}
 		else {
