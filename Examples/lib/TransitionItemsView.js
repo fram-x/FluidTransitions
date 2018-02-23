@@ -6,7 +6,8 @@ import {
 	UIManager, 
 	InteractionManager, 
 	Animated, 
-	findNodeHandle 
+	findNodeHandle,
+	Platform,
 } from 'react-native';
 import PropTypes from 'prop-types';
 
@@ -169,7 +170,14 @@ export default class TransitionItemsView extends React.Component {
 		}
 
 		if(waitForInteractions){
-			InteractionManager.runAfterInteractions(() => Animated.parallel(animations).start(endAnimations));
+			if(Platform.OS == 'Android')
+				InteractionManager.runAfterInteractions(() => Animated.parallel(animations).start(endAnimations));
+			else {
+				await new Promise((resolve, reject)=>
+					setTimeout(resolve, this._getDelayFromIndexAndConfig(delayIndex, config.duration)));			
+
+				Animated.parallel(animations).start(endAnimations);
+			}
 		} else {
 			Animated.parallel(animations).start(endAnimations);
 		}
@@ -183,7 +191,7 @@ export default class TransitionItemsView extends React.Component {
 
 	beginAppearTransitionsForRoute(route, animations, delayIndex, start, end, config, direction = 1){
 		if(route === null)
-			return;
+			return delayIndex;
 
 		const appearElements = this._transitionItems.getAppearElements(route);
 		if(appearElements.length === 0)
