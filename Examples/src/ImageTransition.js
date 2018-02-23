@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, Dimensions, Button, TouchableOpacity, FlatList, Image, StyleSheet } from 'react-native';
 import { NavigationActions } from 'react-navigation';
+import _ from 'lodash';
 
 import { FluidNavigator, Transition } from './../lib/';
 
@@ -8,17 +9,7 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 	},
-	item: {
-        height: 90,
-        padding: 10,
-        flex: 1,
-        flexDirection: 'row',
-    },
-    image: {
-        height: 80,
-        width: 80,
-    },
-    detailsImage: {
+	detailsImage: {
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').width,
     },
@@ -28,7 +19,13 @@ const styles = StyleSheet.create({
     },
     text: {
         paddingBottom:40,
-    }
+    },
+    row: {
+        flexDirection: 'row',
+    },
+    cell: {
+        margin: 2,
+    },   
 });
 
 class ImageListScreen extends React.Component {
@@ -37,58 +34,35 @@ class ImageListScreen extends React.Component {
         this.state= {
             items: []
         }
-    }
-    colcount = 4
+    }    
     componentDidMount() {
         const items = [];
         const size = Dimensions.get('window').width;
-        for(let i=0; i<24; i++)
-            items.push('https://picsum.photos/' + size + '/' + size + '?image=' + i);
+        for(let i=0; i<50; i++)
+            items.push({ url: 'https://picsum.photos/' + size + '/' + size + '?image=' + i});
 
         this.setState({...this.state, items})
     }
     render() {        
         return (
             <View style={styles.container}>
-                <FlatList
-                    data={this.state.items}
-                    keyExtractor={this.keyExtractor}
-                    renderItem={this.renderItem.bind(this)}
-                    >
-                </FlatList>
+                <ImageGrid images={this.state.items} imageSelected={(image) => 
+                    this.props.navigation.navigate('imageDetails', {
+                    url: image.url,
+                })}
+            />
             </View>);
-    }
-    keyExtractor(item, index){
-        return "key_" + index;
-    }
-    renderItem(rowItem) {
-        return (
-            <TouchableOpacity style={styles.item} onPress={() => this.props.navigation.navigate('imageDetails', {
-                itemId: rowItem.index,
-              })}>
-                <Transition shared={'image' + rowItem.index}>
-                    <Image style={styles.image} source={{uri: rowItem.item}}/>
-                </Transition>
-            </TouchableOpacity>
-        );
-    }
-    renderRow(rowItem){
-        return(
-            <View styles={styles.row}>
-
-            </View>
-        )
-    }
+    }    
 }
 
 class ImageDetailsScreen extends React.Component{
     render() {
         const { params } = this.props.navigation.state;
         const size = Dimensions.get('window').width;
-        const uri = 'https://picsum.photos/' + size + '/' + size + '?image=' + params.itemId;
+        const uri = params.url;
         return(
             <View style={styles.container}>
-                <Transition shared={'image' + params.itemId}>
+                <Transition shared={params.url}>
                     <Image style={styles.detailsImage} source={{uri: uri}}/>
                 </Transition>
                 <Transition appear='bottom' nodelay>
@@ -99,6 +73,61 @@ class ImageDetailsScreen extends React.Component{
                 </Transition>
             </View>
         );
+    }
+}
+
+class ImageGrid extends Component {
+    constructor(props){
+        super(props);
+        this._colCount = 3;
+        const { width: windowWidth } = Dimensions.get("window");
+        this._margin = 2;
+        this._photoSize = (windowWidth - this._margin * this._colCount * 2) / this._colCount;        
+        this.state = { chunkedImages : _.chunk(props.images, this._colCount) }        
+    }
+    
+    _colCount
+    _photoSize
+    _margin
+    _chunkedImages
+
+    componentWillReceiveProps(nextProps){
+        this.setState({...this.state, chunkedImages : _.chunk(nextProps.images, this._colCount)});
+    }
+
+    render() {
+        return (
+            <FlatList
+                data={this.state.chunkedImages}
+                keyExtractor={this.keyExtractor}
+                renderItem={this.renderItem.bind(this)}                
+            />);
+    }
+
+    keyExtractor(item, index){
+        return "key_" + index;
+    }
+
+    renderItem(item) {
+        return (
+            <View style={styles.row}>
+                {item.item.map(this.renderCell.bind(this))}
+            </View>
+        )
+    }
+    
+    renderCell(image) {
+        return (
+            <TouchableOpacity onPress={() => this.props.imageSelected(image)} key={image.url}>
+                <View style={styles.cell}>
+                    <Transition shared={image.url}>
+                        <Image source={{uri: image.url}} 
+                            style={{width: this._photoSize, height: this._photoSize}}
+                        />
+                    </Transition>
+                </View>
+            </TouchableOpacity>
+        )
     }
 }
 

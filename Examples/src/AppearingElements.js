@@ -36,8 +36,6 @@ const styles = StyleSheet.create({
 		width: 200,
 		height: 100,
 		margin: 20,
-		borderColor: '#BEBEBE',
-		borderWidth: 1,
 		borderRadius: 10,
 	},
 });
