@@ -2,13 +2,13 @@ import React from 'react';
 import { UIManager, findNodeHandle } from 'react-native';
 
 export default class TransitionItem {
-	constructor(name, route, reactElement, shared, appear, immediate, metrics) {
+	constructor(name, route, reactElement, shared, appear, nodelay, metrics) {
 		this.name = name;
 		this.route = route;
 		this.reactElement = reactElement;
 		this.shared = shared;		
 		this.appear = appear;
-		this.immediate = immediate;
+		this.nodelay = nodelay;
 		this.metrics = metrics;				
 	}
 	name
@@ -17,7 +17,7 @@ export default class TransitionItem {
 	metrics	
 	shared
 	appear
-	immediate
+	nodelay
 	scaleRelativeTo(other) {
 		const validate = i => {
 			if (!i.metrics) {
@@ -47,6 +47,6 @@ export default class TransitionItem {
 	}
 	clone() {
 		return new TransitionItem(
-			this.name, this.route, this.reactElement, this.shared, this.appear, this.immediate, this.metrics);
+			this.name, this.route, this.reactElement, this.shared, this.appear, this.nodelay, this.metrics);
 	}
 }

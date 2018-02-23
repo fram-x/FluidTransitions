@@ -90,7 +90,7 @@ export default class TransitionItemsView extends React.Component {
 			useNativeDriver : config.useNativeDriver
 		}).start(()=> {
 			this._inTransition = false;
-			this.setState({currentTransition: null});			
+			this.setState({currentTransition: null});
 		});
 	}
 
@@ -102,7 +102,7 @@ export default class TransitionItemsView extends React.Component {
 			const {fromItem, toItem} = pair;
 			if(toItem.reactElement.getTransitionSpec() !== { metrics: toItem.metrics })
 				toItem.reactElement.setTransitionSpec({ metrics: toItem.metrics });
-			
+
 			if(fromItem.reactElement.getTransitionSpec() !== { metrics: fromItem.metrics })
 				fromItem.reactElement.setTransitionSpec({ metrics: fromItem.metrics });
 		});
@@ -163,7 +163,7 @@ export default class TransitionItemsView extends React.Component {
 		if(waitForInteractions){
 			await new Promise((resolve, reject) => setTimeout(resolve, 175));
 		}
-		
+
 		Animated.parallel(animations).start(endAnimations);
 
 		// If moving back - wait for half of the delay before committing
@@ -176,34 +176,30 @@ export default class TransitionItemsView extends React.Component {
 	beginAppearTransitionsForRoute(route, animations, delayIndex, start, end, config, direction = 1){
 		if(route === null)
 			return;
-		
+
 		const appearElements = this._transitionItems.getAppearElements(route);
 		if(appearElements.length === 0)
 			return delayIndex;
-			
+
 		let index = delayIndex;
 		transitionSpec = {...config};
 		const { timing } = transitionSpec;
 		delete transitionSpec.timing;
 
-		const transitionConfiguration = {
-			start,
-			end,			
-			timing,
-			direction,
-			config: transitionSpec,			
+		const transitionConfiguration = { start, end, timing, direction, 
+			config: transitionSpec,
 		};
 
 		for(let i=0; i<appearElements.length; i++){
 			const item = appearElements[i];
 			item.reactElement.setTransitionSpec({
-				...transitionConfiguration, 
-				delay: item.immedate ? 0 : index * 75,
-				metrics: item.metrics});
-				
+				...transitionConfiguration,
+				delay: item.nodelay ? 0 : index * 75,
+				metrics: item.metrics}, true);
+
 			const animation = item.reactElement.getAnimation();
 
-			if(!item.immedate)
+			if(!item.nodelay)
 				index++;
 
 			animations.push(animation);
@@ -276,7 +272,7 @@ export default class TransitionItemsView extends React.Component {
 		const itemsToMeasure = this._transitionItems.getItemsToMeasure();
 		const toUpdate = [];
 		const viewNodeHandle = findNodeHandle(this._viewReference);
-		
+
 		let b = null;
 		let size = {};
 		const p = new Promise((resolve, reject) => b = resolve);

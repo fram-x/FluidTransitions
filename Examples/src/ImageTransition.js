@@ -42,7 +42,7 @@ class ImageListScreen extends React.Component {
     componentDidMount() {
         const items = [];
         const size = Dimensions.get('window').width;
-        for(let i=0; i<2; i++)
+        for(let i=0; i<24; i++)
             items.push('https://picsum.photos/' + size + '/' + size + '?image=' + i);
 
         this.setState({...this.state, items})
@@ -91,7 +91,7 @@ class ImageDetailsScreen extends React.Component{
                 <Transition shared={'image' + params.itemId}>
                     <Image style={styles.detailsImage} source={{uri: uri}}/>
                 </Transition>
-                <Transition appear='bottom' immediate>
+                <Transition appear='bottom' nodelay>
                     <View style={styles.detailsView}>
                         <Text style={styles.text}>This is image number {params.itemId}</Text>
                         <Button title='Back' onPress={() => this.props.navigation.goBack()} />

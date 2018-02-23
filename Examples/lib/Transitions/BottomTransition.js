@@ -1,16 +1,16 @@
 import React from 'react';
 import { Dimensions, Animated } from 'react-native';
 
-import BaseTransition from './BaseTransition';
+import BaseAppearTransition from './BaseAppearTransition';
 
-class BottomTransition extends BaseTransition {
-	getTransitionStyle(transitionConfiguration) {
-		if(!transitionConfiguration)
+class BottomTransition extends BaseAppearTransition {
+	getTransitionStyle() {
+		if(!this.state.transitionConfiguration)
 			return {};
 
-		const { y, height } = transitionConfiguration.metrics;
+		const { y, height } = this.state.transitionConfiguration.metrics;
 		const distanceValue = Dimensions.get('window').height - (y + 25);
-		const progress = transitionConfiguration.progress.interpolate({
+		const progress = this.state.transitionConfiguration.progress.interpolate({
 			inputRange: [0, 1],
 			outputRange: [distanceValue, 0]
 		});

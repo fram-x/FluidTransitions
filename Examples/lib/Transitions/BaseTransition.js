@@ -27,7 +27,11 @@ class BaseTransition extends React.Component {
 	_name
 	_innerViewRef
 
-	setTransitionSpec(value){
+	setTransitionSpec(value, force = false){
+		if(force){
+			this.setState({...this.state, transitionConfiguration: value});
+			return;
+		}
 		if(value === null && this.state.transitionConfiguration !== null)
 			this.setState({...this.state, transitionConfiguration: value});
 		else if(value !== null && this.state.transitionConfiguration === null)
@@ -94,7 +98,7 @@ class BaseTransition extends React.Component {
 			this._route = this.context.route;
 			register(new TransitionItem(this.props.shared ? this.props.shared : this._name, this.context.route,
 				this, this.props.shared !== undefined, this.props.appear !== undefined, 
-				this.props.immediate !== undefined));
+				this.props.nodelay !== undefined));
 		}
 	}
 	componentWillUnmount() {

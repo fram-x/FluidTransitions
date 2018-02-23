@@ -1,9 +1,9 @@
 import React from 'react';
 import { Dimensions, Animated } from 'react-native';
 
-import BaseTransition from './BaseTransition';
+import BaseAppearTransition from './BaseAppearTransition';
 
-class VerticalTransition extends BaseTransition {
+class VerticalTransition extends BaseAppearTransition {
 	getTransitionStyle(transitionConfiguration) {
 		if(!transitionConfiguration)
 			return {};
