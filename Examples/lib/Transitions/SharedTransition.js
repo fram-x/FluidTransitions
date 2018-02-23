@@ -8,7 +8,6 @@ import { createTransitionComponent } from './../TransitionView';
 class SharedTransition extends BaseTransition {
 	getTransitionStyle(transitionConfiguration) {
 		if(transitionConfiguration){
-
 			let style = {};
 			if(this.props.appear) {
 				const props = {
@@ -28,7 +27,7 @@ class SharedTransition extends BaseTransition {
 			};
 		}
 		else{
-			return { opacity: 1.0 };
+			return { opacity: this.props.appear === undefined ? 1 : 0 };
 		}
 	}
 }

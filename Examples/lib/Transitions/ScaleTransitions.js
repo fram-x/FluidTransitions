@@ -7,7 +7,7 @@ import BaseTransitionHelper from './BaseTransitionHelper';
 class ScaleTransition extends BaseTransitionHelper {
 	getTransitionStyle(transitionConfiguration) {
 		if(!transitionConfiguration)
-			return { };
+			return { opacity: 0 };
 			
 		const scaleInterpolation = transitionConfiguration.progress.interpolate({
 			inputRange: [0, 1],

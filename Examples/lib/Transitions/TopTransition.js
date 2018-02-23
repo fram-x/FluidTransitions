@@ -6,7 +6,7 @@ import BaseTransitionHelper from './BaseTransitionHelper';
 class TopTransition extends BaseTransitionHelper {
 	getTransitionStyle(transitionConfiguration) {
 		if(!transitionConfiguration || transitionConfiguration.metrics === undefined)
-			return {};
+			return { opacity: 0 };
 
 		const { y, height } = transitionConfiguration.metrics;
 		const distanceValue = -(height + y + 25);		
@@ -16,6 +16,7 @@ class TopTransition extends BaseTransitionHelper {
 		});
 
 		return {
+			opacity: 1,
 			transform: [{
 				translateY: progress
 			}]

@@ -6,8 +6,6 @@ import { FluidNavigator, Transition } from './../lib/';
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
-		justifyContent: 'center',
 		padding: 20,
 	},
 	screen: {
@@ -17,6 +15,8 @@ const styles = StyleSheet.create({
 	},
 	buttonContainer: {
 		flex: 1,
+		paddingTop: 20,
+		paddingBottom: 20,
 		justifyContent: 'flex-end',
 	},
 	textContainer: {
@@ -38,12 +38,17 @@ const styles = StyleSheet.create({
 	header: {
 		fontWeight: 'bold',
 		fontSize: 20,
-	}
+	},
 });
 
 const InitialScreen = (props) => (
 	<ScrollView contentContainerStyle={styles.container}>
 		<Text style={styles.header}>Lorem ipsum</Text>
+		<Transition shared='buttons'>
+			<View style={styles.buttonContainer}>
+				<Button title='Toggle' onPress={() => props.navigation.navigate('screen')} />
+			</View>
+		</Transition>
 		<Transition shared='text1'>
 			<Text style={styles.textContainer}>
 				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum
@@ -66,14 +71,16 @@ const InitialScreen = (props) => (
 		<Transition shared='image2'>
 			<Image source={{uri: 'https://picsum.photos/200/100?image=22'}} style={styles.image}/>
 		</Transition>
-		<View style={styles.buttonContainer}>
-			<Button title='Toggle' onPress={() => props.navigation.navigate('screen')} />
-		</View>
 	</ScrollView>
 );
 
 const Screen = (props) => (
 	<ScrollView contentContainerStyle={styles.container}>
+		<Transition shared='buttons'>
+			<View style={styles.buttonContainer}>
+				<Button title='Toggle' onPress={() => props.navigation.goBack()} />
+			</View>
+		</Transition>
 		<Transition shared='text1'>
 			<Text style={styles.textContainer}>
 				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum
@@ -98,9 +105,6 @@ const Screen = (props) => (
 				euismod arcu.
 			</Text>
 		</Transition>
-		<View style={styles.buttonContainer}>
-			<Button title='Toggle' onPress={() => props.navigation.goBack()} />
-		</View>
 	</ScrollView>
 );
 

@@ -6,7 +6,7 @@ import BaseTransitionHelper from './BaseTransitionHelper';
 class RightTransition extends BaseTransitionHelper {
 	getTransitionStyle(transitionConfiguration) {
 		if(!transitionConfiguration || transitionConfiguration.metrics === undefined)
-			return {};
+			return { opacity: 0 };
 
 		const { x, width } = transitionConfiguration.metrics;
 		const distanceValue = Dimensions.get('window').width-(x - 25);
@@ -16,6 +16,7 @@ class RightTransition extends BaseTransitionHelper {
 		});
 
 		return {
+			opacity: 1,
 			transform: [{
 				translateX: progress
 			}]

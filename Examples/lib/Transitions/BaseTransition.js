@@ -57,8 +57,7 @@ class BaseTransition extends React.Component {
 		const animatedComp = Animated.createAnimatedComponent(element.type);
 
 		const style =  [element.props.style];
-		const transitionStyle =
-			this.getTransitionStyle(this.state.transitionConfiguration);
+		const transitionStyle = this.getTransitionStyle(this.state.transitionConfiguration);
 
 		const props = {
 			...element.props,
@@ -70,7 +69,7 @@ class BaseTransition extends React.Component {
 		return React.createElement(animatedComp, props);
 	}
 	getTransitionStyle(transitionConfiguration) {
-		return {};
+		return { opacity: 0 };
 	}
 	shouldComponentUpdate(nextProps, nextState){
 		return nextState.transitionConfiguration !== this.state.transitionConfiguration;
