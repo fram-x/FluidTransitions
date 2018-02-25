@@ -29,6 +29,7 @@ class Transition extends React.Component {
 		const animatedComp = Animated.createAnimatedComponent(element.type);
 
 		const style =  [element.props.style];
+		const appearStyle = this.getAppearStyle();
 		// TODO: Use helper to generate transitionStyle
 		// const transitionStyle = this.getTransitionStyle(this.state.transitionConfiguration);
 
@@ -36,11 +37,22 @@ class Transition extends React.Component {
 			...this.props,
 			onLayout: this.onLayout.bind(this),
 			collapsable: false,
-			style: style,
+			style: [style, appearStyle],
 			ref: (ref) => this._viewRef = ref
 		};
 
 		return React.createElement(animatedComp, props);
+	}
+
+	getAppearStyle() {
+		if(this.props.appear)
+			return {};
+			
+		const interpolator = this.context.appearProgress.interpolate({
+			inputRange: [0, 1],
+			outputRange: [1, 0]
+		});
+		return { opacity: interpolator };
 	}
 
 	onLayout(event) {
@@ -66,6 +78,7 @@ class Transition extends React.Component {
 		unregister: PropTypes.func,
 		updateMetrics: PropTypes.func,
 		route: PropTypes.string,
+		appearProgress: PropTypes.object
 	}
 
 	componentWillMount() {

@@ -83,49 +83,29 @@ export default class TransitionItemsView extends React.Component {
 		});
 
 		// We should now have the overlay ready
-		return this.runAppearAnimation(config);
+		return this.runAppearAnimation(1.0, config);
 	}
 
 	async onTransitionEnd(props, prevProps, config) {
-
-		if(this._appearTransitionPromise)
-			await this._appearTransitionPromise;
-
-		const fromRoute = props.scene.route.routeName;
-		const toRoute = prevProps.scene.route.routeName;
-
-		let animationDoneFunc;
-		const retVal = new Promise((resolve) => animationDoneFunc = resolve);
-
-		// End swap animation on shared elements - they are faded in
-		Animated.timing(this._appearProgress, {
-			toValue: 0.0,
-			duration: this._fadeTransitionTime,
-			easing: Easing.linear,
-			useNativeDriver : config.useNativeDriver
-		}).start(async ()=> {
-			this.setState({...this.state, currentTransition: null});
-			if(this._appearTransitionPromise)
-				await this._appearTransitionPromise;
-
-			animationDoneFunc();
+		await this.runAppearAnimation(0.0, config);
+		this.setState({
+			...this.state, 
+			sharedElements: null, 
+			transitionElements: null, 
+			config: null, 
+			progress: null
 		});
-
-		return retVal;
 	}
 
-	runAppearAnimation(config){
+	runAppearAnimation(toValue, config){
 
 		// Run swap animation
 		let swapAnimationDone = null;
 		const swapPromise = new Promise((resolve, reject) =>
 			swapAnimationDone = resolve);
 
-		// Begin swap animation on shared elements - they are faded in
-		this._appearProgress.setValue(0);
-
 		Animated.timing(this._appearProgress, {
-			toValue: 1.0,
+			toValue: toValue,
 			duration: this._fadeTransitionTime,
 			easing: Easing.linear,
 			useNativeDriver : config.useNativeDriver,
@@ -158,7 +138,7 @@ export default class TransitionItemsView extends React.Component {
 		if(this._resolveLayoutFunc){
 			this._resolveLayoutFunc();
 			this._resolveLayoutFunc = null;
-		}		
+		}
 	}
 
 	metricsUpdated(name, route) {
@@ -216,7 +196,7 @@ export default class TransitionItemsView extends React.Component {
 					const metrics = {x, y, width, height };
 					if(self._transitionItems.updateMetrics(name, route, metrics))
 						self.metricsUpdated();
-				});				
+				});
 			},
 			appearProgress: this._appearProgress,
 			transitionProgress: this._transitionProgress,
@@ -226,6 +206,6 @@ export default class TransitionItemsView extends React.Component {
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,		
+		flex: 1,
 	}
 });

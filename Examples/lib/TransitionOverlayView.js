@@ -9,9 +9,9 @@ class TransitionOverlayView extends React.Component {
     render() {
         if(!this.props.pairs || !this.props.progress){
             console.log("TransitionOverlayView render empty");
-			return <View 
-				onLayout={this.onLayout.bind(this)} 
-				style={styles.emptyOverlay} 
+			return <Animated.View
+				onLayout={this.onLayout.bind(this)}
+				style={[styles.emptyOverlay, this.getAppearStyle()]}
 				pointerEvents={'none'}
 			/>;
         }
@@ -29,21 +29,32 @@ class TransitionOverlayView extends React.Component {
 				element = (<View>{element}</View>);
 
 			const AnimatedComp = Animated.createAnimatedComponent(element.type);
-            const props = { ...element.props, 
+            const props = { ...element.props,
                 style: [element.props.style, transitionStyle],
-                key: idx 
+                key: idx
             };
 
 			return React.createElement(AnimatedComp, props, element.props.children);
 		});
 
 		return (
-			<Animated.View onLayout={this.onLayout.bind(this)} style={[styles.overlay]}>
+			<Animated.View
+				onLayout={this.onLayout.bind(this)}
+				style={[styles.overlay, this.getAppearStyle()]}
+			>
 				{sharedElements}
 			</Animated.View>
 		);
 	}
-	
+
+	getAppearStyle() {
+		const interpolator = this.context.appearProgress.interpolate({
+			inputRange: [0, 0.01, 0.9, 1],
+			outputRange: [0, 0, 1, 1]
+		});
+		return { opacity: interpolator };
+	}
+
 	onLayout(event) {
 		// const { x, y, width, height } = event.nativeEvent.layout;
 		// console.log("TransitionOverlayView onLayout " + "x:" + x + " y:" + y + " w:" + width + " h:" + height);
@@ -84,6 +95,10 @@ class TransitionOverlayView extends React.Component {
 			transform: [{ translateX }, { translateY }, { scaleX }, { scaleY }]
 		}];
 	}
+
+	static contextTypes = {
+		appearProgress: PropTypes.object
+	}
 }
 
 const styles = StyleSheet.create({
@@ -93,7 +108,6 @@ const styles = StyleSheet.create({
 		left: 0,
 		right: 0,
         bottom: 0,
-        backgroundColor: '#00FF0030',
     },
     emptyOverlay: {
         position: 'absolute',
