@@ -50,8 +50,8 @@ export default class TransitionItems {
 		if(itemIndex > -1){
 			const item = this._items[itemIndex];
 			item.metrics = metrics;
-			console.log("TransitionItems updateMetrics " + name + ", " + route + ": " + 
-				"x:" + metrics.x + " y:" + metrics.y + " w:" + metrics.width + " h:" + metrics.height);
+			// console.log("TransitionItems updateMetrics " + name + ", " + route + ": " + 
+			// 	"x:" + metrics.x + " y:" + metrics.y + " w:" + metrics.width + " h:" + metrics.height);
 			return true;
 		}
 		return false;

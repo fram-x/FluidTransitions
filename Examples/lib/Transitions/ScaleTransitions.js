@@ -14,13 +14,13 @@ class ScaleTransition extends BaseTransitionHelper {
 			outputRange: [0, 1]
 		});
 
-		const opacityInterpolation = transitionConfiguration.progress.interpolate({
-			inputRange: [0, 0.1, 0.9, 1],
-			outputRange: [0, 1, 1, 1]
-		});
+		// const opacityInterpolation = transitionConfiguration.progress.interpolate({
+		// 	inputRange: [0, 0.1, 0.9, 1],
+		// 	outputRange: [0, 1, 1, 1]
+		// });
 
 		return {
-			opacity: opacityInterpolation,
+			// opacity: opacityInterpolation,
             transform: [{ scaleX: scaleInterpolation }, { scaleY: scaleInterpolation }]
 		};
 	}	

@@ -143,8 +143,6 @@ export default class TransitionItemsView extends React.Component {
 	}
 
 	metricsUpdated(name, route) {
-		console.log('TransitionItemsView metrics updated');
-
 		const { toRoute, fromRoute } = this.state;
 		let sharedElements = [];
 		if(fromRoute && toRoute)
@@ -175,7 +173,11 @@ export default class TransitionItemsView extends React.Component {
 	}
 	
 	getIsTransitionElement(name, route) {
-
+		if(this.state.transitionElements){
+			return this.state.transitionElements.findIndex(item => 
+				item.name === name && item.route === route) > -1;
+		}
+		return false;
 	}
 
 	async updateMetrics(name, route, view){
