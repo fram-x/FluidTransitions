@@ -20,11 +20,13 @@ class Transition extends React.Component {
 		super(props, context);
 		this._name = `${uniqueBaseId}-${uuidCount++}`;
 		this._transitionHelper = null;
+		this._metrics = null;
 	}
 
 	_name
 	_route
 	_isMounted
+	_metrics
 	_transitionHelper
 
 	render() {
@@ -56,14 +58,14 @@ class Transition extends React.Component {
 		// 	return {};
 
 		// if(!getIsTransitionElement(this._getName(), this._route))
-		// 	return {};		
+		// 	return {};
 
-		const transitionHelper = this.getTransitionHelper(this.props.appear);
-		if(transitionHelper){
-			const transitionConfig = { progress: this.context.transitionProgress };
-			console.log("TransitionView render with " + transitionHelper);
-			return transitionHelper.getTransitionStyle(transitionConfig);
-		}
+		// const transitionHelper = this.getTransitionHelper(this.props.appear);
+		// if(transitionHelper){
+		// 	const transitionConfig = { progress: this.context.transitionProgress };
+		// 	console.log("TransitionView render with " + transitionHelper);
+		// 	return transitionHelper.getTransitionStyle(transitionConfig);
+		// }
 
 		return {};
 	}
@@ -83,12 +85,12 @@ class Transition extends React.Component {
 		return { };
 	}
 
-	onLayout(event) {
-		const self = this;
-		const { updateMetrics } = self.context;
+	async onLayout(event) {
+		const { updateMetrics } = this.context;
 		if(!updateMetrics) return;
-		if(this._isMounted)
-			updateMetrics(self._getName(), self._route, this._viewRef);
+		if(this._isMounted){
+			this._metrics = await updateMetrics(this._getName(), this._route, this._viewRef);
+		}
 	}
 
 	_getName(){

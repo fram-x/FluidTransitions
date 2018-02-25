@@ -185,11 +185,17 @@ export default class TransitionItemsView extends React.Component {
 		const parentNodeHandle = findNodeHandle(this._viewRef);
 		const nodeHandle = findNodeHandle(view);
 		const self = this;
+		let resolveFunc;
+		const promise = new Promise(resolve => resolveFunc = resolve);
 		UIManager.measureLayout(nodeHandle, parentNodeHandle, ()=> {}, (x, y, width, height) => {
 			const metrics = {x, y, width, height };
 			if(self._transitionItems.updateMetrics(name, route, metrics))
 				self.metricsUpdated();
-		});		
+
+			resolveFunc(metrics);
+		});	
+		
+		return promise;
 	}
 
 	shouldComponentUpdate(nextProps, nextState) {
