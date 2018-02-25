@@ -18,13 +18,14 @@ class Transition extends React.Component {
 
 	_name
 	_route
+	_isMounted
 
 	render() {
-		console.log("TransitionView render");
-
 		let element = React.Children.only(this.props.children);
-		if(element.type.name==='Button')
-			element = (<View>{element}</View>);
+		console.log("TransitionView render " + (element.type ? element.type.displayName : "UNKNOWN"));
+		const elementProps = element.props;
+		// if(element.type.name==='Button')
+		// 	element = (<View>{element}</View>);
 
 		const animatedComp = Animated.createAnimatedComponent(element.type);
 
@@ -34,7 +35,7 @@ class Transition extends React.Component {
 		// const transitionStyle = this.getTransitionStyle(this.state.transitionConfiguration);
 
 		const props = {
-			...this.props,
+			...elementProps,
 			onLayout: this.onLayout.bind(this),
 			collapsable: false,
 			style: [style, appearStyle],
@@ -45,26 +46,26 @@ class Transition extends React.Component {
 	}
 
 	getAppearStyle() {
-		if(this.props.appear)
-			return {};
-			
-		const interpolator = this.context.appearProgress.interpolate({
-			inputRange: [0, 0.5, 0.5, 1],
-			outputRange: [1, 1, 0, 0],
-		});
-		return { opacity: interpolator };
+		const { getIsSharedElement, getIsTransitionElement } = this.context;
+
+		if(getIsSharedElement(this._getName(), this._route)) {
+			// Check if we are part of a shared elements
+			const interpolator = this.context.appearProgress.interpolate({
+				inputRange: [0, 0.5, 0.5, 1],
+				outputRange: [1, 1, 0, 0],
+			});
+			return { opacity: interpolator };
+		}
+
+		return { };
 	}
 
 	onLayout(event) {
 		const self = this;
-		//const nodeHandle = findNodeHandle(this._viewRef);
-		//UIManager.measureInWindow(nodeHandle, (x, y, width, height) => {
-			const { updateMetrics } = self.context;
-			if(!updateMetrics) return;
+		const { updateMetrics } = self.context;
+		if(!updateMetrics) return;
+		if(this._isMounted)
 			updateMetrics(self._getName(), self._route, this._viewRef);
-			//console.log("TransitionView onLayout: x:" + x + " y:" + y + " w:" + width + " h:" + height);
-		//});
-
 	}
 
 	_getName(){
@@ -78,10 +79,13 @@ class Transition extends React.Component {
 		unregister: PropTypes.func,
 		updateMetrics: PropTypes.func,
 		route: PropTypes.string,
-		appearProgress: PropTypes.object
+		appearProgress: PropTypes.object,
+		getIsSharedElement: PropTypes.func,
+		getIsTransitionElement: PropTypes.func,
 	}
 
 	componentWillMount() {
+		this._isMounted = true;
 		const register = this.context.register;
 		if(register) {
 			this._route = this.context.route;
@@ -92,6 +96,7 @@ class Transition extends React.Component {
 	}
 
 	componentWillUnmount() {
+		this._isMounted = false;
 		const unregister = this.context.unregister;
 		if(unregister) {
 			unregister(this._getName(), this._route);

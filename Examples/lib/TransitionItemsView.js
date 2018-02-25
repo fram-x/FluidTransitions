@@ -164,6 +164,20 @@ export default class TransitionItemsView extends React.Component {
 			this._resolveMeasureFunc();
 	}
 
+	getIsSharedElement(name, route) {
+		if(this.state.sharedElements){
+			return this.state.sharedElements.findIndex(pair => 
+				(pair.fromItem.name === name && pair.fromItem.route === route) ||
+				(pair.toItem.name === name && pair.toItem.route === route)
+			) > -1;
+		}
+		return false;
+	}
+	
+	getIsTransitionElement(name, route) {
+
+	}
+
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.state != nextState;
 	}
@@ -182,6 +196,8 @@ export default class TransitionItemsView extends React.Component {
 		updateMetrics: PropTypes.func,
 		appearProgress: PropTypes.object,
 		transitionProgress: PropTypes.object,
+		getIsSharedElement: PropTypes.func,
+		getIsTransitionElement: PropTypes.func,
 	}
 
 	getChildContext() {
@@ -201,6 +217,8 @@ export default class TransitionItemsView extends React.Component {
 			},
 			appearProgress: this._appearProgress,
 			transitionProgress: this._transitionProgress,
+			getIsSharedElement: this.getIsSharedElement.bind(this),
+			getIsTransitionElement: this.getIsTransitionElement.bind(this)
 		};
 	}
 }
