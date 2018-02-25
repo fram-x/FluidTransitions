@@ -23,9 +23,8 @@ class Transition extends React.Component {
 	render() {
 		let element = React.Children.only(this.props.children);
 		console.log("TransitionView render " + (element.type ? element.type.displayName : "UNKNOWN"));
-		const elementProps = element.props;
-		// if(element.type.name==='Button')
-		// 	element = (<View>{element}</View>);
+		if(element.type.name==='Button')
+			element = (<View>{element}</View>);
 
 		const animatedComp = Animated.createAnimatedComponent(element.type);
 
@@ -35,7 +34,7 @@ class Transition extends React.Component {
 		// const transitionStyle = this.getTransitionStyle(this.state.transitionConfiguration);
 
 		const props = {
-			...elementProps,
+			...element.props,
 			onLayout: this.onLayout.bind(this),
 			collapsable: false,
 			style: [style, appearStyle],

@@ -157,7 +157,7 @@ export default class TransitionItemsView extends React.Component {
 				return;
 
 		for(let i=0; i<transitionElements.length; i++)
-			if(!transitionElements.metrics)
+			if(!transitionElements[i].metrics)
 				return;
 
 		if(this._resolveMeasureFunc)
@@ -176,6 +176,18 @@ export default class TransitionItemsView extends React.Component {
 	
 	getIsTransitionElement(name, route) {
 
+	}
+
+	async updateMetrics(name, route, view){
+		await this._resolveLayoutPromise;
+		const parentNodeHandle = findNodeHandle(this._viewRef);
+		const nodeHandle = findNodeHandle(view);
+		const self = this;
+		UIManager.measureLayout(nodeHandle, parentNodeHandle, ()=> {}, (x, y, width, height) => {
+			const metrics = {x, y, width, height };
+			if(self._transitionItems.updateMetrics(name, route, metrics))
+				self.metricsUpdated();
+		});		
 	}
 
 	shouldComponentUpdate(nextProps, nextState) {
@@ -205,16 +217,7 @@ export default class TransitionItemsView extends React.Component {
 		return {
 			register: (item) => this._transitionItems.add(item),
 			unregister: (name, route) => this._transitionItems.remove(name, route),
-			updateMetrics: async (name, route, view) => {
-				await self._resolveLayoutPromise;
-				const parentNodeHandle = findNodeHandle(this._viewRef);
-				const nodeHandle = findNodeHandle(view);
-				UIManager.measureLayout(nodeHandle, parentNodeHandle, ()=> {}, (x, y, width, height) => {
-					const metrics = {x, y, width, height };
-					if(self._transitionItems.updateMetrics(name, route, metrics))
-						self.metricsUpdated();
-				});
-			},
+			updateMetrics: this.updateMetrics.bind(this),
 			appearProgress: this._appearProgress,
 			transitionProgress: this._transitionProgress,
 			getIsSharedElement: this.getIsSharedElement.bind(this),
