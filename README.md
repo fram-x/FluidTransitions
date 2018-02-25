@@ -55,3 +55,17 @@ const Navigator = FluidNavigator({
 });
 
 ```
+
+## Overview of process
+
+`onTransitionStart`:
+- Force rerendering by setting state - build `transitionConfiguration`
+- Wait for layout to finish 
+  - (candidate for base layout view?)
+  - This first rerendering causes the new scene to be rendered to make elements available
+  - Could we pass `transitionConfiguration` here to avoid rerendering?
+  - Could we add functionality to elements to know that they're part of a transition to avoid the following steps?
+- Get list of elements that should be part of shared transitions
+- Get list of elements that should be part of appear transitions
+- Force rerendering in elements by setting state - pass `transitionConfiguration`
+- Wait for layout to finish - components are now rendered with the start style

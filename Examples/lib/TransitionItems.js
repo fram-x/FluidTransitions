@@ -2,83 +2,78 @@
 import { UIManager } from 'react-native';
 
 export default class TransitionItems {
-	constructor(updateStateCallback, getStateCallback) {
-		this._items = [];
-		this._itemsToMeasure = [];
-		this._updateStateCallback = updateStateCallback;
-		this._getStateCallback = getStateCallback;
+	constructor() {
+		this._items = [];		
 	}
-	_items
-	_itemsToMeasure
-	_updateStateCallback
-	_getStateCallback
-	updateState() {
-		const c = this.getState() ? (this.getState().c ? this.getState().c : 0) : 0;
-		const newState = {...this.getState(), c: c + 1 };
-		this._updateStateCallback(newState);
-	}
+
+	_items	
+	
 	getState() {
 		return this._getStateCallback();
 	}
+
 	count() {
 		return this.getItems().length;
 	}
+
 	add(item) {
 		if(this.getItems().findIndex(e => e.name === item.name && e.route === item.route) >= 0)
 			return false;
 
+		console.log("TransitionItems add " + item.name + ", " + item.route);
+
 		const newItems = [...this.getItems(), item];
 		this.setItems(newItems);
-
-		if(item.shared){
-			const matchingItem = this._findMatchByName(item.name, item.route);
-
-			// schedule to measure (on layout) if another view with the same name is mounted
-			if (matchingItem) {
-				this.setItemsToMeasure([...this.getItemsToMeasure(), item, matchingItem]);
-			} else {
-				this.setItemsToMeasure([...this.getItemsToMeasure(), item]);
-			}		
-		}
-		else {
-			this.setItemsToMeasure([...this.getItemsToMeasure(), item]);
-		}
-
 		return true;
 	}
+
 	remove(name, route) {
 		const index = this.getItems().findIndex(e => e.name === name && e.route === route)
 		if (index >= 0) {
 			const newItems = [...this.getItems().slice(0, index), ...this.getItems().slice(index + 1)];
 			this.setItems(newItems);
 			return true;
-		}		
-		return false;		
+		}
+		return false;
 	}
+
 	setItems(newItems) {
-		this._items = newItems;
-		this.updateState();
+		this._items = newItems;		
 	}
+
 	getItems() {
 		return this._items;
 	}
-	setItemsToMeasure(newItems) {
-		this._itemsToMeasure = newItems;
+
+	updateMetrics(name, route, metrics) {
+		const itemIndex = this._findIndex(name, route);		
+		if(itemIndex > -1){
+			const item = this._items[itemIndex];
+			item.metrics = metrics;
+			console.log("TransitionItems updateMetrics " + name + ", " + route + ": " + 
+				"x:" + metrics.x + " y:" + metrics.y + " w:" + metrics.width + " h:" + metrics.height);
+			return true;
+		}
+		return false;
 	}
-	getItemsToMeasure() {
-		return this._itemsToMeasure;
+
+	getSharedElements(fromRoute, toRoute) {
+		return this._getItemPairs(fromRoute, toRoute)
+			.filter(pair => pair.toItem !== undefined && pair.fromItem !== undefined);
 	}
-	getAppearElements(fromRoute, toRoute) {		
+
+	getTransitionElements(fromRoute, toRoute) {
 		const itemPairs = this._getItemPairs(fromRoute, toRoute)
 			.filter(pair => pair.toItem !== undefined && pair.fromItem !== undefined);
 
 		let items = this._items.filter(e => e.appear === true && e.route === fromRoute);
-		items = items.filter(e => itemPairs.findIndex(p => 
+		items = items.filter(e => itemPairs.findIndex(p =>
 			(e.name === p.fromItem.name && e.route === p.fromItem.route) ||
 			(e.name === p.toItem.name && e.route === p.toItem.route)) === -1);
-				
+
 		return items;
 	}
+
 	getMeasuredItemPairs(fromRoute, toRoute) {
 		const itemPairs = this._getItemPairs(fromRoute, toRoute);
 		return itemPairs.filter(this._isMeasured);
@@ -87,46 +82,14 @@ export default class TransitionItems {
 		const itemsInNextTransition = this.getMeasuredItemPairs(fromRoute, toRoute);
 		let itemsToReset = this._items.filter(item => (item.route === fromRoute || item.route === toRoute))
 			.filter(item => item.shared)
-			.filter(item => 
-				itemsInNextTransition.findIndex((el) => item.name === el.fromItem.name && 
+			.filter(item =>
+				itemsInNextTransition.findIndex((el) => item.name === el.fromItem.name &&
 					item.route === el.fromItem.route) === -1)
-			.filter(item => 
-				itemsInNextTransition.findIndex((el) => item.name === el.toItem.name && 
+			.filter(item =>
+				itemsInNextTransition.findIndex((el) => item.name === el.toItem.name &&
 					item.route === el.toItem.route) === -1);
 
 		itemsToReset.forEach(item => item.reactElement.setTransitionSpec(null));
-	}
-	updateMetrics(requests) {
-		const indexedRequests = requests.map(r => ({
-			...r,
-			index: this._findIndex(r.name, r.route),
-		}));
-
-		if (indexedRequests.every(r => r.index < 0)) {
-			return;
-		}
-		else {
-			let newItems = Array.from(this.getItems());
-			indexedRequests.forEach(r => {
-				if (r.index >= 0) {
-					const newItem = newItems[r.index].clone();
-					newItem.metrics = r.metrics;
-					newItems[r.index] = newItem;
-				}
-			});
-			this.setItemsToMeasure([]);
-			this.setItems(newItems);
-		}
-	}
-	_removeAllMetrics() {
-		if (this.getItems().some(i => !!i.metrics)) {
-			const newItems = this._items.map(item => {
-				const newItem = item.clone();
-				newItem.metrics = null;
-				return newItem;
-			});
-			this.setItems(newItems);
-		}
 	}
 	_findIndex(name, route){
 		return this.getItems().findIndex(i => {

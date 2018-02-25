@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { View, StyleSheet, Animated } from 'react-native';
 
 import BaseTransition from './BaseTransition';
-import { createTransitionComponent } from './../TransitionView';
 
 class SharedTransition extends BaseTransition {
 	getTransitionStyle(transitionConfiguration) {
@@ -27,7 +26,7 @@ class SharedTransition extends BaseTransition {
 			};
 		}
 		else{
-			return { opacity: this.props.appear === undefined ? 1 : 0 };
+			return { opacity: 1 };
 		}
 	}
 }

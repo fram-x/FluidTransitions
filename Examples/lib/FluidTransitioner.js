@@ -42,9 +42,9 @@ class FluidTransitioner extends Component {
 
 	componentDidMount() {
 		// Add appear transitions here
-		const config = this._configureTransition();
+		/*const config = this._configureTransition();
 		const state = this.props.navigation.state;
-		this._transitionItemsView.beginAppearTransitions(0, -1, state.routes[state.index].routeName, null, config, true);
+		this._transitionItemsView.beginAppearTransitions(0, -1, state.routes[state.index].routeName, null, config, true);*/
 	}
 
 	async _onTransitionStart (props, prevProps) {
@@ -67,7 +67,7 @@ class FluidTransitioner extends Component {
 			timing: Animated.spring,
 			stiffness: 140,
 			damping: 8.5,
-			mass: 0.5,			
+			mass: 0.5,
 			duration: 450,
 			...this.props.transitionConfig,
 			isInteraction: true,
@@ -79,7 +79,6 @@ class FluidTransitioner extends Component {
 		const scenes = props.scenes.map(scene => this._renderScene({ ...props, scene }, prevProps));
 		return (
 			<TransitionItemsView
-				style={styles.scenes}
 				navigation={this.props.navigation}
 				ref={ref => this._transitionItemsView = ref}
 			>
@@ -91,21 +90,16 @@ class FluidTransitioner extends Component {
 	_renderScene(transitionProps, prevProps) {
 		const { position, scene } = transitionProps;
 		const { index } = scene;
-
-		// let diff = 0;
-		// if(prevProps)
-		// 	diff = (index - prevProps.index);
-
-		let opacity = 0.0;
-		// if(diff <= 1 && diff >= -1)
-		opacity = position.interpolate({
+		console.log('FluidTransitioner renderScene ' + index);
+		const opacity = position.interpolate({
 			inputRange: [index - 1, index - 0.0001, index, index + 0.9999, index + 1],
 			outputRange: [0, 1, 1, 1, 0],
 		});
 
 		const style = { opacity };
-		const Scene = this.props.router.getComponentForRouteName(scene.route.routeName);
 		const navigation = this._getChildNavigation(scene);
+
+		const Scene = this.props.router.getComponentForRouteName(scene.route.routeName);
 
 		return (
 			<Animated.View
@@ -116,9 +110,10 @@ class FluidTransitioner extends Component {
 			</Animated.View>
 		);
 	}
-
 	_getChildNavigation = (scene) => {
-		if (!this._childNavigationProps) this._childNavigationProps = {};
+		if (!this._childNavigationProps)
+			this._childNavigationProps = {};
+
 		let navigation = this._childNavigationProps[scene.key];
 		if (!navigation || navigation.state !== scene.route) {
 			navigation = this._childNavigationProps[scene.key] = addNavigationHelpers({
@@ -126,14 +121,12 @@ class FluidTransitioner extends Component {
 				state: scene.route
 			});
 		}
+
 		return navigation;
 	}
 }
 
 const styles = StyleSheet.create({
-	scenes: {
-		flex: 1,
-	},
 	scene: {
 		position: 'absolute',
 		backgroundColor: '#FFF',

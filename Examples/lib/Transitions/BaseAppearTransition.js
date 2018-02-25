@@ -19,7 +19,7 @@ class BaseAppearTransition extends BaseTransition {
 		if(transitionHelper !== null)
 			style = transitionHelper.getTransitionStyle(transitionConfiguration);
 
-		return style;
+		return {...style, opacity: 1};
 	}
 	
 }

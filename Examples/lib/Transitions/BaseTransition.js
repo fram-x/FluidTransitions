@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { View, StyleSheet, Animated } from 'react-native';
 
-import TransitionItem from './../TransitionItem';
 import ScaleTransition from './ScaleTransitions';
 import TopTransition from './TopTransition';
 import BottomTransition from './BottomTransition';
@@ -11,24 +10,19 @@ import RightTransition from './RightTransition';
 import HorizontalTransition from './HorizontalTransition';
 import VerticalTransition from './VerticalTransition';
 
-let uniqueBaseId = `transitionCompId-${Date.now()}`;
-let uuidCount = 0;
+
 
 class BaseTransition extends React.Component {
 	constructor(props, context){
-		super(props, context);
-		this._name = `${uniqueBaseId}-${uuidCount++}`;
+		super(props, context);		
 		this._transitionProgress = new Animated.Value(0);
 		this.state = { transitionConfiguration: null };
 		this._transitionHelper = null;
 	}
 
 	_transitionHelper
-	_transitionProgress
-	_innerViewRef
-	_route
-	_name
-	_innerViewRef
+	_transitionProgress		
+	_innerViewRef	
 
 	setTransitionSpec(value, force = false){
 		if(force){
@@ -49,7 +43,7 @@ class BaseTransition extends React.Component {
 	}
 
 	render() {
-
+		console.log(this.props);
 		let element = React.Children.only(this.props.children);
 		if(element.type.name==='Button')
 			element = (<View>{element}</View>);
@@ -62,12 +56,13 @@ class BaseTransition extends React.Component {
 		const props = {
 			...element.props,
 			collapsable: false,
-			style: [style, transitionStyle],
-			ref: ref => this._innerViewRef = ref
+			style: [style],
+			ref: ref => this._innerViewRef = ref,			
 		};
 
 		return React.createElement(animatedComp, props);
 	}
+	
 	getTransitionStyle(transitionConfiguration) {
 		return { opacity: 0 };
 	}
@@ -94,24 +89,7 @@ class BaseTransition extends React.Component {
 
 		return animation;
 	}
-	componentDidMount() {
-		const register = this.context.register;
-		if(register) {
-			this._route = this.context.route;
-			register(new TransitionItem(this.props.shared ? this.props.shared : this._name, this.context.route,
-				this, this.props.shared !== undefined, this.props.appear !== undefined, 
-				this.props.nodelay !== undefined));
-		}
-	}
-	componentWillUnmount() {
-		const unregister = this.context.unregister;
-		if(unregister) {
-			if(this.props.shared)
-				unregister(this.props.shared, this._route);
-			else
-				unregister(this._name, this._route);
-		}
-	}
+	
 	getReactElement() {
 		return React.Children.only(this.props.children);
 	}
