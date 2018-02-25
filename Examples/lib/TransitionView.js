@@ -49,8 +49,8 @@ class Transition extends React.Component {
 			return {};
 			
 		const interpolator = this.context.appearProgress.interpolate({
-			inputRange: [0, 1],
-			outputRange: [1, 0]
+			inputRange: [0, 0.5, 0.5, 1],
+			outputRange: [1, 1, 0, 0],
 		});
 		return { opacity: interpolator };
 	}

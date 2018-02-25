@@ -75,7 +75,8 @@ export default class TransitionItemsView extends React.Component {
 		console.log("TransitionItemsView onTransitionStart items measured");
 
 		// Extend state with information about shared elements and appear elements
-		this.setState({...this.state,
+		this.setState({
+			...this.state,
 			sharedElements,
 			transitionElements,
 			config,

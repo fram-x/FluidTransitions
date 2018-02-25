@@ -49,8 +49,8 @@ class TransitionOverlayView extends React.Component {
 
 	getAppearStyle() {
 		const interpolator = this.context.appearProgress.interpolate({
-			inputRange: [0, 0.01, 0.9, 1],
-			outputRange: [0, 0, 1, 1]
+			inputRange: [0, 0.1, 1],
+			outputRange: [0, 1, 1],
 		});
 		return { opacity: interpolator };
 	}
@@ -119,8 +119,8 @@ const styles = StyleSheet.create({
 	},
 	sharedElement: {
 		position: 'absolute',
-		borderColor: '#34CE34',
-		borderWidth: 2,
+		// borderColor: '#34CE34',
+		// borderWidth: 2,
 		margin: 0,
 		left: 0,
 		top: 0,
