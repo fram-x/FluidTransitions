@@ -139,10 +139,17 @@ class FluidTransitioner extends Component {
 		const { position, scene } = transitionProps;
 		const { index } = scene;
 		console.log('FluidTransitioner renderScene ' + index);
-		const opacity = position.interpolate({
-			inputRange: [index - 1, index - 0.0001, index, index + 0.9999, index + 1],
-			outputRange: [0, 1, 1, 1, 0],
-		});
+
+		let diff = 0;
+		if(prevProps)
+			diff = (index - prevProps.index);
+
+		let opacity = 0.0;
+		if(diff <= 1 && diff >= -1)
+			opacity = position.interpolate({
+				inputRange: [index - 1, index - 0.0001, index, index + 0.9999, index + 1],
+				outputRange: [0, 1, 1, 1, 0],
+			});
 
 		const style = { opacity };
 		const navigation = this._getChildNavigation(scene);
