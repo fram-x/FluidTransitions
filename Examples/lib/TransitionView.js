@@ -160,6 +160,10 @@ class Transition extends React.Component {
 		getIsTransitionElement: PropTypes.func,
 	}
 
+	shouldComponentUpdate(nextProps, nextState){
+		return true;
+	}
+
 	componentWillMount() {
 		const register = this.context.register;
 		if(register) {

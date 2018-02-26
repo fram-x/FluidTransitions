@@ -80,8 +80,7 @@ export default class TransitionItemsView extends React.Component {
 		const transitionElements = this._transitionItems.getTransitionElements(fromRoute, toRoute);
 		
 		if(sharedElements.length === 0 && transitionElements.length === 0){
-			this._sharedProgress.setValue(1);
-			this.resetState();
+			this._sharedProgress.setValue(1);			
 			return;
 		}
 
@@ -96,12 +95,16 @@ export default class TransitionItemsView extends React.Component {
 			progress: props.progress
 		});
 
-		// We should now have the overlay ready
-		await this.runAppearAnimation(1.0, config);
+		if(sharedElements.length > 0){
+			// We should now have the overlay ready
+			await this.runAppearAnimation(1.0, config);
+		}
 
+		// Show all items - they should now have their initial values set correctly
+		// to begin their transition
 		this._hiddenProgress.setValue(1);
 
-		// Start transitions
+		// Start transitions: TODO: setup individual animation to handle delays
 		// const { timing } = config;
 		// delete config.timing;
 		// timing(this._transitionProgress, {
@@ -126,6 +129,8 @@ export default class TransitionItemsView extends React.Component {
 	}
 
 	runAppearAnimation(toValue, config){
+
+		console.log("TransitionItemsView runAppearAnimation " + toValue);
 
 		// Run swap animation
 		let swapAnimationDone = null;
