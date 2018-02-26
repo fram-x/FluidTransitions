@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { View, StyleSheet, Animated, Easing, UIManager } from 'react-native';
+import { View, StyleSheet, InteractionManager, Animated, Easing, UIManager } from 'react-native';
 import { Transitioner, addNavigationHelpers } from 'react-navigation';
 
 import TransitionItemsView from './TransitionItemsView';
@@ -10,6 +10,8 @@ class FluidTransitioner extends Component {
 		super(props);
 	}
 
+	_layoutPromise
+	_layoutResolveFunc
 	_transitionItemsView
 
 	static childContextTypes = {
@@ -26,13 +28,15 @@ class FluidTransitioner extends Component {
 
 	render() {
 		return (
-			<Transitioner
-				configureTransition={this._configureTransition.bind(this)}
-				onTransitionStart={this._onTransitionStart.bind(this)}
-				onTransitionEnd={this._onTransitionEnd.bind(this)}
-				render={this._render.bind(this)}
-				navigation={this.props.navigation}
-			/>
+			<View style={styles.container} onLayout={this.onLayout.bind(this)}>
+				<Transitioner
+					configureTransition={this._configureTransition.bind(this)}
+					onTransitionStart={this._onTransitionStart.bind(this)}
+					onTransitionEnd={this._onTransitionEnd.bind(this)}
+					render={this._render.bind(this)}
+					navigation={this.props.navigation}
+				/>
+			</View>
 		);
 	}
 
@@ -40,11 +44,55 @@ class FluidTransitioner extends Component {
 		return this.props !== nextProps;
 	}
 
+	onLayout() {
+		if(this._layoutResolveFunc){
+			this._layoutResolveFunc();
+			this._layoutResolveFunc = null;
+		}
+	}
+
 	componentDidMount() {
+		console.log("FluidTransitioner componentDidMount");
+		this._layoutPromise = new Promise(resolve => this._layoutResolveFunc = resolve);
+
 		// Add appear transitions here
-		/*const config = this._configureTransition();
-		const state = this.props.navigation.state;
-		this._transitionItemsView.beginAppearTransitions(0, -1, state.routes[state.index].routeName, null, config, true);*/
+		InteractionManager.runAfterInteractions(async () => {
+						
+			if(!this._transitionItemsView){
+				console.log("FluidTransitioner componentDidMount after interactions - bailing out.");
+				return;
+			}
+
+			console.log("FluidTransitioner componentDidMount after interactions");
+
+			// Wait for layout 
+			await this._layoutPromise;
+
+			// Build properties
+			const config = this._configureTransition();
+			const { state } = this.props.navigation;
+			const progress = new Animated.Value(0);
+			const props = {
+				index: state.index,
+				progress,
+				navigation: this.props.navigation,
+				scene: {
+					index: 1,
+					route: state.routes[state.index]
+				}
+			};
+			
+			// Start transition
+			await this._transitionItemsView.onTransitionStart(props, null, config);
+
+			// Run animation
+			const { timing } = config;
+			delete config.timing;
+			timing(progress, {
+				toValue: 1.0,
+				...config
+			}).start(async ()=> await this._transitionItemsView.onTransitionEnd(props, null, config));
+		});
 	}
 
 	async _onTransitionStart (props, prevProps) {
@@ -127,6 +175,13 @@ class FluidTransitioner extends Component {
 }
 
 const styles = StyleSheet.create({
+	container: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+	},
 	scene: {
 		position: 'absolute',
 		backgroundColor: '#FFF',

@@ -134,7 +134,7 @@ class BaseTransition extends React.Component {
 	static contextTypes = {
 		register: PropTypes.func,
 		unregister: PropTypes.func,
-		appearProgress: PropTypes.object,
+		sharedProgress: PropTypes.object,
 		transitionProgress: PropTypes.object,
 		route: PropTypes.string,
 	}

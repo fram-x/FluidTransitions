@@ -19,7 +19,7 @@ class SharedTransition extends BaseTransition {
 
 			return {
 				...style,
-				opacity: this.context.appearProgress.interpolate({
+				opacity: this.context.sharedProgress.interpolate({
 					inputRange: [0, 0.5, 0.5, 1],
 					outputRange: [1, 1, 0, 0],
 				})

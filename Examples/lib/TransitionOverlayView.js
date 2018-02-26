@@ -48,7 +48,7 @@ class TransitionOverlayView extends React.Component {
 	}
 
 	getAppearStyle() {
-		const interpolator = this.context.appearProgress.interpolate({
+		const interpolator = this.context.sharedProgress.interpolate({
 			inputRange: [0, 0.1, 1],
 			outputRange: [0, 1, 1],
 		});
@@ -97,7 +97,7 @@ class TransitionOverlayView extends React.Component {
 	}
 
 	static contextTypes = {
-		appearProgress: PropTypes.object
+		sharedProgress: PropTypes.object
 	}
 }
 
@@ -114,8 +114,7 @@ const styles = StyleSheet.create({
 		top: 0,
 		left: 0,
 		right: 0,
-        bottom: 0,
-        backgroundColor: '#FF000030',
+        bottom: 0,        
 	},
 	sharedElement: {
 		position: 'absolute',

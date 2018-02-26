@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Animated, UIManager, findNodeHandle } from 'react-native';
+import { View, Animated, UIManager } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
@@ -28,26 +28,33 @@ class Transition extends React.Component {
 	_isMounted
 	_metrics
 	_transitionHelper
+	_viewRef
 
 	render() {
+		// Get child
 		let element = React.Children.only(this.props.children);
-		console.log("TransitionView render " + 
-			(element.type ? element.type.displayName : "UNKNOWN") + " (" + this._getName() + "/" + this._route + ")");
+		console.log("TransitionView render " +
+			(element.type ? element.type.displayName : "UNKNOWN") + " (" + this._getName() +
+			"/" + this._route + ")");
 
+		// Wrap buttons to be able to animate them
 		if(element.type.name==='Button')
 			element = (<View>{element}</View>);
 
+		// Convert to animated component
 		const animatedComp = Animated.createAnimatedComponent(element.type);
 
+		// Build styles
 		const style =  [element.props.style];
 		const appearStyle = this.getAppearStyle();
 		const transitionStyle = this.getTransitionStyle();
 
+		// Save properties
 		const props = {
 			...element.props,
 			onLayout: this.onLayout.bind(this),
 			collapsable: false,
-			style: [style, appearStyle, transitionStyle],
+			style: [style, transitionStyle, appearStyle],
 			ref: (ref) => this._viewRef = ref
 		};
 
@@ -55,19 +62,24 @@ class Transition extends React.Component {
 	}
 
 	getTransitionStyle() {
-		// const { getIsTransitionElement } = this.context;
-		// if(!getIsTransitionElement)
-		// 	return {};
+		const opacityStyle = {opacity: this.context.hiddenProgress.interpolate({
+			inputRange:[0, 1],
+			outputRange: [0, 1] 
+		})};
 
-		// if(!getIsTransitionElement(this._getName(), this._route))
-		// 	return {};
+		const { getIsSharedElement } = this.context;
+		if(getIsSharedElement(this._getName(), this._route) || !this.props.appear)
+			return {};
 
-		// const transitionHelper = this.getTransitionHelper(this.props.appear);
-		// if(transitionHelper){
-		// 	const transitionConfig = { progress: this.context.transitionProgress };
-		// 	console.log("TransitionView render with " + transitionHelper);
-		// 	return transitionHelper.getTransitionStyle(transitionConfig);
-		// }
+		if(!this.context.transitionProgress())
+			return opacityStyle;
+
+		const transitionHelper = this.getTransitionHelper(this.props.appear);
+		if(transitionHelper){
+			const transitionConfig = { progress: this.context.transitionProgress() };
+			console.log("TransitionView render with " + transitionHelper);
+			return transitionHelper.getTransitionStyle(transitionConfig);
+		}
 
 		return {};
 	}
@@ -77,7 +89,7 @@ class Transition extends React.Component {
 
 		if(getIsSharedElement(this._getName(), this._route)) {
 			// Check if we are part of a shared elements
-			const interpolator = this.context.appearProgress.interpolate({
+			const interpolator = this.context.sharedProgress.interpolate({
 				inputRange: [0, 0.5, 0.5, 1],
 				outputRange: [1, 1, 0, 0],
 			});
@@ -89,7 +101,7 @@ class Transition extends React.Component {
 
 	async onLayout(event) {
 		const { updateMetrics } = this.context;
-		if(!updateMetrics) return;
+		if(this._metrics !== null || !updateMetrics) return;
 		if(this._isMounted){
 			this._metrics = await updateMetrics(this._getName(), this._route, this._viewRef);
 		}
@@ -102,7 +114,10 @@ class Transition extends React.Component {
 	}
 
 	getTransitionHelper(appear){
-		return new ScaleTransition();
+		if(appear)
+			return new ScaleTransition();
+			return null;
+
 		if(this._transitionHelper === null) {
 			switch(appear){
 				case 'top':
@@ -138,14 +153,14 @@ class Transition extends React.Component {
 		unregister: PropTypes.func,
 		updateMetrics: PropTypes.func,
 		route: PropTypes.string,
-		appearProgress: PropTypes.object,
-		transitionProgress: PropTypes.object,
+		sharedProgress: PropTypes.object,
+		hiddenProgress: PropTypes.object,
+		transitionProgress: PropTypes.func,
 		getIsSharedElement: PropTypes.func,
 		getIsTransitionElement: PropTypes.func,
 	}
 
 	componentWillMount() {
-		this._isMounted = true;
 		const register = this.context.register;
 		if(register) {
 			this._route = this.context.route;
@@ -153,6 +168,10 @@ class Transition extends React.Component {
 				this, this.props.shared !== undefined, this.props.appear !== undefined,
 				this.props.nodelay !== undefined));
 		}
+	}
+
+	componentDidMount() {
+		this._isMounted = true;
 	}
 
 	componentWillUnmount() {

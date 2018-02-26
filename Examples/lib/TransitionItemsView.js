@@ -19,8 +19,9 @@ export default class TransitionItemsView extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this._appearProgress = new Animated.Value(0);
+		this._sharedProgress = new Animated.Value(0);
 		this._transitionProgress = new Animated.Value(0);
+		this._hiddenProgress = new Animated.Value(0);
 		this._transitionItems = new TransitionItems();
 
 		this.state = { currentTransition: null };
@@ -35,8 +36,12 @@ export default class TransitionItemsView extends React.Component {
 	_fadeTransitionTime
 	_overlay
 	_transitionItems
-	_appearProgress
+	
+	_sharedProgress
+	_hiddenProgress
+
 	_transitionProgress
+	_transitionProgressListener
 
 	_resolveLayoutPromise
 	_resolveLayoutFunc
@@ -53,24 +58,32 @@ export default class TransitionItemsView extends React.Component {
 		// Wait for self layout
 		await this._resolveLayoutPromise;
 
-		// Setup wait promise for resolving measurement on new items
+		// Setup wait promise for resolving measurement on new items	
 		this._resolveMeasurePromise = new Promise(resolve => this._resolveMeasureFunc = resolve);
 
 		console.log("");
 		console.log("TransitionItemsView onTransitionStart");
 		console.log("");
 
-		// Get routes
+		// Get routes and direction
 		const toRoute = props.scene.route.routeName;
-		const fromRoute = prevProps.scene.route.routeName;
+		const fromRoute = prevProps ? prevProps.scene.route.routeName : "UNKNOWN";
+		const direction = props.index > (prevProps ? prevProps.index : 9999) ? 1 : -1;
 
 		this.setState({...this.state, fromRoute, toRoute});
 
-		await this._resolveMeasurePromise;
+		if(direction === 1)	
+			await this._resolveMeasurePromise;
 
 		// Get items in transition
 		const sharedElements = this._transitionItems.getSharedElements(fromRoute, toRoute);
 		const transitionElements = this._transitionItems.getTransitionElements(fromRoute, toRoute);
+		
+		if(sharedElements.length === 0 && transitionElements.length === 0){
+			this._sharedProgress.setValue(1);
+			this.resetState();
+			return;
+		}
 
 		console.log("TransitionItemsView onTransitionStart items measured");
 
@@ -84,11 +97,25 @@ export default class TransitionItemsView extends React.Component {
 		});
 
 		// We should now have the overlay ready
-		return this.runAppearAnimation(1.0, config);
+		await this.runAppearAnimation(1.0, config);
+
+		this._hiddenProgress.setValue(1);
+
+		// Start transitions
+		// const { timing } = config;
+		// delete config.timing;
+		// timing(this._transitionProgress, {
+		// 	toValue: 1.0,
+		// 	...config
+		// }).start();
 	}
 
 	async onTransitionEnd(props, prevProps, config) {
 		await this.runAppearAnimation(0.0, config);
+		this.resetState();		
+	}
+
+	resetState() {
 		this.setState({
 			...this.state, 
 			sharedElements: null, 
@@ -105,7 +132,7 @@ export default class TransitionItemsView extends React.Component {
 		const swapPromise = new Promise((resolve, reject) =>
 			swapAnimationDone = resolve);
 
-		Animated.timing(this._appearProgress, {
+		Animated.timing(this._sharedProgress, {
 			toValue: toValue,
 			duration: this._fadeTransitionTime,
 			easing: Easing.linear,
@@ -181,20 +208,22 @@ export default class TransitionItemsView extends React.Component {
 	}
 
 	async updateMetrics(name, route, view){
-		await this._resolveLayoutPromise;
+		await this._resolveLayoutPromise;		
 		const parentNodeHandle = findNodeHandle(this._viewRef);
 		const nodeHandle = findNodeHandle(view);
 		const self = this;
 		let resolveFunc;
-		const promise = new Promise(resolve => resolveFunc = resolve);
-		UIManager.measureLayout(nodeHandle, parentNodeHandle, ()=> {}, (x, y, width, height) => {
+		const promise = new Promise(resolve => resolveFunc = resolve);		
+		UIManager.measureLayout(nodeHandle, parentNodeHandle, ()=> {
+			console.log("FAIL");
+		}, (x, y, width, height) => {
 			const metrics = {x, y, width, height };
 			if(self._transitionItems.updateMetrics(name, route, metrics))
 				self.metricsUpdated();
 
 			resolveFunc(metrics);
 		});	
-		
+
 		return promise;
 	}
 
@@ -214,8 +243,9 @@ export default class TransitionItemsView extends React.Component {
 		register: PropTypes.func,
 		unregister: PropTypes.func,
 		updateMetrics: PropTypes.func,
-		appearProgress: PropTypes.object,
-		transitionProgress: PropTypes.object,
+		sharedProgress: PropTypes.object,
+		hiddenProgress: PropTypes.object,
+		transitionProgress: PropTypes.func,
 		getIsSharedElement: PropTypes.func,
 		getIsTransitionElement: PropTypes.func,
 	}
@@ -226,8 +256,9 @@ export default class TransitionItemsView extends React.Component {
 			register: (item) => this._transitionItems.add(item),
 			unregister: (name, route) => this._transitionItems.remove(name, route),
 			updateMetrics: this.updateMetrics.bind(this),
-			appearProgress: this._appearProgress,
-			transitionProgress: this._transitionProgress,
+			sharedProgress: this._sharedProgress,
+			hiddenProgress: this._hiddenProgress,
+			transitionProgress: ()=> this.state.progress,
 			getIsSharedElement: this.getIsSharedElement.bind(this),
 			getIsTransitionElement: this.getIsTransitionElement.bind(this)
 		};
