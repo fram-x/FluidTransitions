@@ -254,6 +254,10 @@ export default class TransitionItemsView extends React.Component {
 			return -1;
 	}
 
+	getReverse(route) {
+		return route === this.state.fromRoute;
+	}
+
 	getIsSharedElement(name, route) {
 		if(this.state.sharedElements){
 			return this.state.sharedElements.findIndex(pair =>
@@ -284,7 +288,8 @@ export default class TransitionItemsView extends React.Component {
 	static childContextTypes = {
 		register: PropTypes.func,
 		unregister: PropTypes.func,
-		direction: PropTypes.func,
+		getDirection: PropTypes.func,
+		getReverse: PropTypes.func,
 		sharedProgress: PropTypes.object,
 		hiddenProgress: PropTypes.object,
 		transitionProgress: PropTypes.func,
@@ -301,7 +306,8 @@ export default class TransitionItemsView extends React.Component {
 			unregister: (name, route) => this._transitionItems.remove(name, route),
 			sharedProgress: this._sharedProgress,
 			hiddenProgress: this._hiddenProgress,
-			direction: this.getDirection.bind(this),
+			getDirection: this.getDirection.bind(this),
+			getReverse: this.getReverse.bind(this),
 			transitionProgress: ()=> this.state.progress,
 			getIsSharedElement: this.getIsSharedElement.bind(this),
 			getIsTransitionElement: this.getIsTransitionElement.bind(this),

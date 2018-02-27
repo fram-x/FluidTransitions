@@ -14,7 +14,7 @@ class HorizontalTransition extends BaseTransitionHelper {
 
 		const progress = transitionConfiguration.progress.interpolate({
 			inputRange: [0, 1],
-			outputRange: [distanceValue, 0]
+			outputRange: transitionConfiguration.reverse ? [0, distanceValue] : [distanceValue, 0]
 		});
 
 		return {			

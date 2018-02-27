@@ -65,8 +65,8 @@ class Transition extends React.Component {
 			outputRange: [0, 1]
 		})};
 
-		const { getIsSharedElement, getMetrics } = this.context;
-		if(!getIsSharedElement && !getMetrics) return;
+		const { getIsSharedElement, getMetrics, getDirection, getReverse } = this.context;
+		if(!getIsSharedElement && !getMetrics && !getDirection && !getReverse) return;
 
 		if(getIsSharedElement(this._getName(), this._route) || !this.props.appear)
 			return {};
@@ -78,13 +78,14 @@ class Transition extends React.Component {
 
 		const transitionHelper = this.getTransitionHelper(this.props.appear);
 		if(transitionHelper){
-			const direction = this.context.direction(this._getName(), this._route);
+			const direction = getDirection(this._getName(), this._route);
 			const transitionConfig = {
 				progress: this.context.transitionProgress(),
 				direction,
 				metrics: metrics,
 				start: direction === 1 ? 0 : 1,
-				end: direction === 1 ? 1 : 0
+				end: direction === 1 ? 1 : 0,
+				reverse: getReverse(this._route)
 			};
 			return transitionHelper.getTransitionStyle(transitionConfig);
 		}
@@ -161,7 +162,8 @@ class Transition extends React.Component {
 		transitionProgress: PropTypes.func,
 		getIsSharedElement: PropTypes.func,
 		getIsTransitionElement: PropTypes.func,
-		direction: PropTypes.func,
+		getDirection: PropTypes.func,
+		getReverse: PropTypes.func,
 		layoutReady: PropTypes.func,
 		getMetrics: PropTypes.func,
 	}
