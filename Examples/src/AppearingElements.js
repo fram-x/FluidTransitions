@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
 		height: 100,
 		margin: 20,
 		borderRadius: 10,
-	},
+	}
 });
 
 const InitialScreen = (props) => (
@@ -45,7 +45,7 @@ const InitialScreen = (props) => (
 			<Transition appear='horizontal'>
 				<Text style={styles.text}>Click toggle to see appearance animations.</Text>
 			</Transition>
-			<Transition shared='button' appear='bottom'>			
+			<Transition shared='button' appear='bottom'>
 				<Button title='Toggle' onPress={() => props.navigation.navigate('screen')} />
 			</Transition>
 		</View>
@@ -86,7 +86,7 @@ const Navigator = FluidNavigator({
     screen: { screen: Screen },
 // }, {
 //     transitionConfig: {
-//         timing: Animated.timing,    
+//         timing: Animated.timing,
 // 		easing: Easing.cubic,
 // 		duration: 800,
 //     }
