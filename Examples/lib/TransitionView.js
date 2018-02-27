@@ -39,8 +39,8 @@ class Transition extends React.Component {
 	_route
 	_isMounted
 	_transitionHelper
-	_viewRef
-
+	_viewRef	
+	
 	render() {
 		// Get child
 		let element = React.Children.only(this.props.children);
@@ -86,19 +86,20 @@ class Transition extends React.Component {
 
 	getTransitionStyle() {
 		const opacityStyle = {opacity: this.context.hiddenProgress.interpolate({
-			inputRange:[0, 1],
-			outputRange: [0, 1]
+			inputRange:[0, 0.75, 1],
+			outputRange: [0, 0, 1]
 		})};
 
 		const { getIsSharedElement, getMetrics, getDirection, getReverse } = this.context;
 		if(!getIsSharedElement && !getMetrics && !getDirection && !getReverse) return;
 
-		if(getIsSharedElement(this._getName(), this._route) || !this.props.appear)
+		if(getIsSharedElement(this._getName(), this._route) || !this.props.appear){			
 			return {};
+		}
 
 		if(!this.context.transitionProgress())
 			return opacityStyle;
-
+		
 		const metrics = getMetrics(this._getName(), this._route);
 
 		const transitionHelper = this.getTransitionHelper(this.props.appear);
@@ -119,11 +120,12 @@ class Transition extends React.Component {
 	}
 
 	getAppearStyle() {
-		const { getIsSharedElement, getIsTransitionElement } = this.context;
+		const { getIsSharedElement } = this.context;
+		if(!getIsSharedElement) return;
 		if(getIsSharedElement(this._getName(), this._route)) {
 			const interpolator = this.context.sharedProgress.interpolate({
-				inputRange: [0, 0.5, 0.5, 1],
-				outputRange: [1, 1, 0, 0],
+				inputRange: [0, 0.5, 1],
+				outputRange: [1, 1, 0],
 			});
 			return { opacity: interpolator };
 		}
@@ -136,7 +138,7 @@ class Transition extends React.Component {
 	}
 
 	async onLayout(event) {
-		console.log("TransitionView onLayout " + this._getName() + ", " + this._route);
+		// console.log("TransitionView onLayout " + this._getName() + ", " + this._route);
 		const { layoutReady } = this.context;
 		if(!layoutReady) return;
 		layoutReady(this._getName(), this._route);
@@ -159,22 +161,15 @@ class Transition extends React.Component {
 		return this._transitionHelper;
 	}
 
-	static contextTypes = {
-		register: PropTypes.func,
-		unregister: PropTypes.func,
-		route: PropTypes.string,
-		sharedProgress: PropTypes.object,
-		hiddenProgress: PropTypes.object,
-		transitionProgress: PropTypes.func,
-		getIsSharedElement: PropTypes.func,
-		getIsTransitionElement: PropTypes.func,
-		getDirection: PropTypes.func,
-		getReverse: PropTypes.func,
-		layoutReady: PropTypes.func,
-		getMetrics: PropTypes.func,
-	}
-
 	shouldComponentUpdate(nextProps, nextState){
+		// const retVal = true;
+		// let isSharedElement;
+		// const { getIsSharedElement } = this.context;
+		// if(!getIsSharedElement) return true;		
+		// isSharedElement = (getIsSharedElement(this._getName(), this._route));
+		// if(this._lastIsSharedElement === isSharedElement)
+		// 	return false;
+
 		return true;
 	}
 
@@ -198,6 +193,21 @@ class Transition extends React.Component {
 		if(unregister) {
 			unregister(this._getName(), this._route);
 		}
+	}
+
+	static contextTypes = {
+		register: PropTypes.func,
+		unregister: PropTypes.func,
+		route: PropTypes.string,
+		sharedProgress: PropTypes.object,
+		hiddenProgress: PropTypes.object,
+		transitionProgress: PropTypes.func,
+		getIsSharedElement: PropTypes.func,
+		getIsTransitionElement: PropTypes.func,
+		getDirection: PropTypes.func,
+		getReverse: PropTypes.func,
+		layoutReady: PropTypes.func,
+		getMetrics: PropTypes.func,
 	}
 }
 
