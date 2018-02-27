@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Animated, UIManager } from 'react-native';
+import { View, Animated, findNodeHandle } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
@@ -119,14 +119,14 @@ class Transition extends React.Component {
 		return { };
 	}
 
-	async onLayout(event) {
-		const { layoutReady } = this.context;
-		if(!layoutReady) return;
-		layoutReady(this._getName(), this._route, event.nativeEvent.target);
+	getNodeHandle() {
+		return findNodeHandle(this._viewRef);
 	}
 
-	getViewRef() {
-		return this._viewRef;
+	async onLayout(event) {
+		const { layoutReady } = this.context;
+		if(!layoutReady) return;		
+		layoutReady(this._getName(), this._route);
 	}
 
 	_getName(){

@@ -27,7 +27,8 @@ export default class TransitionItemsView extends React.Component {
 		this.state = { currentTransition: null };
 		this._isMounted = false;
 		this._overlay = null;
-		this._fadeTransitionTime = 25;
+		this._fadeTransitionTime = 25;		
+
 	}
 
 	_fadeTransitionTime
@@ -49,7 +50,6 @@ export default class TransitionItemsView extends React.Component {
 	_isMounted
 	_appearTransitionPromise
 	_appearTransitionPromiseResolve
-	_viewMetrics
 
 	async onTransitionStart(props, prevProps, config) {
 
@@ -58,7 +58,7 @@ export default class TransitionItemsView extends React.Component {
 
 		console.log("");
 		console.log("TransitionItemsView onTransitionStart");
-		
+
 		// Get routes and direction
 		const toRoute = props.scene.route.routeName;
 		const fromRoute = prevProps ? prevProps.scene.route.routeName : "UNKNOWN";
@@ -79,7 +79,7 @@ export default class TransitionItemsView extends React.Component {
 		console.log("TransitionItemsView onTransitionStart begin items measure...");
 		await this.measureItems(sharedElements, transitionElements);
 		console.log("TransitionItemsView onTransitionStart items measure done");
-		
+
 		// Extend state with information about shared elements and appear elements
 		this.setState({
 			...this.state,
@@ -130,7 +130,7 @@ export default class TransitionItemsView extends React.Component {
 			transitionElements: null,
 			config: null,
 			progress: null
-		});		
+		});
 	}
 
 	runAppearAnimation(toValue, config){
@@ -156,8 +156,7 @@ export default class TransitionItemsView extends React.Component {
 		// console.log("TransitionItemsView: render");
 		return(
 			<View
-				style={styles.container}
-				onLayout={this.onLayout.bind(this)}
+				style={styles.container}				
 				ref={(ref) => this._viewRef = ref}
 			>
 				{this.props.children}
@@ -169,37 +168,32 @@ export default class TransitionItemsView extends React.Component {
 		);
 	}
 
-	onLayout(event) {
-		const { x, y, width, height } = event.nativeEvent.layout;
-		this._viewMetrics = { x, y, width, height };
-		// console.log("TransitionItemsView onLayout: x:" + x + " y:" + y + " w:" + width + " h:" + height);
-		if(this._resolveLayoutFunc){
-			this._resolveLayoutFunc();
-			this._resolveLayoutFunc = null;
-		}
-	}
-
-	layoutReady(name, route, nodeHandle) {
+	layoutReady(name, route) {
 		const sharedElements = this._transitionItems.getSharedElements(
 			this.state.fromRoute, this.state.toRoute);
+
 		const transitionElements = this._transitionItems.getTransitionElements(
 			this.state.fromRoute, this.state.toRoute);
-	
-		const item = this._transitionItems.getItemByNameAndRoute(name, route);
-		item.nodeHandle = nodeHandle;
 
+		const item = this._transitionItems.getItemByNameAndRoute(name, route);
+		if(!item){
+			// a stray element that will be removed - lets just bail out
+			return;
+		}
+		item.layoutRead = true;
+		
 		if(sharedElements.length === 0 && transitionElements.length === 0) return;
 
 		// resolve layout read
 		for(let i=0; i<sharedElements.length; i++){
-			if(!sharedElements[i].fromItem.nodeHandle)
+			if(!sharedElements[i].fromItem.layoutRead)
 				return;
 
-			if(!sharedElements[i].toItem.nodeHandle)
+			if(!sharedElements[i].toItem.layoutRead)
 				return;
 		}
 		for(let i=0; i<transitionElements.length; i++)
-			if(!transitionElements[i].nodeHandle)
+			if(!transitionElements[i].layoutRead)
 				return;
 
 		if(this._resolveChildLayoutFunc){
@@ -208,38 +202,44 @@ export default class TransitionItemsView extends React.Component {
 		}
 	}
 
-	async measureItems(sharedElements, transitionElements) {
-		const pnh = findNodeHandle(this._viewRef);
+	async measureItems(sharedElements, transitionElements) {		
+		let resolveFunc;
+		let viewMetrics = {};
+		const promise = new Promise(resolve => resolveFunc = resolve);
+		const nodeHandle = findNodeHandle(this._viewRef);
+		UIManager.measureInWindow(nodeHandle, (x, y, width, height) => {
+			viewMetrics = {x, y, width, height };			
+			resolveFunc();
+		});		
+		
+		await promise;
 
 		for(let i=0; i<sharedElements.length; i++){
 			const pair = sharedElements[i];
-			await this.measureItem(pair.fromItem, pnh);
-			await this.measureItem(pair.toItem, pnh);
+			await this.measureItem(viewMetrics, pair.fromItem, nodeHandle);
+			await this.measureItem(viewMetrics, pair.toItem, nodeHandle);
 		}
 
 		for(let i=0; i<transitionElements.length; i++){
-			await this.measureItem(transitionElements[i], pnh);
+			await this.measureItem(viewMetrics, transitionElements[i], nodeHandle);
 		}
 	}
 
-	async measureItem(item, parentNodeHandle){
+	async measureItem(viewMetrics, item, parentNodeHandle){
 		if(item.metrics)
 			return;
 
 		const self = this;
-		let resolveFunc;
-		const promise = new Promise(resolve => resolveFunc = resolve);
-
-		UIManager.measureLayout(item.nodeHandle, parentNodeHandle, ()=> {
-			console.log("TransitionItemsView measureItem failed " + item.name + ", " + item.route);
-		}, (x, y, width, height) => {
-			item.metrics = {x, y, width, height };
-			resolveFunc();
+		return new Promise((resolve, reject) => {
+			console.log("TransitionItemsView measureItem " + item.name + ", " + item.route);
+			UIManager.measureInWindow(item.reactElement.getNodeHandle(), (x, y, width, height) => {
+				console.log("TransitionItemsView measureItem success " + item.name + ", " + item.route);
+				item.metrics = {x: x - viewMetrics.x, y: y - viewMetrics.y, width, height };
+				resolve();
+			});
 		});
-
-		return promise;
 	}
-	
+
 	getMetrics(name, route) {
 		const item = this._transitionItems.getItemByNameAndRoute(name, route);
 		return item.metrics;

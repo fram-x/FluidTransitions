@@ -20,7 +20,7 @@ export default class TransitionItems {
 		if(this.getItems().findIndex(e => e.name === item.name && e.route === item.route) >= 0)
 			return false;
 
-		console.log("TransitionItems add " + item.name + ", " + item.route);
+		// console.log("TransitionItems add " + item.name + ", " + item.route);
 
 		const newItems = [...this.getItems(), item];
 		this.setItems(newItems);
@@ -32,8 +32,10 @@ export default class TransitionItems {
 		if (index >= 0) {
 			const newItems = [...this.getItems().slice(0, index), ...this.getItems().slice(index + 1)];
 			this.setItems(newItems);
+			// console.log("TransitionItems remove " + name + ", " + route);
 			return true;
 		}
+		// console.log("TransitionItems remove FAILED, could not find " + name + ", " + route);
 		return false;
 	}
 
