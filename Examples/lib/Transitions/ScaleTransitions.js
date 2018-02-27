@@ -11,16 +11,9 @@ class ScaleTransition extends BaseTransitionHelper {
 			
 		const scaleInterpolation = transitionConfiguration.progress.interpolate({
 			inputRange: [0, 1],
-			outputRange: [0, 1]
+			outputRange: [transitionConfiguration.start, transitionConfiguration.end],
 		});
-
-		const opacityInterpolation = transitionConfiguration.progress.interpolate({
-			inputRange: [0, 0.1, 0.9, 1],
-			outputRange: [0, 1, 1, 1]
-		});
-
 		return {
-			opacity: opacityInterpolation,
             transform: [{ scaleX: scaleInterpolation }, { scaleY: scaleInterpolation }]
 		};
 	}	

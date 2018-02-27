@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Button, Image, StyleSheet } from 'react-native';
+import { View, Text, Button, Image, Animated, Easing, StyleSheet } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 
 import { FluidNavigator, Transition } from './../lib/';
@@ -45,7 +45,7 @@ const InitialScreen = (props) => (
 			<Transition appear='horizontal'>
 				<Text style={styles.text}>Click toggle to see appearance animations.</Text>
 			</Transition>
-			<Transition shared='button' appear='bottom'>
+			<Transition shared='button' appear='bottom'>			
 				<Button title='Toggle' onPress={() => props.navigation.navigate('screen')} />
 			</Transition>
 		</View>
@@ -84,6 +84,12 @@ const Screen = (props) => (
 const Navigator = FluidNavigator({
     home: { screen: InitialScreen },
     screen: { screen: Screen },
+}, {
+    transitionConfig: {
+        timing: Animated.timing,    
+		easing: Easing.cubic,
+		duration: 800,
+    }
 });
 
 export default () => (
