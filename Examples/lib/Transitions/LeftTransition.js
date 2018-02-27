@@ -6,7 +6,7 @@ import BaseTransitionHelper from './BaseTransitionHelper';
 class LeftTransition extends BaseTransitionHelper {
 	getTransitionStyle(transitionConfiguration) {
 		if(!transitionConfiguration || transitionConfiguration.metrics === undefined)
-			return { opacity: 0 };
+			return { };
 
 		const { x, width } = transitionConfiguration.metrics;
 		const distanceValue = -(width + x + 25);		
@@ -16,7 +16,6 @@ class LeftTransition extends BaseTransitionHelper {
 		});
 
 		return {
-			opacity: 1,
 			transform: [{
 				translateX: progress
 			}]

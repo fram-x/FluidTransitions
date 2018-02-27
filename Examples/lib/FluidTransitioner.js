@@ -52,18 +52,18 @@ class FluidTransitioner extends Component {
 	}
 
 	componentDidMount() {
-		console.log("FluidTransitioner componentDidMount");
+		// console.log("FluidTransitioner componentDidMount");
 		this._layoutPromise = new Promise(resolve => this._layoutResolveFunc = resolve);
 
 		// Add appear transitions here
 		InteractionManager.runAfterInteractions(async () => {
 						
 			if(!this._transitionItemsView){
-				console.log("FluidTransitioner componentDidMount after interactions - bailing out.");
+				// console.log("FluidTransitioner componentDidMount after interactions - bailing out.");
 				return;
 			}
 
-			console.log("FluidTransitioner componentDidMount after interactions");
+			// console.log("FluidTransitioner componentDidMount after interactions");
 
 			// Wait for layout 
 			await this._layoutPromise;
@@ -83,7 +83,9 @@ class FluidTransitioner extends Component {
 			};
 			
 			// Start transition
-			await this._transitionItemsView.onTransitionStart(props, null, config);
+			const retVal = await this._transitionItemsView.onTransitionStart(props, null, config);
+			if(!retVal)
+				return;
 
 			// Run animation
 			const { timing } = config;
@@ -138,7 +140,7 @@ class FluidTransitioner extends Component {
 	_renderScene(transitionProps, prevProps) {
 		const { position, scene } = transitionProps;
 		const { index } = scene;
-		console.log('FluidTransitioner renderScene ' + index);
+		// console.log('FluidTransitioner renderScene ' + index);
 
 		let diff = 0;
 		if(prevProps)

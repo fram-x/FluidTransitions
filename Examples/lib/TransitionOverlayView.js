@@ -8,15 +8,14 @@ class TransitionOverlayView extends React.Component {
     }
     render() {
         if(!this.props.pairs || !this.props.progress){
-            console.log("TransitionOverlayView render empty");
+            // console.log("TransitionOverlayView render empty");
 			return <Animated.View
-				onLayout={this.onLayout.bind(this)}
 				style={[styles.emptyOverlay, this.getAppearStyle()]}
 				pointerEvents={'none'}
 			/>;
         }
 
-		console.log("TransitionOverlayView render");
+		// console.log("TransitionOverlayView render");
 		const self = this;
 		const sharedElements = this.props.pairs.map((pair, idx) => {
 
@@ -39,8 +38,8 @@ class TransitionOverlayView extends React.Component {
 
 		return (
 			<Animated.View
-				onLayout={this.onLayout.bind(this)}
 				style={[styles.overlay, this.getAppearStyle()]}
+				pointerEvents={'none'}
 			>
 				{sharedElements}
 			</Animated.View>
@@ -55,12 +54,8 @@ class TransitionOverlayView extends React.Component {
 		return { opacity: interpolator };
 	}
 
-	onLayout(event) {
-		// const { x, y, width, height } = event.nativeEvent.layout;
-		// console.log("TransitionOverlayView onLayout " + "x:" + x + " y:" + y + " w:" + width + " h:" + height);
-	}
     componentWillReceiveProps(nextProps) {
-        console.log("TransitionOverlayView componentWillReceiveProps");
+        // console.log("TransitionOverlayView componentWillReceiveProps");
     }
 
     getTransitionStyle(progress, fromItem, toItem) {
@@ -114,7 +109,7 @@ const styles = StyleSheet.create({
 		top: 0,
 		left: 0,
 		right: 0,
-        bottom: 0,        
+        bottom: 0,
 	},
 	sharedElement: {
 		position: 'absolute',

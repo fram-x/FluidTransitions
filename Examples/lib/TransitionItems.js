@@ -45,16 +45,8 @@ export default class TransitionItems {
 		return this._items;
 	}
 
-	updateMetrics(name, route, metrics) {
-		const itemIndex = this._findIndex(name, route);		
-		if(itemIndex > -1){
-			const item = this._items[itemIndex];
-			item.metrics = metrics;
-			// console.log("TransitionItems updateMetrics " + name + ", " + route + ": " + 
-			// 	"x:" + metrics.x + " y:" + metrics.y + " w:" + metrics.width + " h:" + metrics.height);
-			return true;
-		}
-		return false;
+	getItemByNameAndRoute(name, route) {
+		return this.getItems().find(e => e.name === name && e.route === route);
 	}
 
 	getSharedElements(fromRoute, toRoute) {
