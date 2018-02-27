@@ -5,18 +5,21 @@ export default class TransitionItem {
 		this.name = name;
 		this.route = route;
 		this.reactElement = reactElement;
-		this.shared = shared;		
+		this.shared = shared;
 		this.appear = appear;
 		this.nodelay = nodelay;
-		this.metrics = metrics;				
+		this.metrics = metrics;
 	}
+	
 	name
 	route
 	reactElement
-	metrics	
+	metrics
 	shared
 	appear
 	nodelay
+	layoutReady
+
 	scaleRelativeTo(other) {
 		const validate = i => {
 			if (!i.metrics) {
@@ -33,7 +36,7 @@ export default class TransitionItem {
 	getReactElement() {
 		return this.reactElement.getReactElement();
 	}
-	
+
 	clone() {
 		return new TransitionItem(
 			this.name, this.route, this.reactElement, this.shared, this.appear, this.nodelay, this.metrics);

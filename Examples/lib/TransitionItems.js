@@ -20,7 +20,7 @@ export default class TransitionItems {
 		if(this.getItems().findIndex(e => e.name === item.name && e.route === item.route) >= 0)
 			return false;
 
-		// console.log("TransitionItems add " + item.name + ", " + item.route);
+		console.log("TransitionItems add " + item.name + ", " + item.route);
 
 		const newItems = [...this.getItems(), item];
 		this.setItems(newItems);

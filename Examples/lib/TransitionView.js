@@ -44,25 +44,29 @@ class Transition extends React.Component {
 	render() {
 		// Get child
 		let element = React.Children.only(this.props.children);
-		// console.log("TransitionView render " +
-		// 	(element.type ? element.type.displayName : "UNKNOWN") + " (" + this._getName() +
-		// 	"/" + this._route + ")");
+		console.log("TransitionView render " +
+			(element.type ? element.type.displayName : "UNKNOWN") + " (" + this._getName() +
+			"/" + this._route + ")");
+
+		let elementProps = element.props;
 
 		// Wrap buttons to be able to animate them
-		if(element.type.name==='Button')
-			element = (<View>{element}</View>);
+		// if(element.type.name==='Button'){
+		// 	element = (<View>{element}</View>);
+		// 	elementProps = {};
+		// }
 
 		// Convert to animated component
 		const animatedComp = Animated.createAnimatedComponent(element.type);
 
 		// Build styles
-		const style =  [element.props.style];
+		const style =  [elementProps.style];
 		const appearStyle = this.getAppearStyle();
 		const transitionStyle = this.getTransitionStyle();
 
 		// Save properties
 		const props = {
-			...element.props,
+			...elementProps,
 			onLayout: this.onLayout.bind(this),
 			collapsable: false,
 			style: [style, transitionStyle, appearStyle],
@@ -124,8 +128,9 @@ class Transition extends React.Component {
 	}
 
 	async onLayout(event) {
+		console.log("TransitionView onLayout " + this._getName() + ", " + this._route);
 		const { layoutReady } = this.context;
-		if(!layoutReady) return;		
+		if(!layoutReady) return;
 		layoutReady(this._getName(), this._route);
 	}
 
