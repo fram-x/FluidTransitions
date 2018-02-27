@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { View, StyleSheet, Animated } from 'react-native';
 
-import BaseTransitionHelper from './BaseTransitionHelper';
+import BaseTransition from './BaseTransition';
 
-class ScaleTransition extends BaseTransitionHelper {
+class ScaleTransition extends BaseTransition {
 	getTransitionStyle(transitionConfiguration) {
 		if(!transitionConfiguration)
 			return { opacity: 0 };

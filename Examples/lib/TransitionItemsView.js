@@ -75,12 +75,13 @@ export default class TransitionItemsView extends React.Component {
 			return false;
 		}
 
-		//console.log("TransitionItemsView onTransitionStart wait for child layouts");
-		await new Promise(resolve => this._resolveChildLayoutFunc = resolve);
-
-		//console.log("TransitionItemsView onTransitionStart items measure...");
-		await this.measureItems(sharedElements, transitionElements);
-		//console.log("TransitionItemsView onTransitionStart items measured");
+		if(this.hasMoreItemsWaitingForMeasurement(sharedElements, transitionElements)) {
+			console.log("TransitionItemsView onTransitionStart wait for child layouts");
+			await new Promise(resolve => this._resolveChildLayoutFunc = resolve);
+			console.log("TransitionItemsView onTransitionStart items measure...");
+			await this.measureItems(sharedElements, transitionElements);
+			console.log("TransitionItemsView onTransitionStart items measured");
+		}
 
 		// Extend state with information about shared elements and appear elements
 		this.setState({
@@ -186,11 +187,11 @@ export default class TransitionItemsView extends React.Component {
 			this.state.fromRoute, this.state.toRoute);
 		const transitionElements = this._transitionItems.getTransitionElements(
 			this.state.fromRoute, this.state.toRoute);
-
-		if(sharedElements.length === 0 && transitionElements.length === 0) return;
-
+	
 		const item = this._transitionItems.getItemByNameAndRoute(name, route);
 		item.nodeHandle = nodeHandle;
+
+		if(sharedElements.length === 0 && transitionElements.length === 0) return;
 
 		// resolve layout read
 		for(let i=0; i<sharedElements.length; i++){
@@ -240,6 +241,11 @@ export default class TransitionItemsView extends React.Component {
 		});
 
 		return promise;
+	}
+	
+	hasMoreItemsWaitingForMeasurement(sharedElements, transitionElements) {
+		return sharedElements.map(m => !m.fromItem.metrics || !m.toItem.metrics) ||
+			transitionElements.map(m => !m.metrics);
 	}
 
 	getMetrics(name, route) {

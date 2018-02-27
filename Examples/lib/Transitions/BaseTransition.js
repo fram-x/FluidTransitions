@@ -1,4 +1,4 @@
-class BaseTransitionHelper {
+class BaseTransition {
     getTransitionSpec(spec) {
         return spec;
     }
@@ -7,4 +7,4 @@ class BaseTransitionHelper {
     }
 }
 
-export default BaseTransitionHelper;
+export default BaseTransition;

@@ -53,7 +53,7 @@ const InitialScreen = (props) => (
 
 const Screen = (props) => (
 	<View style={styles.container}>
-		<Transition appear='scale'>
+		<Transition appear='top'>
 			<View style={styles.textContainer}>
 		    	<Text>Screen</Text>
 			</View>
@@ -72,7 +72,7 @@ const Screen = (props) => (
                 <View style={styles.circle}/>
             </Transition>
 		</View>
-		<Transition appear='scale'>
+		<Transition appear='bottom'>
 			<Image source={{uri: 'https://picsum.photos/200/100?image=12'}} style={styles.image}/>
 		</Transition>
         <Transition shared='button'>
@@ -84,12 +84,12 @@ const Screen = (props) => (
 const Navigator = FluidNavigator({
     home: { screen: InitialScreen },
     screen: { screen: Screen },
-}, {
-    transitionConfig: {
-        timing: Animated.timing,    
-		easing: Easing.cubic,
-		duration: 800,
-    }
+// }, {
+//     transitionConfig: {
+//         timing: Animated.timing,    
+// 		easing: Easing.cubic,
+// 		duration: 800,
+//     }
 });
 
 export default () => (

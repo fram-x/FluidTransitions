@@ -1,9 +1,9 @@
 import React from 'react';
 import { Dimensions, Animated } from 'react-native';
 
-import BaseTransitionHelper from './BaseTransitionHelper';
+import BaseTransition from './BaseTransition';
 
-class BottomTransition extends BaseTransitionHelper {
+class BottomTransition extends BaseTransition {
 	getTransitionStyle(transitionConfiguration) {
 		if(!transitionConfiguration || transitionConfiguration.metrics === undefined)
 			return { };
@@ -12,7 +12,7 @@ class BottomTransition extends BaseTransitionHelper {
 		const distanceValue = Dimensions.get('window').height - (y + 25);
 		const progress = transitionConfiguration.progress.interpolate({
 			inputRange: [0, 1],
-			outputRange: [distanceValue, 0]
+			outputRange: transitionConfiguration.reverse ? [0, distanceValue] : [distanceValue, 0]
 		});
 
 		return {			
