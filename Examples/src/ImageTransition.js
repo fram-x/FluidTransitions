@@ -43,7 +43,7 @@ class ImageListScreen extends React.Component {
     componentDidMount() {
         const items = [];
         const size = Dimensions.get('window').width;
-        for(let i=0; i<10; i++){
+        for(let i=0; i<25; i++){
             let randomNumber = Math.floor((Math.random() * 250) + 1);
             while(items.findIndex(e => e.id === randomNumber) > -1){
                 randomNumber = Math.floor((Math.random() * 250) + 1);
