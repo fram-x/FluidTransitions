@@ -31,9 +31,9 @@ class Transition extends React.Component {
 	render() {
 		// Get child
 		let element = React.Children.only(this.props.children);
-		console.log("TransitionView render " +
-			(element.type ? element.type.displayName : "UNKNOWN") + " (" + this._getName() +
-			"/" + this._route + ")");
+		// console.log("TransitionView render " +
+		// 	(element.type ? element.type.displayName : "UNKNOWN") + " (" + this._getName() +
+		// 	"/" + this._route + ")");
 
 		// Wrap buttons to be able to animate them
 		if(element.type.name==='Button')
