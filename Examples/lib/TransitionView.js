@@ -15,11 +15,24 @@ import VerticalTransition from './Transitions/VerticalTransition';
 let uniqueBaseId = `transitionCompId-${Date.now()}`;
 let uuidCount = 0;
 
+const transitionTypes = [];
+export function registerTransitionType(name, transitionClass) {
+	transitionTypes.push({name, transitionClass})
+}
+
+registerTransitionType("scale", ScaleTransition);
+registerTransitionType("top", TopTransition);
+registerTransitionType("bottom", BottomTransition);
+registerTransitionType("left", LeftTransition);
+registerTransitionType("right", RightTransition);
+registerTransitionType("horizontal", HorizontalTransition);
+registerTransitionType("vertical", VerticalTransition);
+
 class Transition extends React.Component {
 	constructor(props, context){
 		super(props, context);
 		this._name = `${uniqueBaseId}-${uuidCount++}`;
-		this._transitionHelper = null;		
+		this._transitionHelper = null;
 	}
 
 	_name
@@ -124,30 +137,10 @@ class Transition extends React.Component {
 
 	getTransitionHelper(appear){
 		if(this._transitionHelper === null) {
-			switch(appear){
-				case 'top':
-					this._transitionHelper = new TopTransition();
-					break;
-				case 'bottom':
-					this._transitionHelper = new BottomTransition();
-					break;
-				case 'left':
-					this._transitionHelper = new LeftTransition();
-					break;
-				case 'right':
-					this._transitionHelper = new RightTransition();
-					break;
-				case 'horizontal':
-					this._transitionHelper = new HorizontalTransition();
-					break;
-				case 'vertical':
-					this._transitionHelper = new VerticalTransition();
-					break;
-				case 'scale':
-					this._transitionHelper = new ScaleTransition();
-					break;
-				default:
-					break;
+			if(appear){
+				const transitionType = transitionTypes.find(e => e.name === appear);
+				if(transitionType)
+					this._transitionHelper = new transitionType.transitionClass();
 			}
 		}
 		return this._transitionHelper;
