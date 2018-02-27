@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Animated, findNodeHandle } from 'react-native';
+import { Button, View, Animated, findNodeHandle } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
@@ -49,15 +49,20 @@ class Transition extends React.Component {
 			"/" + this._route + ")");
 
 		let elementProps = element.props;
+		let animatedComp;
+		let child = null;
 
 		// Wrap buttons to be able to animate them
-		// if(element.type.name==='Button'){
-		// 	element = (<View>{element}</View>);
-		// 	elementProps = {};
-		// }
-
-		// Convert to animated component
-		const animatedComp = Animated.createAnimatedComponent(element.type);
+		if(element.type.name==='Button'){
+			element = React.createElement(element.type, {...element.props, collapsable: false});
+			const wrapper = (<View>{element}</View>);
+			elementProps = {};
+			animatedComp = Animated.createAnimatedComponent(wrapper.type);
+			child = element;
+		}
+		else
+			// Convert to animated component
+			animatedComp = Animated.createAnimatedComponent(element.type);
 
 		// Build styles
 		const style =  [elementProps.style];
@@ -72,6 +77,9 @@ class Transition extends React.Component {
 			style: [style, transitionStyle, appearStyle],
 			ref: (ref) => this._viewRef = ref
 		};
+	
+		if(child)
+			return React.createElement(animatedComp, props, child);
 
 		return React.createElement(animatedComp, props);
 	}
