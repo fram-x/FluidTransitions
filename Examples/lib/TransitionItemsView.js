@@ -27,8 +27,8 @@ export default class TransitionItemsView extends React.Component {
 		this.state = { currentTransition: null };
 		this._isMounted = false;
 		this._overlay = null;
-		this._fadeTransitionTime = 25;		
-
+		this._fadeTransitionTime = 25;
+		this._resolveLayoutPromise = new Promise(resolve => this._resolveLayoutFunc = resolve);
 	}
 
 	_fadeTransitionTime
@@ -156,7 +156,8 @@ export default class TransitionItemsView extends React.Component {
 		// console.log("TransitionItemsView: render");
 		return(
 			<View
-				style={styles.container}				
+				onLayout={this.onLayout.bind(this)}
+				style={styles.container}
 				ref={(ref) => this._viewRef = ref}
 			>
 				{this.props.children}
@@ -166,6 +167,13 @@ export default class TransitionItemsView extends React.Component {
 				/>
 			</View>
 		);
+	}
+
+	onLayout() {
+		if(this._resolveLayoutFunc){
+			this._resolveLayoutFunc();
+			this._resolveLayoutFunc = null;
+		}	
 	}
 
 	layoutReady(name, route) {
@@ -181,7 +189,7 @@ export default class TransitionItemsView extends React.Component {
 			return;
 		}
 		item.layoutRead = true;
-		
+
 		if(sharedElements.length === 0 && transitionElements.length === 0) return;
 
 		// resolve layout read
@@ -202,16 +210,16 @@ export default class TransitionItemsView extends React.Component {
 		}
 	}
 
-	async measureItems(sharedElements, transitionElements) {		
+	async measureItems(sharedElements, transitionElements) {
 		let resolveFunc;
 		let viewMetrics = {};
 		const promise = new Promise(resolve => resolveFunc = resolve);
 		const nodeHandle = findNodeHandle(this._viewRef);
 		UIManager.measureInWindow(nodeHandle, (x, y, width, height) => {
-			viewMetrics = {x, y, width, height };			
+			viewMetrics = {x, y, width, height };
 			resolveFunc();
-		});		
-		
+		});
+
 		await promise;
 
 		for(let i=0; i<sharedElements.length; i++){
@@ -231,9 +239,9 @@ export default class TransitionItemsView extends React.Component {
 
 		const self = this;
 		return new Promise((resolve, reject) => {
-			console.log("TransitionItemsView measureItem " + item.name + ", " + item.route);
+			// console.log("TransitionItemsView measureItem " + item.name + ", " + item.route);
 			UIManager.measureInWindow(item.reactElement.getNodeHandle(), (x, y, width, height) => {
-				console.log("TransitionItemsView measureItem success " + item.name + ", " + item.route);
+				//console.log("TransitionItemsView measureItem success " + item.name + ", " + item.route);
 				item.metrics = {x: x - viewMetrics.x, y: y - viewMetrics.y, width, height };
 				resolve();
 			});

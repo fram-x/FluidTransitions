@@ -10,8 +10,6 @@ class FluidTransitioner extends Component {
 		super(props);
 	}
 
-	_layoutPromise
-	_layoutResolveFunc
 	_transitionItemsView
 
 	static childContextTypes = {
@@ -28,15 +26,13 @@ class FluidTransitioner extends Component {
 
 	render() {
 		return (
-			<View style={styles.container} onLayout={this.onLayout.bind(this)}>
-				<Transitioner
-					configureTransition={this._configureTransition.bind(this)}
-					onTransitionStart={this._onTransitionStart.bind(this)}
-					onTransitionEnd={this._onTransitionEnd.bind(this)}
-					render={this._render.bind(this)}
-					navigation={this.props.navigation}
-				/>
-			</View>
+			<Transitioner
+				configureTransition={this._configureTransition.bind(this)}
+				onTransitionStart={this._onTransitionStart.bind(this)}
+				onTransitionEnd={this._onTransitionEnd.bind(this)}
+				render={this._render.bind(this)}
+				navigation={this.props.navigation}
+			/>
 		);
 	}
 
@@ -44,29 +40,15 @@ class FluidTransitioner extends Component {
 		return this.props !== nextProps;
 	}
 
-	onLayout() {
-		if(this._layoutResolveFunc){
-			this._layoutResolveFunc();
-			this._layoutResolveFunc = null;
-		}
-	}
-
 	componentDidMount() {
-		// console.log("FluidTransitioner componentDidMount");
-		this._layoutPromise = new Promise(resolve => this._layoutResolveFunc = resolve);
 
 		// Add appear transitions here
 		InteractionManager.runAfterInteractions(async () => {
-						
+
 			if(!this._transitionItemsView){
 				// console.log("FluidTransitioner componentDidMount after interactions - bailing out.");
 				return;
 			}
-
-			// console.log("FluidTransitioner componentDidMount after interactions");
-
-			// Wait for layout 
-			await this._layoutPromise;
 
 			// Build properties
 			const config = this._configureTransition();
@@ -81,7 +63,7 @@ class FluidTransitioner extends Component {
 					route: state.routes[state.index]
 				}
 			};
-			
+
 			// Start transition
 			const retVal = await this._transitionItemsView.onTransitionStart(props, null, config);
 			if(!retVal)
