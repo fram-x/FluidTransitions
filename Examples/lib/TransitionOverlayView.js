@@ -35,7 +35,10 @@ class TransitionOverlayView extends React.Component {
 			const transitionStyle = self.getTransitionStyle(fromItem, toItem);
 
 			// Buttons needs to be wrapped in a view to work properly.
-			let element = React.Children.only(fromItem.reactElement.props.children);
+			let element = React.Children.only(self._transitionConfig.direction === -1 ? 
+				fromItem.reactElement.props.children : 
+				toItem.reactElement.props.children);
+				
 			if(element.type.name === 'Button')
 				element = (<View>{element}</View>);
 
@@ -140,8 +143,8 @@ const styles = StyleSheet.create({
 	},
 	sharedElement: {
 		position: 'absolute',
-		borderColor: '#34CE34',
-		borderWidth: 1,
+		// borderColor: '#34CE34',
+		// borderWidth: 1,
 		margin: 0,
 		left: 0,
 		top: 0,

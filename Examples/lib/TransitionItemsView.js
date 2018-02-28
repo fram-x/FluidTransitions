@@ -27,7 +27,7 @@ export default class TransitionItemsView extends React.Component {
 
 		this._isMounted = false;
 		this._overlayView = null;
-		this._fadeTransitionTime = 550;
+		this._fadeTransitionTime = 50;
 	}
 
 	_fadeTransitionTime
@@ -88,7 +88,10 @@ export default class TransitionItemsView extends React.Component {
 
 		// Lets update the overlay
 		if(this._overlayView)
-			this._overlayView.setTransitionConfig({sharedElements, progress: props.progress});
+			this._overlayView.setTransitionConfig({sharedElements, 
+				progress: props.progress,
+				direction}
+		);
 
 		// Lets fade in the overlay
 		await this.runAppearAnimation(this._sharedProgress, 1.0, config);
@@ -125,7 +128,8 @@ export default class TransitionItemsView extends React.Component {
 				pair.toItem.reactElement.endTransition();
 			});
 
-			this._transitionConfig.transitionElements.forEach(item => item.reactElement.endTransition());
+			this._transitionConfig.transitionElements.forEach(item => 
+				item.reactElement.endTransition());
 
 			await this.runAppearAnimation(this._hiddenProgress, 1.0, config);
 			await this.runAppearAnimation(this._sharedProgress, 0.0, config);
@@ -143,6 +147,7 @@ export default class TransitionItemsView extends React.Component {
 				this._overlayView.setTransitionConfig({});
 		}
 	}
+
 	runAppearAnimation(progress, toValue, config){
 		let swapAnimationDone = null;
 		const swapPromise = new Promise((resolve, reject) =>
@@ -304,7 +309,7 @@ export default class TransitionItemsView extends React.Component {
 
 	_lastChildCount;
 	shouldComponentUpdate(nextProps, nextState) {
-		const retVal = nextProps.children.length > this._lastChildCount;
+		const retVal = nextProps.children.length !== this._lastChildCount;
 		this._lastChildCount = nextProps.children.length;
 		return retVal;
 	}

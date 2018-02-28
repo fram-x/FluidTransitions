@@ -133,13 +133,13 @@ class Transition extends React.Component {
 		const { getIsSharedElement, hiddenProgress } = this.context;
 		if(!getIsSharedElement || !hiddenProgress) return { };
 
-		//if(this._isInTransition && getIsSharedElement(this._getName(), this._route)) {
+		if(getIsSharedElement(this._getName(), this._route)) {
 			const interpolator = hiddenProgress.interpolate({
 				inputRange: [0, 1],
 				outputRange: [0, 1],
 			});
 			return { opacity: interpolator };
-		// }
+		}
 
 		// return { };
 	}
@@ -218,8 +218,8 @@ class Transition extends React.Component {
 
 const styles = StyleSheet.create({
 	transitionElement: {
-		borderColor: '#FF0000',
-		borderWidth: 1,
+		// borderColor: '#FF0000',
+		// borderWidth: 1,
 	}
 });
 
