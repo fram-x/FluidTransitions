@@ -64,7 +64,7 @@ export default class TransitionItemsView extends React.Component {
 		const toRoute = props.scene.route.routeName;
 		const fromRoute = prevProps ? prevProps.scene.route.routeName : "UNKNOWN";
 		const direction = props.index > (prevProps ? prevProps.index : 9999) ? 1 : -1;
-		
+				
 		this.setState({...this.state, fromRoute, toRoute, direction});
 		
 		// Get items in transition

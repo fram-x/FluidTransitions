@@ -39,8 +39,8 @@ class Transition extends React.Component {
 	_route
 	_isMounted
 	_transitionHelper
-	_viewRef	
-	
+	_viewRef
+
 	render() {
 		// Get child
 		let element = React.Children.only(this.props.children);
@@ -61,8 +61,10 @@ class Transition extends React.Component {
 			child = element;
 		}
 		else
+		{
 			// Convert to animated component
 			animatedComp = Animated.createAnimatedComponent(element.type);
+		}
 
 		// Build styles
 		const style =  [elementProps.style];
@@ -77,7 +79,7 @@ class Transition extends React.Component {
 			style: [style, transitionStyle, appearStyle],
 			ref: (ref) => this._viewRef = ref
 		};
-	
+
 		if(child)
 			return React.createElement(animatedComp, props, child);
 
@@ -85,7 +87,10 @@ class Transition extends React.Component {
 	}
 
 	getTransitionStyle() {
-		const opacityStyle = {opacity: this.context.hiddenProgress.interpolate({
+		const { hiddenProgress } = this.context;
+		if(!hiddenProgress) return { };
+
+		const opacityStyle = {opacity: hiddenProgress.interpolate({
 			inputRange:[0, 0.75, 1],
 			outputRange: [0, 0, 1]
 		})};
@@ -93,13 +98,13 @@ class Transition extends React.Component {
 		const { getIsSharedElement, getMetrics, getDirection, getReverse } = this.context;
 		if(!getIsSharedElement && !getMetrics && !getDirection && !getReverse) return;
 
-		if(getIsSharedElement(this._getName(), this._route) || !this.props.appear){			
+		if(getIsSharedElement(this._getName(), this._route) || !this.props.appear){
 			return {};
 		}
 
 		if(!this.context.transitionProgress())
 			return opacityStyle;
-		
+
 		const metrics = getMetrics(this._getName(), this._route);
 
 		const transitionHelper = this.getTransitionHelper(this.props.appear);
@@ -159,18 +164,6 @@ class Transition extends React.Component {
 			}
 		}
 		return this._transitionHelper;
-	}
-
-	shouldComponentUpdate(nextProps, nextState){
-		// const retVal = true;
-		// let isSharedElement;
-		// const { getIsSharedElement } = this.context;
-		// if(!getIsSharedElement) return true;		
-		// isSharedElement = (getIsSharedElement(this._getName(), this._route));
-		// if(this._lastIsSharedElement === isSharedElement)
-		// 	return false;
-
-		return true;
 	}
 
 	componentWillMount() {
