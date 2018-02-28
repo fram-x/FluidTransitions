@@ -3,24 +3,36 @@ import { View, StyleSheet, Animated } from 'react-native';
 import PropTypes from 'prop-types';
 
 class TransitionOverlayView extends React.Component {
-    constructor(props){
-        super(props);
-    }
+    constructor(props, context){
+		super(props, context);
+		this._transitionConfig = {};		
+		this._forceUpdate = false;
+		this._isMounted = false;
+	}
+
+	_transitionConfig
+	_forceUpdate
+	_isMounted
+
+	setTransitionConfig(transitionConfig) {		
+		this._transitionConfig = transitionConfig;
+		this._forceUpdate = true;
+		if(this._isMounted)
+			this.forceUpdate();
+	}
+
     render() {
-        if(!this.props.pairs || !this.props.progress){
+        if(!this._transitionConfig.sharedElements){
             // console.log("TransitionOverlayView render empty");
-			return <Animated.View
-				style={[styles.emptyOverlay, this.getAppearStyle()]}
-				pointerEvents={'none'}
-			/>;
+			return null;
         }
 
-		// console.log("TransitionOverlayView render");
-		const self = this;
-		const sharedElements = this.props.pairs.map((pair, idx) => {
+		console.log("TransitionOverlayView render");
+		const self = this;		
+		const sharedElements = this._transitionConfig.sharedElements.map((pair, idx) => {
 
             const {fromItem, toItem} = pair;
-			const transitionStyle = self.getTransitionStyle(self.props.progress, fromItem, toItem);
+			const transitionStyle = self.getTransitionStyle(fromItem, toItem);
 
 			// Buttons needs to be wrapped in a view to work properly.
 			let element = React.Children.only(fromItem.reactElement.props.children);
@@ -29,8 +41,8 @@ class TransitionOverlayView extends React.Component {
 
 			const AnimatedComp = Animated.createAnimatedComponent(element.type);
             const props = { ...element.props,
-                style: [element.props.style, transitionStyle],
-                key: idx
+				style: [element.props.style, transitionStyle],				
+                key: idx,
             };
 
 			return React.createElement(AnimatedComp, props, element.props.children);
@@ -39,6 +51,7 @@ class TransitionOverlayView extends React.Component {
 		return (
 			<Animated.View
 				style={[styles.overlay, this.getAppearStyle()]}
+				onLayout={this.props.onLayout}
 				pointerEvents={'none'}
 			>
 				{sharedElements}
@@ -48,17 +61,16 @@ class TransitionOverlayView extends React.Component {
 
 	getAppearStyle() {
 		const interpolator = this.context.sharedProgress.interpolate({
-			inputRange: [0, 0.35, 1],
-			outputRange: [0, 1, 1],
+			inputRange: [0, 1],
+			outputRange: [0, 1],
 		});
 		return { opacity: interpolator };
 	}
 
-    componentWillReceiveProps(nextProps) {
-        // console.log("TransitionOverlayView componentWillReceiveProps");
-    }
+    getTransitionStyle(fromItem, toItem) {
+		const { progress } = this._transitionConfig;
+		if(!progress) return {};
 
-    getTransitionStyle(progress, fromItem, toItem) {
 		const toVsFromScaleX = toItem.scaleRelativeTo(fromItem).x;
 		const toVsFromScaleY = toItem.scaleRelativeTo(fromItem).y;
 
@@ -91,6 +103,21 @@ class TransitionOverlayView extends React.Component {
 		}];
 	}
 
+	shouldComponentUpdate(nextProps, nextState) {
+		const retVal = this._forceUpdate;
+		this._forceUpdate = false;
+		console.log("TransitionOverlayView shouldUpdate " + retVal);
+		return retVal;
+	}
+
+	componentDidMount() {
+		this._isMounted = true;
+	}
+
+	componentWillUnmount() {
+		this._isMounted = false;
+	}
+
 	static contextTypes = {
 		sharedProgress: PropTypes.object
 	}
@@ -102,19 +129,19 @@ const styles = StyleSheet.create({
 		top: 0,
 		left: 0,
 		right: 0,
-        bottom: 0,
+		bottom: 0,
     },
     emptyOverlay: {
         position: 'absolute',
 		top: 0,
 		left: 0,
 		right: 0,
-        bottom: 0,
+		bottom: 0,
 	},
 	sharedElement: {
 		position: 'absolute',
-		// borderColor: '#34CE34',
-		// borderWidth: 2,
+		borderColor: '#34CE34',
+		borderWidth: 1,
 		margin: 0,
 		left: 0,
 		top: 0,
