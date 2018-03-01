@@ -27,7 +27,7 @@ class TransitionOverlayView extends React.Component {
 			return null;
         }
 
-		console.log("TransitionOverlayView render");
+		// console.log("TransitionOverlayView render");
 		const self = this;		
 		const sharedElements = this._transitionConfig.sharedElements.map((pair, idx) => {
 
@@ -38,7 +38,7 @@ class TransitionOverlayView extends React.Component {
 			let element = React.Children.only(self._transitionConfig.direction === -1 ? 
 				fromItem.reactElement.props.children : 
 				toItem.reactElement.props.children);
-				
+
 			if(element.type.name === 'Button')
 				element = (<View>{element}</View>);
 
@@ -109,7 +109,7 @@ class TransitionOverlayView extends React.Component {
 	shouldComponentUpdate(nextProps, nextState) {
 		const retVal = this._forceUpdate;
 		this._forceUpdate = false;
-		console.log("TransitionOverlayView shouldUpdate " + retVal);
+		// console.log("TransitionOverlayView shouldUpdate " + retVal);
 		return retVal;
 	}
 

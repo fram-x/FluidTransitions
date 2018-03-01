@@ -28,6 +28,7 @@ export default class TransitionItemsView extends React.Component {
 		this._isMounted = false;
 		this._overlayView = null;
 		this._fadeTransitionTime = 50;
+		this._itemsToMeasure = [];
 	}
 
 	_fadeTransitionTime
@@ -51,17 +52,13 @@ export default class TransitionItemsView extends React.Component {
 	_appearTransitionPromise
 	_appearTransitionPromiseResolve
 
+	_itemsToMeasure
+
 	async onTransitionStart(props, prevProps, config) {
 
 		console.log("-------------------------------------");
 		console.log("TransitionItemsView onTransitionStart");
 		console.log("-------------------------------------");
-
-		// If we're appearing and there are no appear transition, lets just bail out.
-		if(!prevProps && this._transitionItems.getTransitionElements(fromRoute, toRoute).length === 0) {
-			console.log("TransitionItemsView onTransitionStart skipping. No transitions.");
-			return;
-		}
 
 		// Get the rest of the data required to run a transition
 		const toRoute = props.scene.route.routeName;
@@ -69,6 +66,12 @@ export default class TransitionItemsView extends React.Component {
 		const direction = props.index > (prevProps ? prevProps.index : 9999) ? 1 : -1;
 		const sharedElements = this._transitionItems.getSharedElements(fromRoute, toRoute);
 		const transitionElements = this._transitionItems.getTransitionElements(fromRoute, toRoute);
+
+		// If we're appearing and there are no appear transition, lets just bail out.
+		if(!prevProps && transitionElements.length === 0) {
+			console.log("TransitionItemsView onTransitionStart skipping. No transitions.");
+			return;
+		}
 
 		this._transitionConfig = {
 			fromRoute, toRoute, sharedElements, transitionElements, direction, config,
@@ -84,7 +87,12 @@ export default class TransitionItemsView extends React.Component {
 			", t:" + transitionElements.length);
 
 		// wait for layouts in child elements
-		await this.resolveLayouts(sharedElements, transitionElements, prevProps === null);
+		if(this._itemsToMeasure.length > 0) {
+			await this.measureItems(sharedElements, transitionElements);
+			this._itemsToMeasure = [];
+		}
+		else
+			await this.resolveLayouts(sharedElements, transitionElements, prevProps === null);
 
 		// Lets update the overlay
 		if(this._overlayView)
@@ -120,7 +128,7 @@ export default class TransitionItemsView extends React.Component {
 	}
 
 	async onTransitionEnd(props, prevProps, config) {
-		console.log("TransitionItemsView onTransitionEnd");
+		// console.log("TransitionItemsView onTransitionEnd");
 		if(this._transitionConfig.toRoute && this._transitionConfig.fromRoute){
 
 			this._transitionConfig.sharedElements.forEach(pair => {
@@ -145,6 +153,8 @@ export default class TransitionItemsView extends React.Component {
 
 			if(this._overlayView)
 				this._overlayView.setTransitionConfig({});
+
+			this._itemsToMeasure = [];
 		}
 	}
 
@@ -164,7 +174,7 @@ export default class TransitionItemsView extends React.Component {
 	}
 
 	render() {
-		console.log("TransitionItemsView: render");
+		// console.log("TransitionItemsView: render");
 		return(
 			<View
 				onLayout={this.onLayout.bind(this)}
@@ -181,7 +191,7 @@ export default class TransitionItemsView extends React.Component {
 	}
 
 	onOverlayLayout() {
-		console.log("TransitionItemsView onOverlaylayout");
+		// console.log("TransitionItemsView onOverlaylayout");
 	}
 
 	async resolveLayouts(sharedElements, transitionElements, appear = false) {
@@ -196,11 +206,11 @@ export default class TransitionItemsView extends React.Component {
 	}
 
 	onLayout() {
-		console.log("TransitionItemsView onLayout");
+		// console.log("TransitionItemsView onLayout");
 	}
 
 	layoutReady(name, route) {
-		//console.log("TransitionItemsView layoutReady " + name + ", " + route);
+		// console.log("TransitionItemsView layoutReady " + name + ", " + route);
 		const sharedElements = this._transitionItems.getSharedElements(
 			this._transitionConfig.fromRoute, this._transitionConfig.toRoute);
 
@@ -212,13 +222,15 @@ export default class TransitionItemsView extends React.Component {
 			// a stray element that will be removed - lets just bail out
 			//console.log("TransitionItemsView layoutReady bailing out. No item found " + name + ", " + route);
 			return;
-		}
-		item.layoutReady = true;
-
+		}		
+	
 		if(sharedElements.length === 0 && transitionElements.length === 0) {
 			// console.log("TransitionItemsView layoutReady bailing out. No items in transition.");
+			this._itemsToMeasure.push(item);
 			return;
-		}
+		}		
+
+		item.layoutReady = true;
 
 		// resolve layout read
 		for(let i=0; i<sharedElements.length; i++){
@@ -250,14 +262,18 @@ export default class TransitionItemsView extends React.Component {
 
 		await promise;
 
-		for(let i=0; i<sharedElements.length; i++){
-			const pair = sharedElements[i];
-			await this.measureItem(viewMetrics, pair.fromItem, nodeHandle);
-			await this.measureItem(viewMetrics, pair.toItem, nodeHandle);
+		if(sharedElements) {
+			for(let i=0; i<sharedElements.length; i++){
+				const pair = sharedElements[i];
+				await this.measureItem(viewMetrics, pair.fromItem, nodeHandle);
+				await this.measureItem(viewMetrics, pair.toItem, nodeHandle);
+			}
 		}
 
-		for(let i=0; i<transitionElements.length; i++){
-			await this.measureItem(viewMetrics, transitionElements[i], nodeHandle);
+		if(transitionElements) {
+			for(let i=0; i<transitionElements.length; i++){
+				await this.measureItem(viewMetrics, transitionElements[i], nodeHandle);
+			}
 		}
 	}
 

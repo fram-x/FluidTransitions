@@ -68,10 +68,7 @@ class Transition extends React.Component {
 		let elementProps = element.props;
 		let animatedComp;
 		let child = null;
-
-		if(element.type.displayName === 'Image')
-			console.log("TransitionView render IMAGE " + this._getName() + " " + this._route);
-
+		
 		// Wrap buttons to be able to animate them
 		if(element.type.name==='Button'){
 			element = React.createElement(element.type, {...element.props, collapsable: false});
@@ -141,7 +138,7 @@ class Transition extends React.Component {
 			return { opacity: interpolator };
 		}
 
-		// return { };
+		return { };
 	}
 
 	shouldComponentUpdate(nextProps, nextState){
