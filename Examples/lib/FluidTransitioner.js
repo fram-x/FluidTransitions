@@ -126,14 +126,15 @@ class FluidTransitioner extends Component {
 
 		let diff = 0;
 		if(prevProps)
-			diff = (index - prevProps.index);
+			diff = (index - transitionProps.index);
 
 		let opacity = 0.0;
-		//if(diff <= 1 && diff >= -1)
+		if(diff <= 1 && diff >= -1)
 			opacity = position.interpolate({
 				inputRange: [index - 1, index - 0.0001, index, index + 0.9999, index + 1],
 				outputRange: [0, 1, 1, 1, 0],
 			});
+			console.log('FluidTransitioner renderScene ' + index + " " + opacity);
 
 		const style = { opacity };
 		const navigation = this._getChildNavigation(scene);
@@ -149,6 +150,7 @@ class FluidTransitioner extends Component {
 			</Animated.View>
 		);
 	}
+
 	_getChildNavigation = (scene) => {
 		if (!this._childNavigationProps)
 			this._childNavigationProps = {};
