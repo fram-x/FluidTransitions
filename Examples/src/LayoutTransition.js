@@ -43,12 +43,12 @@ const styles = StyleSheet.create({
 
 const InitialScreen = (props) => (
 	<ScrollView contentContainerStyle={styles.container}>
-		<Text style={styles.header}>Lorem ipsum</Text>
 		<Transition shared='buttons'>
 			<View style={styles.buttonContainer}>
 				<Button title='Toggle' onPress={() => props.navigation.navigate('screen')} />
 			</View>
 		</Transition>
+		<Text style={styles.header}>Lorem ipsum</Text>		
 		<Transition shared='text1'>
 			<Text style={styles.textContainer}>
 				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum
@@ -77,7 +77,7 @@ const InitialScreen = (props) => (
 const Screen = (props) => (
 	<ScrollView contentContainerStyle={styles.container}>
 		<Transition shared='buttons'>
-			<View style={styles.buttonContainer}>
+			<View style={[styles.buttonContainer, {transform: [{ rotate: '180deg' }]}]}>
 				<Button title='Toggle' onPress={() => props.navigation.goBack()} />
 			</View>
 		</Transition>

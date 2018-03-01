@@ -77,6 +77,18 @@ class TransitionOverlayView extends React.Component {
 		const toVsFromScaleX = toItem.scaleRelativeTo(fromItem).x;
 		const toVsFromScaleY = toItem.scaleRelativeTo(fromItem).y;
 
+		let rotateFrom = this.getRotation(fromItem);
+		let rotateTo = this.getRotation(toItem);
+		let rotate = '0deg';
+		if(rotateFrom || rotateTo) {
+			if(!rotateFrom) rotateFrom = '0deg';
+			if(!rotateTo) rotateTo = '0deg';
+			rotate = progress.interpolate({
+				inputRange: [0, 1],
+				outputRange: [rotateFrom, rotateTo]
+			});
+		}
+
 		const scaleX = progress.interpolate({
 			inputRange: [0, 1],
 			outputRange: [1, toVsFromScaleX],
@@ -102,8 +114,22 @@ class TransitionOverlayView extends React.Component {
 		return [styles.sharedElement, {
 			width: fromItem.metrics.width,
 			height: fromItem.metrics.height,
-			transform: [{ translateX }, { translateY }, { scaleX }, { scaleY }]
+			transform: [{ translateX }, { translateY }, { scaleX }, { scaleY }, { rotate }]
 		}];
+	}
+
+	getRotation(item) {
+		const element = React.Children.only(item.reactElement.props.children);
+		const styles = element.props.style;
+		if(!styles) return null;		
+		const s = StyleSheet.flatten(styles);
+		if(s.transform){
+			const rotation = s.transform.find(e => e.rotate);
+			if(rotation){
+				return rotation.rotate;
+			}
+		}
+		return null;
 	}
 
 	shouldComponentUpdate(nextProps, nextState) {
