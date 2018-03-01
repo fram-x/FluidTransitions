@@ -36,6 +36,7 @@ class Transition extends React.Component {
 
 		this._isInTransition = false;
 		this._forceUpdate = false;
+		this._startTransition = this.props.appear ? 0 : 1;
 	}
 
 	_name
@@ -44,6 +45,7 @@ class Transition extends React.Component {
 	_transitionHelper
 	_viewRef
 
+	_startTransition
 	_forceUpdate
 	_isInTransition
 
@@ -62,13 +64,13 @@ class Transition extends React.Component {
 	}
 
 	render() {
-				
+
 		// Get child
 		let element = React.Children.only(this.props.children);
 		let elementProps = element.props;
 		let animatedComp;
 		let child = null;
-		
+
 		// Wrap buttons to be able to animate them
 		if(element.type.name==='Button'){
 			element = React.createElement(element.type, {...element.props, collapsable: false});
@@ -106,24 +108,28 @@ class Transition extends React.Component {
 		const { hiddenProgress, getIsSharedElement, getMetrics, getDirection, getReverse } = this.context;
 		if(!getIsSharedElement && !getMetrics && !getDirection && !getReverse) return { };
 
-		if(this._isInTransition && this.context.transitionProgress()){
-			const metrics = getMetrics(this._getName(), this._route);
-			const transitionHelper = this.getTransitionHelper(this.props.appear);
+		if(this._isInTransition){
 
-			if(transitionHelper){
-				const direction = getDirection(this._getName(), this._route);
-				const transitionConfig = {
-					progress: this.context.transitionProgress(),
-					direction,
-					metrics: metrics,
-					start: direction === 1 ? 0 : 1,
-					end: direction === 1 ? 1 : 0,
-					reverse: getReverse(this._route)
-				};
-				return transitionHelper.getTransitionStyle(transitionConfig);
-			}
+			const direction = getDirection(this._getName(), this._route);
+
+			if(this.context.transitionProgress()){
+				this._startTransition = 1;
+				const metrics = getMetrics(this._getName(), this._route);
+				const transitionHelper = this.getTransitionHelper(this.props.appear);
+				if(transitionHelper){
+					const transitionConfig = {
+						progress: this.context.transitionProgress(),
+						direction,
+						metrics: metrics,
+						start: direction === 1 ? 0 : 1,
+						end: direction === 1 ? 1 : 0,
+						reverse: getReverse(this._route)
+					};
+					return transitionHelper.getTransitionStyle(transitionConfig);
+				}
+			}			
 		}
-		return {};
+		return { opacity: this._startTransition };
 	}
 
 	getAppearStyle() {

@@ -134,8 +134,7 @@ class FluidTransitioner extends Component {
 				inputRange: [index - 1, index - 0.0001, index, index + 0.9999, index + 1],
 				outputRange: [0, 1, 1, 1, 0],
 			});
-			console.log('FluidTransitioner renderScene ' + index + " " + opacity);
-
+			
 		const style = { opacity };
 		const navigation = this._getChildNavigation(scene);
 

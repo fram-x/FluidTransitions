@@ -56,7 +56,7 @@ export default class TransitionItemsView extends React.Component {
 
 	async onTransitionStart(props, prevProps, config) {
 
-		console.log("TransitionItemsView onTransitionStart");
+		// console.log("TransitionItemsView onTransitionStart");
 		
 		// Get the rest of the data required to run a transition
 		const toRoute = props.scene.route.routeName;
@@ -81,8 +81,8 @@ export default class TransitionItemsView extends React.Component {
 			return false;
 		}
 
-		console.log("TransitionItemsView onTransitionStart se:" + sharedElements.length +
-			", t:" + transitionElements.length);
+		// console.log("TransitionItemsView onTransitionStart se:" + sharedElements.length +
+		// 	", t:" + transitionElements.length);
 
 		// wait for layouts in child elements
 		if(this._itemsToMeasure.length > 0) {
@@ -296,10 +296,13 @@ export default class TransitionItemsView extends React.Component {
 	}
 
 	getDirection(name, route) {
-		if(route === this._transitionConfig.toRoute)
-			return 1;
-		else
+		if(!this._transitionConfig.fromRoute) 
+			return 0;
+
+		if(route === this._transitionConfig.fromRoute)
 			return -1;
+		else
+			return 1;
 	}
 
 	getReverse(route) {
@@ -323,7 +326,7 @@ export default class TransitionItemsView extends React.Component {
 
 	_lastChildCount;
 	shouldComponentUpdate(nextProps, nextState) {
-		const retVal = nextProps.children.length !== this._lastChildCount;
+		const retVal =  nextProps.children.length !== this._lastChildCount;
 		this._lastChildCount = nextProps.children.length;
 		return retVal;
 	}
