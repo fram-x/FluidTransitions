@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, View, Animated, findNodeHandle } from 'react-native';
+import { Button, View, Animated, StyleSheet, findNodeHandle } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
@@ -33,6 +33,9 @@ class Transition extends React.Component {
 		super(props, context);
 		this._name = `${uniqueBaseId}-${uuidCount++}`;
 		this._transitionHelper = null;
+
+		this._isInTransition = false;
+		this._forceUpdate = false;
 	}
 
 	_name
@@ -41,17 +44,31 @@ class Transition extends React.Component {
 	_transitionHelper
 	_viewRef
 
+	_forceUpdate
+	_isInTransition
+
+	beginTransition() {
+		this._isInTransition = true;
+		this._forceUpdate = true;
+		if(this._isMounted)
+			this.forceUpdate();
+	}
+
+	endTransition() {
+		this._isInTransition = false;
+		this._forceUpdate = true;
+		if(this._isMounted)
+			this.forceUpdate();
+	}
+
 	render() {
+				
 		// Get child
 		let element = React.Children.only(this.props.children);
-		console.log("TransitionView render " +
-			(element.type ? element.type.displayName : "UNKNOWN") + " (" + this._getName() +
-			"/" + this._route + ")");
-
 		let elementProps = element.props;
 		let animatedComp;
 		let child = null;
-
+		
 		// Wrap buttons to be able to animate them
 		if(element.type.name==='Button'){
 			element = React.createElement(element.type, {...element.props, collapsable: false});
@@ -71,12 +88,11 @@ class Transition extends React.Component {
 		const appearStyle = this.getAppearStyle();
 		const transitionStyle = this.getTransitionStyle();
 
-		// Save properties
 		const props = {
 			...elementProps,
 			onLayout: this.onLayout.bind(this),
 			collapsable: false,
-			style: [style, transitionStyle, appearStyle],
+			style: [style, transitionStyle, appearStyle, styles.transitionElement],
 			ref: (ref) => this._viewRef = ref
 		};
 
@@ -87,55 +103,48 @@ class Transition extends React.Component {
 	}
 
 	getTransitionStyle() {
-		const { hiddenProgress } = this.context;
-		if(!hiddenProgress) return { };
+		const { hiddenProgress, getIsSharedElement, getMetrics, getDirection, getReverse } = this.context;
+		if(!getIsSharedElement && !getMetrics && !getDirection && !getReverse) return { };
 
-		const opacityStyle = {opacity: hiddenProgress.interpolate({
-			inputRange:[0, 0.75, 1],
-			outputRange: [0, 0, 1]
-		})};
+		if(this._isInTransition && this.context.transitionProgress()){
+			const metrics = getMetrics(this._getName(), this._route);
+			const transitionHelper = this.getTransitionHelper(this.props.appear);
 
-		const { getIsSharedElement, getMetrics, getDirection, getReverse } = this.context;
-		if(!getIsSharedElement && !getMetrics && !getDirection && !getReverse) return;
-
-		if(getIsSharedElement(this._getName(), this._route) || !this.props.appear){
-			return {};
+			if(transitionHelper){
+				const direction = getDirection(this._getName(), this._route);
+				const transitionConfig = {
+					progress: this.context.transitionProgress(),
+					direction,
+					metrics: metrics,
+					start: direction === 1 ? 0 : 1,
+					end: direction === 1 ? 1 : 0,
+					reverse: getReverse(this._route)
+				};
+				return transitionHelper.getTransitionStyle(transitionConfig);
+			}
 		}
-
-		if(!this.context.transitionProgress())
-			return opacityStyle;
-
-		const metrics = getMetrics(this._getName(), this._route);
-
-		const transitionHelper = this.getTransitionHelper(this.props.appear);
-		if(transitionHelper){
-			const direction = getDirection(this._getName(), this._route);
-			const transitionConfig = {
-				progress: this.context.transitionProgress(),
-				direction,
-				metrics: metrics,
-				start: direction === 1 ? 0 : 1,
-				end: direction === 1 ? 1 : 0,
-				reverse: getReverse(this._route)
-			};
-			return transitionHelper.getTransitionStyle(transitionConfig);
-		}
-
 		return {};
 	}
 
 	getAppearStyle() {
-		const { getIsSharedElement } = this.context;
-		if(!getIsSharedElement) return;
+		const { getIsSharedElement, hiddenProgress } = this.context;
+		if(!getIsSharedElement || !hiddenProgress) return { };
+
 		if(getIsSharedElement(this._getName(), this._route)) {
-			const interpolator = this.context.sharedProgress.interpolate({
-				inputRange: [0, 0.5, 1],
-				outputRange: [1, 1, 0],
+			const interpolator = hiddenProgress.interpolate({
+				inputRange: [0, 1],
+				outputRange: [0, 1],
 			});
 			return { opacity: interpolator };
 		}
 
 		return { };
+	}
+
+	shouldComponentUpdate(nextProps, nextState){
+		const retVal = this._forceUpdate;
+		this._forceUpdate = false;
+		return retVal;
 	}
 
 	getNodeHandle() {
@@ -203,5 +212,12 @@ class Transition extends React.Component {
 		getMetrics: PropTypes.func,
 	}
 }
+
+const styles = StyleSheet.create({
+	transitionElement: {
+		// borderColor: '#FF0000',
+		// borderWidth: 1,
+	}
+});
 
 export default Transition;

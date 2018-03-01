@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Dimensions, Button, TouchableOpacity, FlatList, Animated, Easing, Image, StyleSheet } from 'react-native';
+import { View, Text, Dimensions, Button, TouchableWithoutFeedback, FlatList, Animated, Easing, Image, StyleSheet } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import _ from 'lodash';
 
@@ -43,10 +43,12 @@ class ImageListScreen extends React.Component {
     componentDidMount() {
         const items = [];
         const size = Dimensions.get('window').width;
-        for(let i=0; i<25; i++){
-            let randomNumber = Math.floor((Math.random() * 250) + 1);
+        const max = 3;
+        const randMax = 100;
+        for(let i=0; i<max; i++){
+            let randomNumber = Math.floor((Math.random() * randMax) + 1);
             while(items.findIndex(e => e.id === randomNumber) > -1){
-                randomNumber = Math.floor((Math.random() * 250) + 1);
+                randomNumber = Math.floor((Math.random() * randMax) + 1);
             }
 
             items.push({ url: 'https://picsum.photos/' + size + '/' + size + '?image=' + randomNumber, id: randomNumber});
@@ -131,7 +133,7 @@ class ImageGrid extends Component {
 
     renderCell(image) {
         return (
-            <TouchableOpacity onPress={() => this.props.imageSelected(image)} key={image.url}>
+            <TouchableWithoutFeedback onPress={() => this.props.imageSelected(image)} key={image.url}>
                 <View style={styles.cell}>
                     <Transition shared={image.url}>
                         <Image source={{uri: image.url}}
@@ -139,7 +141,7 @@ class ImageGrid extends Component {
                         />
                     </Transition>
                 </View>
-            </TouchableOpacity>
+            </TouchableWithoutFeedback>
         )
     }
 }
