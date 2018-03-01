@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 class TransitionOverlayView extends React.Component {
     constructor(props, context){
 		super(props, context);
-		this._transitionConfig = {};		
+		this._transitionConfig = {};
 		this._forceUpdate = false;
 		this._isMounted = false;
 	}
@@ -14,7 +14,7 @@ class TransitionOverlayView extends React.Component {
 	_forceUpdate
 	_isMounted
 
-	setTransitionConfig(transitionConfig) {		
+	setTransitionConfig(transitionConfig) {
 		this._transitionConfig = transitionConfig;
 		this._forceUpdate = true;
 		if(this._isMounted)
@@ -28,15 +28,15 @@ class TransitionOverlayView extends React.Component {
         }
 
 		// console.log("TransitionOverlayView render");
-		const self = this;		
+		const self = this;
 		const sharedElements = this._transitionConfig.sharedElements.map((pair, idx) => {
 
             const {fromItem, toItem} = pair;
 			const transitionStyle = self.getTransitionStyle(fromItem, toItem);
 
 			// Buttons needs to be wrapped in a view to work properly.
-			let element = React.Children.only(self._transitionConfig.direction === -1 ? 
-				fromItem.reactElement.props.children : 
+			let element = React.Children.only(self._transitionConfig.direction === -1 ?
+				fromItem.reactElement.props.children :
 				toItem.reactElement.props.children);
 
 			if(element.type.name === 'Button')
@@ -44,7 +44,7 @@ class TransitionOverlayView extends React.Component {
 
 			const AnimatedComp = Animated.createAnimatedComponent(element.type);
             const props = { ...element.props,
-				style: [element.props.style, transitionStyle],				
+				style: [element.props.style, transitionStyle],
                 key: idx,
             };
 

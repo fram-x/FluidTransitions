@@ -129,7 +129,7 @@ class FluidTransitioner extends Component {
 			diff = (index - prevProps.index);
 
 		let opacity = 0.0;
-		if(diff <= 1 && diff >= -1)
+		//if(diff <= 1 && diff >= -1)
 			opacity = position.interpolate({
 				inputRange: [index - 1, index - 0.0001, index, index + 0.9999, index + 1],
 				outputRange: [0, 1, 1, 1, 0],

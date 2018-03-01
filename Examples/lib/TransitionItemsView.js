@@ -45,8 +45,8 @@ export default class TransitionItemsView extends React.Component {
 	_transitionProgress
 	_transitionProgressListener
 
-	_resolveChildLayoutPromise
-	_resolveChildLayoutFunc
+	// _resolveChildLayoutPromise
+	// _resolveChildLayoutFunc
 
 	_isMounted
 	_appearTransitionPromise
@@ -56,10 +56,8 @@ export default class TransitionItemsView extends React.Component {
 
 	async onTransitionStart(props, prevProps, config) {
 
-		console.log("-------------------------------------");
 		console.log("TransitionItemsView onTransitionStart");
-		console.log("-------------------------------------");
-
+		
 		// Get the rest of the data required to run a transition
 		const toRoute = props.scene.route.routeName;
 		const fromRoute = prevProps ? prevProps.scene.route.routeName : "UNKNOWN";
@@ -198,7 +196,7 @@ export default class TransitionItemsView extends React.Component {
 		if(this._transitionConfig.direction !== -1 || appear)
 		{
 			// console.log("TransitionItemsView onTransitionStart wait for child layout callbacks...");
-			await new Promise(resolve => this._resolveChildLayoutFunc = resolve);
+			// await new Promise(resolve => this._resolveChildLayoutFunc = resolve);
 			// console.log("TransitionItemsView onTransitionStart begin items measure...");
 			await this.measureItems(sharedElements, transitionElements);
 			// console.log("TransitionItemsView onTransitionStart items measure done");
@@ -232,22 +230,22 @@ export default class TransitionItemsView extends React.Component {
 
 		item.layoutReady = true;
 
-		// resolve layout read
-		for(let i=0; i<sharedElements.length; i++){
-			if(!sharedElements[i].fromItem.layoutReady)
-				return;
+		// // resolve layout read
+		// for(let i=0; i<sharedElements.length; i++){
+		// 	if(!sharedElements[i].fromItem.layoutReady)
+		// 		return;
 
-			if(!sharedElements[i].toItem.layoutReady)
-				return;
-		}
-		for(let i=0; i<transitionElements.length; i++)
-			if(!transitionElements[i].layoutReady)
-				return;
+		// 	if(!sharedElements[i].toItem.layoutReady)
+		// 		return;
+		// }
+		// for(let i=0; i<transitionElements.length; i++)
+		// 	if(!transitionElements[i].layoutReady)
+		// 		return;
 
-		if(this._resolveChildLayoutFunc){
-			this._resolveChildLayoutFunc();
-			this._resolveChildLayoutFunc = null;
-		}
+		// if(this._resolveChildLayoutFunc){
+		// 	this._resolveChildLayoutFunc();
+		// 	this._resolveChildLayoutFunc = null;
+		// }
 	}
 
 	async measureItems(sharedElements, transitionElements) {
