@@ -19,6 +19,9 @@ const styles = StyleSheet.create({
 		paddingBottom: 20,
 		justifyContent: 'flex-end',
 	},
+	rotated: {
+		transform: [{ rotate: '180deg' }]
+	},
 	textContainer: {
 		paddingTop: 10,
 		paddingBottom: 10,
@@ -77,7 +80,7 @@ const InitialScreen = (props) => (
 const Screen = (props) => (
 	<ScrollView contentContainerStyle={styles.container}>
 		<Transition shared='buttons'>
-			<View style={[styles.buttonContainer, {transform: [{ rotate: '180deg' }]}]}>
+			<View style={[styles.buttonContainer, styles.rotated]}>
 				<Button title='Toggle' onPress={() => props.navigation.goBack()} />
 			</View>
 		</Transition>

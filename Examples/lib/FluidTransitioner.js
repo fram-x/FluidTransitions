@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { View, StyleSheet, InteractionManager, Animated, Easing, UIManager } from 'react-native';
+import { View, StyleSheet, InteractionManager, Platform, Animated, Easing, UIManager } from 'react-native';
 import { Transitioner, addNavigationHelpers } from 'react-navigation';
 
 import TransitionItemsView from './TransitionItemsView';

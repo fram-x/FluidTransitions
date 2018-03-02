@@ -79,7 +79,7 @@ class TransitionOverlayView extends React.Component {
 
 		let rotateFrom = this.getRotation(fromItem);
 		let rotateTo = this.getRotation(toItem);
-		let rotate = '0deg';
+		let rotate = null;
 		if(rotateFrom || rotateTo) {
 			if(!rotateFrom) rotateFrom = '0deg';
 			if(!rotateTo) rotateTo = '0deg';
@@ -111,10 +111,14 @@ class TransitionOverlayView extends React.Component {
 				fromItem.metrics.height/2 * (toVsFromScaleY-1)],
 		});
 
+		const transform = [{ translateX }, { translateY }, { scaleX }, { scaleY }];
+		if(rotate)
+			transform.push({ rotate });
+
 		return [styles.sharedElement, {
 			width: fromItem.metrics.width,
 			height: fromItem.metrics.height,
-			transform: [{ translateX }, { translateY }, { scaleX }, { scaleY }, { rotate }]
+			transform
 		}];
 	}
 

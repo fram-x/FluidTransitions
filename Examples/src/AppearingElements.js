@@ -46,7 +46,9 @@ const InitialScreen = (props) => (
 				<Text style={styles.text}>Click toggle to see appearance animations.</Text>
 			</Transition>
 			<Transition shared='button' appear='bottom'>
-				<Button title='Toggle' onPress={() => props.navigation.navigate('screen')} />
+				<View>
+					<Button title='Toggle' onPress={() => props.navigation.navigate('screen')} />
+				</View>
 			</Transition>
 		</View>
 );
@@ -76,7 +78,9 @@ const Screen = (props) => (
 			<Image source={{uri: 'https://picsum.photos/200/100?image=12'}} style={styles.image}/>
 		</Transition>
         <Transition shared='button'>
-			<Button title='Toggle' onPress={() => props.navigation.goBack()} />
+			<View>
+				<Button title='Toggle' onPress={() => props.navigation.goBack()} />
+			</View>
         </Transition>
 	</View>
 );

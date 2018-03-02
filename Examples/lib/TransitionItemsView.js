@@ -28,10 +28,12 @@ export default class TransitionItemsView extends React.Component {
 		this._isMounted = false;
 		this._overlayView = null;
 		this._fadeTransitionTime = 50;
+		this._delayTransitionTime = 80;
 		this._itemsToMeasure = [];
 	}
 
 	_fadeTransitionTime
+	_delayTransitionTime
 
 	_overlayView
 
@@ -121,7 +123,7 @@ export default class TransitionItemsView extends React.Component {
 			// Start transitions: setup individual animation to handle delays
 			Animated.parallel(animations).start(ownAnimationsResolve);
 			const delayTime = transitionElements.reduce((accumulator, item) => 
-				accumulator + (item.delay ? 80 : 0), 0);
+				accumulator + (item.delay ? this._delayTransitionTime : 0), 0);
 
 			if(direction === -1) {
 				await new Promise(resolve => setTimeout(resolve, delayTime));
@@ -188,7 +190,7 @@ export default class TransitionItemsView extends React.Component {
 			const animation = timing(item.progress, {
 				...transitionConfig,
 				toValue: 1.0,
-				delay: item.delay ? index * 80 : 0,
+				delay: item.delay ? index * this._delayTransitionTime : 0,
 			});
 			if(item.delay) index++;
 			animations.push(animation);
