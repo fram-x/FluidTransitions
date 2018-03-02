@@ -86,9 +86,6 @@ export default class TransitionItemsView extends React.Component {
 			return false;
 		}
 
-		// console.log("TransitionItemsView onTransitionStart se:" + sharedElements.length +
-		// 	", t:" + transitionElements.length);
-
 		// wait for layouts in child elements
 		if(this._itemsToMeasure.length > 0) {
 			await this.measureItems(sharedElements, transitionElements);
@@ -97,7 +94,7 @@ export default class TransitionItemsView extends React.Component {
 		else
 			await this.resolveLayouts(sharedElements, transitionElements, prevProps === null);
 
-		// Lets update the overlay
+		// Force update the overlay
 		if(this._overlayView)
 			this._overlayView.setTransitionConfig({sharedElements,
 				progress: props.progress,
@@ -122,13 +119,13 @@ export default class TransitionItemsView extends React.Component {
 		if(animations.length > 0){
 			// Start transitions: setup individual animation to handle delays
 			Animated.parallel(animations).start(ownAnimationsResolve);
-			const delayTime = transitionElements.reduce((accumulator, item) => 
+			const delayTime = transitionElements.reduce((accumulator, item) =>
 				accumulator + (item.delay ? this._delayTransitionTime : 0), 0);
 
 			if(direction === -1) {
 				await new Promise(resolve => setTimeout(resolve, delayTime));
 			}
-			
+
 		}
 		else{
 			ownAnimationsResolve();
@@ -138,10 +135,7 @@ export default class TransitionItemsView extends React.Component {
 	}
 
 	async onTransitionEnd(props, prevProps, config) {
-
 		await this._ownAnimationsPromise;
-
-		// console.log("TransitionItemsView onTransitionEnd");
 		if(this._transitionConfig.toRoute && this._transitionConfig.fromRoute){
 
 			this._transitionConfig.sharedElements.forEach(pair => {
@@ -200,58 +194,32 @@ export default class TransitionItemsView extends React.Component {
 	}
 
 	runAppearAnimation(progress, toValue, config){
-		let swapAnimationDone = null;
-		const swapPromise = new Promise((resolve, reject) =>
-			swapAnimationDone = resolve);
-
-		Animated.timing(progress, {
-			toValue: toValue,
-			duration: this._fadeTransitionTime,
-			easing: Easing.linear,
-			useNativeDriver : config.useNativeDriver,
-		}).start(swapAnimationDone);
-
-		return swapPromise;
+		return swapPromise = new Promise(resolve => {
+			Animated.timing(progress, {
+				toValue: toValue,
+				duration: this._fadeTransitionTime,
+				easing: Easing.linear,
+				useNativeDriver : config.useNativeDriver,
+			}).start(resolve);
+		});
 	}
 
 	render() {
-		// console.log("TransitionItemsView: render");
 		return(
-			<View
-				onLayout={this.onLayout.bind(this)}
-				style={styles.container}
-				ref={(ref) => this._viewRef = ref}
-			>
+			<View style={styles.container} ref={(ref) => this._viewRef = ref}>
 				{this.props.children}
-				<TransitionOverlayView
-					ref={(ref) => this._overlayView = ref}
-					onLayout={this.onOverlayLayout.bind(this)}
-				/>
+				<TransitionOverlayView ref={(ref) => this._overlayView = ref} />
 			</View>
 		);
 	}
 
-	onOverlayLayout() {
-		// console.log("TransitionItemsView onOverlaylayout");
-	}
-
 	async resolveLayouts(sharedElements, transitionElements, appear = false) {
-		if(this._transitionConfig.direction !== -1 || appear)
-		{
-			// console.log("TransitionItemsView onTransitionStart wait for child layout callbacks...");
-			// await new Promise(resolve => this._resolveChildLayoutFunc = resolve);
-			// console.log("TransitionItemsView onTransitionStart begin items measure...");
+		if(this._transitionConfig.direction !== -1 || appear) {
 			await this.measureItems(sharedElements, transitionElements);
-			// console.log("TransitionItemsView onTransitionStart items measure done");
 		}
 	}
 
-	onLayout() {
-		// console.log("TransitionItemsView onLayout");
-	}
-
 	layoutReady(name, route) {
-		// console.log("TransitionItemsView layoutReady " + name + ", " + route);
 		const sharedElements = this._transitionItems.getSharedElements(
 			this._transitionConfig.fromRoute, this._transitionConfig.toRoute);
 
@@ -261,44 +229,26 @@ export default class TransitionItemsView extends React.Component {
 		const item = this._transitionItems.getItemByNameAndRoute(name, route);
 		if(!item){
 			// a stray element that will be removed - lets just bail out
-			//console.log("TransitionItemsView layoutReady bailing out. No item found " + name + ", " + route);
 			return;
 		}
 
 		if(sharedElements.length === 0 && transitionElements.length === 0) {
-			// console.log("TransitionItemsView layoutReady bailing out. No items in transition.");
 			this._itemsToMeasure.push(item);
 			return;
 		}
 
 		item.layoutReady = true;
-
-		// // resolve layout read
-		// for(let i=0; i<sharedElements.length; i++){
-		// 	if(!sharedElements[i].fromItem.layoutReady)
-		// 		return;
-
-		// 	if(!sharedElements[i].toItem.layoutReady)
-		// 		return;
-		// }
-		// for(let i=0; i<transitionElements.length; i++)
-		// 	if(!transitionElements[i].layoutReady)
-		// 		return;
-
-		// if(this._resolveChildLayoutFunc){
-		// 	this._resolveChildLayoutFunc();
-		// 	this._resolveChildLayoutFunc = null;
-		// }
 	}
 
 	async measureItems(sharedElements, transitionElements) {
-		let resolveFunc;
 		let viewMetrics = {};
-		const promise = new Promise(resolve => resolveFunc = resolve);
 		const nodeHandle = findNodeHandle(this._viewRef);
-		UIManager.measureInWindow(nodeHandle, (x, y, width, height) => {
-			viewMetrics = {x, y, width, height };
-			resolveFunc();
+
+		const promise = new Promise(resolve => {
+			UIManager.measureInWindow(nodeHandle, (x, y, width, height) => {
+				viewMetrics = {x, y, width, height };
+				resolve();
+			});
 		});
 
 		await promise;
@@ -324,9 +274,7 @@ export default class TransitionItemsView extends React.Component {
 
 		const self = this;
 		return new Promise((resolve, reject) => {
-			// console.log("TransitionItemsView measureItem " + item.name + ", " + item.route);
 			UIManager.measureInWindow(item.reactElement.getNodeHandle(), (x, y, width, height) => {
-				// console.log("TransitionItemsView measureItem success " + item.name + ", " + item.route);
 				item.metrics = {x: x - viewMetrics.x, y: y - viewMetrics.y, width, height };
 				resolve();
 			});

@@ -22,12 +22,10 @@ class TransitionOverlayView extends React.Component {
 	}
 
     render() {
-        if(!this._transitionConfig.sharedElements){
-            // console.log("TransitionOverlayView render empty");
+        if(!this._transitionConfig.sharedElements){            
 			return null;
         }
 
-		// console.log("TransitionOverlayView render");
 		const self = this;
 		const sharedElements = this._transitionConfig.sharedElements.map((pair, idx) => {
 
@@ -138,8 +136,7 @@ class TransitionOverlayView extends React.Component {
 
 	shouldComponentUpdate(nextProps, nextState) {
 		const retVal = this._forceUpdate;
-		this._forceUpdate = false;
-		// console.log("TransitionOverlayView shouldUpdate " + retVal);
+		this._forceUpdate = false;		
 		return retVal;
 	}
 

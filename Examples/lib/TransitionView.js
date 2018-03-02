@@ -73,11 +73,12 @@ class Transition extends React.Component {
 
 		// Wrap buttons to be able to animate them
 		if(element.type.name==='Button'){
-			element = React.createElement(element.type, {...element.props, collapsable: false});
-			const wrapper = (<View>{element}</View>);
-			elementProps = {};
-			animatedComp = Animated.createAnimatedComponent(wrapper.type);
-			child = element;
+			throw "Buttons need to be wrapped in a View."
+			// element = React.createElement(element.type, {...element.props, collapsable: false});
+			// const wrapper = (<View>{element}</View>);
+			// elementProps = {};
+			// animatedComp = Animated.createAnimatedComponent(wrapper.type);
+			// child = element;
 		}
 		else
 		{
@@ -166,8 +167,7 @@ class Transition extends React.Component {
 		return findNodeHandle(this._viewRef);
 	}
 
-	async onLayout(event) {
-		// console.log("TransitionView onLayout " + this._getName() + ", " + this._route);
+	async onLayout(event) {		
 		const { layoutReady } = this.context;
 		if(!layoutReady) return;
 		layoutReady(this._getName(), this._route);
