@@ -59,16 +59,16 @@ const Screen = (props) => (
 			</View>
         </Transition>
 		<View style={styles.screen}>
-            <Transition appear='left'>
+            <Transition appear='left' delay>
 				<View style={styles.circle}/>
             </Transition>
-            <Transition appear='left'>
+            <Transition appear='left' delay>
                 <View style={styles.circle}/>
             </Transition>
-            <Transition appear='right'>
+            <Transition appear='right' delay>
                 <View style={styles.circle}/>
             </Transition>
-			<Transition appear='right'>
+			<Transition appear='right' delay>
                 <View style={styles.circle}/>
             </Transition>
 		</View>

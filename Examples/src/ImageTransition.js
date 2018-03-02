@@ -78,7 +78,7 @@ class ImageDetailsScreen extends React.Component{
                 <Transition shared={params.url}>
                     <Image style={styles.detailsImage} source={{uri: uri}}/>
                 </Transition>
-                <Transition appear='bottom' nodelay>
+                <Transition appear='bottom'>
                     <View style={styles.detailsView}>
                         <Text style={styles.text}>{params.url}</Text>
                         <View style={styles.buttonContainer}>

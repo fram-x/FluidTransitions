@@ -36,7 +36,7 @@ class Transition extends React.Component {
 
 		this._isInTransition = false;
 		this._forceUpdate = false;
-		this._startTransition = this.props.appear ? 0 : 1;
+		this._startTransition = this.props.appear ? 0 : 1;		
 	}
 
 	_name
@@ -49,7 +49,7 @@ class Transition extends React.Component {
 	_forceUpdate
 	_isInTransition
 
-	beginTransition() {
+	beginTransition() {		
 		this._isInTransition = true;
 		this._forceUpdate = true;
 		if(this._isMounted)
@@ -105,20 +105,29 @@ class Transition extends React.Component {
 	}
 
 	getTransitionStyle() {
-		const { hiddenProgress, getIsSharedElement, getMetrics, getDirection, getReverse } = this.context;
-		if(!getIsSharedElement && !getMetrics && !getDirection && !getReverse) return { };
+		const { 
+			hiddenProgress, 
+			getIsSharedElement, 
+			getMetrics, 
+			getDirection, 
+			getReverse,
+			getTransitionProgress
+		} = this.context;
+
+		if(!getIsSharedElement || !getMetrics || !getDirection || !getReverse || !getTransitionProgress) 
+			return { };
 
 		if(this._isInTransition){
 
 			const direction = getDirection(this._getName(), this._route);
-
-			if(this.context.transitionProgress()){
+			const progress = getTransitionProgress(this._getName(), this._route);
+			if(progress){
 				this._startTransition = 1;
 				const metrics = getMetrics(this._getName(), this._route);
 				const transitionHelper = this.getTransitionHelper(this.props.appear);
 				if(transitionHelper){
 					const transitionConfig = {
-						progress: this.context.transitionProgress(),
+						progress: progress,
 						direction,
 						metrics: metrics,
 						start: direction === 1 ? 0 : 1,
@@ -187,7 +196,7 @@ class Transition extends React.Component {
 			this._route = this.context.route;
 			register(new TransitionItem(this._getName(), this.context.route,
 				this, this.props.shared !== undefined, this.props.appear !== undefined,
-				this.props.nodelay !== undefined));
+				this.props.delay !== undefined));
 		}
 	}
 
@@ -209,7 +218,7 @@ class Transition extends React.Component {
 		route: PropTypes.string,
 		sharedProgress: PropTypes.object,
 		hiddenProgress: PropTypes.object,
-		transitionProgress: PropTypes.func,
+		getTransitionProgress: PropTypes.func,
 		getIsSharedElement: PropTypes.func,
 		getIsTransitionElement: PropTypes.func,
 		getDirection: PropTypes.func,

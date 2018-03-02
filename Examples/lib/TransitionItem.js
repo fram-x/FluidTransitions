@@ -1,13 +1,13 @@
 import React from 'react';
 
 export default class TransitionItem {
-	constructor(name, route, reactElement, shared, appear, nodelay, metrics) {
+	constructor(name, route, reactElement, shared, appear, delay, metrics) {
 		this.name = name;
 		this.route = route;
 		this.reactElement = reactElement;
 		this.shared = shared;
 		this.appear = appear;
-		this.nodelay = nodelay;
+		this.delay = delay;
 		this.metrics = metrics;
 	}
 	
@@ -17,7 +17,7 @@ export default class TransitionItem {
 	metrics
 	shared
 	appear
-	nodelay
+	delay
 	layoutReady
 
 	scaleRelativeTo(other) {
@@ -39,6 +39,6 @@ export default class TransitionItem {
 
 	clone() {
 		return new TransitionItem(
-			this.name, this.route, this.reactElement, this.shared, this.appear, this.nodelay, this.metrics);
+			this.name, this.route, this.reactElement, this.shared, this.appear, this.delay, this.metrics);
 	}
 }
