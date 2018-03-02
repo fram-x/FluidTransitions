@@ -30,6 +30,7 @@ export default class TransitionItemsView extends React.Component {
 		this._fadeTransitionTime = 50;
 		this._delayTransitionTime = 80;
 		this._itemsToMeasure = [];
+		this._inTransitionPromise = null;
 	}
 
 	_fadeTransitionTime
@@ -53,9 +54,16 @@ export default class TransitionItemsView extends React.Component {
 	_appearTransitionPromise
 	_appearTransitionPromiseResolve
 
+	_inTransitionPromise
+	_inTransitionResolveFunc
+
 	_itemsToMeasure
 
 	async onTransitionStart(props, prevProps, config) {
+
+		if(this._inTransitionPromise){
+			await this._inTransitionPromise;
+		}
 
 		// console.log("TransitionItemsView onTransitionStart");
 		let ownAnimationsResolve;
@@ -85,6 +93,9 @@ export default class TransitionItemsView extends React.Component {
 			console.log("TransitionItemsView onTransitionStart skip transitions.");
 			return false;
 		}
+
+		// Create wait handle to avoid dispatching several transitions at a time.
+		this._inTransitionPromise = new Promise(resolve => this._inTransitionResolveFunc = resolve);
 
 		// wait for layouts in child elements
 		if(this._itemsToMeasure.length > 0) {
@@ -162,6 +173,10 @@ export default class TransitionItemsView extends React.Component {
 				this._overlayView.setTransitionConfig({});
 
 			this._itemsToMeasure = [];
+			if(this._inTransitionResolveFunc){
+				this._inTransitionResolveFunc();
+				this._inTransitionResolveFunc = null;
+			}
 		}
 	}
 
