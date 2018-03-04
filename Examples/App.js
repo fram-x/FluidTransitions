@@ -4,8 +4,7 @@
  * @flow
  */
 
-import React, { Component } from 'react';
-import { View, Button, Text, StyleSheet } from 'react-native';
+import React from 'react';
 import { StackNavigator } from 'react-navigation';
 
 import HomeScreen from './src/HomeScreen';
@@ -15,19 +14,19 @@ import ImageTransition from './src/ImageTransition';
 import LayoutTransition from './src/LayoutTransition';
 
 const ExampleNavigator = StackNavigator({
-	home: { screen: HomeScreen, navigationOptions: { title: 'Fluid Transitions' }},
-	shared: { screen: SharedElements },
-	appear: { screen: AppearingElements },
-	image: { screen: ImageTransition },
-	layout: { screen: LayoutTransition }
+  home: { screen: HomeScreen, navigationOptions: { title: 'Fluid Transitions' } },
+  shared: { screen: SharedElements },
+  appear: { screen: AppearingElements },
+  image: { screen: ImageTransition },
+  layout: { screen: LayoutTransition },
 });
 
-class MyApp extends React.Component {
-	render () { 
-		return (
-			<ExampleNavigator />
-		);
-	}
+class MyApp extends React.Component<any> {
+  render() {
+    return (
+      <ExampleNavigator />
+    );
+  }
 }
 
 export default MyApp;

@@ -1,6 +1,6 @@
 class BaseTransition {
-  getTransitionStyle(transitionSpecification){
-    return { }
+  getTransitionStyle(transitionSpecification) {
+    return { };
   }
 }
 
