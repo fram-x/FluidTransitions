@@ -1,9 +1,9 @@
 import React from 'react';
-import { StackRouter, createNavigationContainer, createNavigator } from 'react-navigation';
+import { StackRouter, NavigationActions, createNavigationContainer, createNavigator } from 'react-navigation';
 import FluidTransitioner from './FluidTransitioner';
 
 export default (routeConfigMap, stackConfig = {}) => {
-    const {
+  const {
     initialRouteName,
     initialRouteParams,
     paths,
@@ -28,13 +28,12 @@ export default (routeConfigMap, stackConfig = {}) => {
       {...props}
       transitionConfig={transitionConfig}
       onTransitionStart={onTransitionStart}
-      onTransitionEnd={(lastTransition, transition) => {
-        const { state, dispatch } = props.navigation;
+      onTransitionEnd={() => {
+        const { dispatch } = props.navigation;
         dispatch(NavigationActions.completeTransition());
-        onTransitionEnd && onTransitionEnd();
+        if (onTransitionEnd) onTransitionEnd();
       }}
-    />)
-  );
+    />));
 
   return createNavigationContainer(navigator);
 };
