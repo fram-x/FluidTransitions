@@ -1,10 +1,7 @@
 class BaseTransition {
-    getTransitionSpec(spec) {
-        return spec;
-    }
-    getTransitionStyle(spec){
-        return {}
-    }
+  getTransitionStyle(transitionSpecification){
+    return { }
+  }
 }
 
 export default BaseTransition;

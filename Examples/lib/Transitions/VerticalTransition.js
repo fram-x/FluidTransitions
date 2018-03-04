@@ -4,25 +4,25 @@ import { Dimensions, Animated } from 'react-native';
 import BaseTransition from './BaseTransition';
 
 class VerticalTransition extends BaseTransition {
-	getTransitionStyle(transitionConfiguration) {
-		if(!transitionConfiguration || transitionConfiguration.metrics === undefined)
-			return { };
+  getTransitionStyle(transitionConfiguration) {
+    if(!transitionConfiguration || transitionConfiguration.metrics === undefined)
+      return { };
         
         const { y, height } = transitionConfiguration.metrics;
         const distanceValue = transitionConfiguration.direction === 1 ? 
             -(height + y + 25) : Dimensions.get('window').height - (y - 25);
 
-		const progress = transitionConfiguration.progress.interpolate({
-			inputRange: [0, 1],
-			outputRange: [distanceValue, 0]
-		});
+    const progress = transitionConfiguration.progress.interpolate({
+      inputRange: [0, 1],
+      outputRange: [distanceValue, 0]
+    });
 
-		return {			
-			transform: [{
-				translateY: progress
-			}]
-		};
-	}
+    return {			
+      transform: [{
+        translateY: progress
+      }]
+    };
+  }
 }
 
 export default VerticalTransition;
