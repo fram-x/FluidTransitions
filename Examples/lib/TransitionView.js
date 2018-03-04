@@ -20,13 +20,13 @@ let uuidCount: number = 0;
 
 type TransitionEntry = {
   name: string,
-  TransitionClass: Function
+  transitionClass: any
 }
 
 const transitionTypes: Array<TransitionEntry> = [];
 
-export function registerTransitionType(name: string, TransitionClass: Function): TransitionEntry {
-  transitionTypes.push({ name, TransitionClass });
+export function registerTransitionType(name: string, transitionClass: any): TransitionEntry {
+  transitionTypes.push({ name, transitionClass });
 }
 
 const styles = StyleSheet.create({
@@ -124,7 +124,7 @@ class Transition extends React.Component<any> {
     if (this._transitionHelper === null) {
       if (appear) {
         const transitionType = transitionTypes.find(e => e.name === appear);
-        if (transitionType) { this._transitionHelper = new transitionType.TransitionClass(); }
+        if (transitionType) { this._transitionHelper = new transitionType.transitionClass(); }
       }
     }
     return this._transitionHelper;
