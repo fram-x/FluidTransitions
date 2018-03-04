@@ -3,16 +3,7 @@ import { View, StyleSheet, Animated } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
-
-export type TransitionConfiguration = {
-  fromRoute: string,
-  toRoute: string,
-  sharedElements: Map<TransitionItem, TransitionItem>,
-  transitionElements: Array<TransitionItem>,
-  direction: number,
-  config: Object,
-  progress: Animated.Value
-}
+import { TransitionConfiguration } from './Types';
 
 class TransitionOverlayView extends React.Component {
   constructor(props, context) {
@@ -30,7 +21,7 @@ class TransitionOverlayView extends React.Component {
     this._transitionConfig = transitionConfig;
     this._forceUpdate = true;
     if (this._isMounted)
-      this.forceUpdate();
+      {this.forceUpdate();}
   }
 
   render() {
@@ -40,7 +31,6 @@ class TransitionOverlayView extends React.Component {
 
     const self = this;
     const sharedElements = this._transitionConfig.sharedElements.map((pair, idx) => {
-
       const { fromItem, toItem } = pair;
       const transitionStyle = self.getTransitionStyle(fromItem, toItem);
 
@@ -50,7 +40,7 @@ class TransitionOverlayView extends React.Component {
         toItem.reactElement.props.children);
 
       if (element.type.name === 'Button')
-        element = (<View>{element}</View>);
+        {element = (<View>{element}</View>);}
 
       const AnimatedComp = Animated.createAnimatedComponent(element.type);
       const props = {
@@ -66,7 +56,7 @@ class TransitionOverlayView extends React.Component {
       <Animated.View
         style={[styles.overlay, this.getAppearStyle()]}
         onLayout={this.props.onLayout}
-        pointerEvents={'none'}
+        pointerEvents="none"
       >
         {sharedElements}
       </Animated.View>
@@ -96,7 +86,7 @@ class TransitionOverlayView extends React.Component {
       if (!rotateTo) rotateTo = '0deg';
       rotate = progress.interpolate({
         inputRange: [0, 1],
-        outputRange: [rotateFrom, rotateTo]
+        outputRange: [rotateFrom, rotateTo],
       });
     }
 
@@ -124,12 +114,12 @@ class TransitionOverlayView extends React.Component {
 
     const transform = [{ translateX  }, { translateY  }, { scaleX }, { scaleY }];
     if (rotate)
-      transform.push({ rotate });
+      {transform.push({ rotate });}
 
     return [styles.sharedElement, {
       width: fromItem.metrics.width,
       height: fromItem.metrics.height,
-      transform
+      transform,
     }];
   }
 
@@ -162,7 +152,7 @@ class TransitionOverlayView extends React.Component {
   }
 
   static contextTypes = {
-    sharedProgress: PropTypes.object
+    sharedProgress: PropTypes.object,
   }
 }
 
@@ -188,7 +178,7 @@ const styles = StyleSheet.create({
     margin: 0,
     left: 0,
     top: 0,
-  }
+  },
 });
 
 export default TransitionOverlayView;

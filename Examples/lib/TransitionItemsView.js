@@ -1,19 +1,11 @@
 import React from 'react';
-import {
-  View,
-  StyleSheet,
-  Easing,
-  UIManager,
-  InteractionManager,
-  Animated,
-  Platform,
-  findNodeHandle,
-  Dimensions
-} from 'react-native';
+import { View, StyleSheet, Easing, UIManager, Animated, findNodeHandle } from 'react-native';
 import PropTypes from 'prop-types';
 
-import TransitionItems, { Metrics } from './TransitionItems';
-import TransitionOverlayView, { TransitionConfiguration } from './TransitionOverlayView';
+import { Metrics, TransitionConfiguration } from './Types';
+import TransitionItem from './TransitionItem';
+import TransitionItems from './TransitionItems';
+import TransitionOverlayView from './TransitionOverlayView';
 
 export default class TransitionItemsView extends React.Component {
   constructor(props) {
@@ -42,7 +34,7 @@ export default class TransitionItemsView extends React.Component {
 
   _sharedProgress: Animated.Value
   _hiddenProgress: Animated.Value
-  
+
   _ownAnimationsPromise: Promise
 
   _isMounted: boolean
@@ -55,8 +47,7 @@ export default class TransitionItemsView extends React.Component {
   _itemsToMeasure: Array<TransitionItem>
 
   async onTransitionStart(props: Object, prevProps?: Object, config: Object) {
-
-    if(this._inTransitionPromise){
+    if (this._inTransitionPromise) {
       await this._inTransitionPromise;
     }
 
@@ -66,26 +57,26 @@ export default class TransitionItemsView extends React.Component {
 
     // Get the rest of the data required to run a transition
     const toRoute = props.scene.route.routeName;
-    const fromRoute = prevProps ? prevProps.scene.route.routeName : "UNKNOWN";
+    const fromRoute = prevProps ? prevProps.scene.route.routeName : 'UNKNOWN';
     const direction = props.index > (prevProps ? prevProps.index : 9999) ? 1 : -1;
     const sharedElements = this._transitionItems.getSharedElements(fromRoute, toRoute);
     const transitionElements = this._transitionItems.getTransitionElements(fromRoute, toRoute);
 
     // If we're appearing and there are no appear transition, lets just bail out.
-    if(!prevProps && transitionElements.length === 0) {
-      console.log("TransitionItemsView onTransitionStart skipping. No transitions.");
+    if (!prevProps && transitionElements.length === 0) {
+      console.log('TransitionItemsView onTransitionStart skipping. No transitions.');
       return;
     }
 
     // Configure animations
-    const animations = this.configureAnimations(transitionElements, props.progress, config)
+    const animations = this.configureAnimations(transitionElements, props.progress, config);
 
     this._transitionConfig = {
-      fromRoute, toRoute, sharedElements, transitionElements, direction, config
+      fromRoute, toRoute, sharedElements, transitionElements, direction, config,
     };
 
-    if(sharedElements.length === 0 && transitionElements.length === 0){
-      console.log("TransitionItemsView onTransitionStart skip transitions.");
+    if (sharedElements.length === 0 && transitionElements.length === 0) {
+      console.log('TransitionItemsView onTransitionStart skip transitions.');
       return false;
     }
 
@@ -93,19 +84,17 @@ export default class TransitionItemsView extends React.Component {
     this._inTransitionPromise = new Promise(resolve => this._inTransitionResolveFunc = resolve);
 
     // wait for layouts in child elements
-    if(this._itemsToMeasure.length > 0) {
+    if (this._itemsToMeasure.length > 0) {
       await this.measureItems(sharedElements, transitionElements);
       this._itemsToMeasure = [];
-    }
-    else
-      await this.resolveLayouts(sharedElements, transitionElements, prevProps === null);
+    } else { await this.resolveLayouts(sharedElements, transitionElements, prevProps === null); }
 
     // Force update the overlay
-    if(this._overlayView)
-      this._overlayView.setTransitionConfig({sharedElements,
+    if (this._overlayView) {
+      this._overlayView.setTransitionConfig({ sharedElements,
         progress: props.progress,
-        direction}
-    );
+        direction });
+    }
 
     // Lets fade in the overlay
     await this.runAppearAnimation(this._sharedProgress, 1.0, config);
@@ -122,18 +111,16 @@ export default class TransitionItemsView extends React.Component {
 
     // Show all items - they should now have their initial values set correctly
     // to begin their transition
-    if(animations.length > 0){
+    if (animations.length > 0) {
       // Start transitions: setup individual animation to handle delays
       Animated.parallel(animations).start(ownAnimationsResolve);
       const delayTime = transitionElements.reduce((accumulator, item) =>
         accumulator + (item.delay ? this._delayTransitionTime : 0), 0);
 
-      if(direction === -1) {
+      if (direction === -1) {
         await new Promise(resolve => setTimeout(resolve, delayTime));
       }
-
-    }
-    else{
+    } else {
       ownAnimationsResolve();
     }
 
@@ -142,8 +129,7 @@ export default class TransitionItemsView extends React.Component {
 
   async onTransitionEnd(props: Object, prevProps?: Object, config: Object) {
     await this._ownAnimationsPromise;
-    if(this._transitionConfig.toRoute && this._transitionConfig.fromRoute){
-
+    if (this._transitionConfig.toRoute && this._transitionConfig.fromRoute) {
       this._transitionConfig.sharedElements.forEach(pair => {
         pair.fromItem.reactElement.endTransition();
         pair.toItem.reactElement.endTransition();
@@ -161,28 +147,27 @@ export default class TransitionItemsView extends React.Component {
         sharedElements: null,
         transitionElements: null,
         config: null,
-        progress: null
+        progress: null,
       };
 
-      if(this._overlayView)
-        this._overlayView.setTransitionConfig({});
+      if (this._overlayView) { this._overlayView.setTransitionConfig({}); }
 
       this._itemsToMeasure = [];
-      if(this._inTransitionResolveFunc){
+      if (this._inTransitionResolveFunc) {
         this._inTransitionResolveFunc();
         this._inTransitionResolveFunc = null;
       }
     }
   }
 
-  configureAnimations(transitionElements: Array<TransitionItem>, progress: Animated.Value, config: Object){
+  configureAnimations(transitionElements: Array<TransitionItem>, progress: Animated.Value, config: Object) {
     const hasDelayedAnimations = transitionElements.find(e => e.delay);
-    if(!hasDelayedAnimations){
+    if (!hasDelayedAnimations) {
       transitionElements.forEach(item => item.progress = progress);
       return [];
     }
 
-    const transitionConfig = {...config};
+    const transitionConfig = { ...config };
     const { timing } = transitionConfig;
     delete transitionConfig.timing;
 
@@ -196,7 +181,7 @@ export default class TransitionItemsView extends React.Component {
         toValue: 1.0,
         delay: item.delay ? index * this._delayTransitionTime : 0,
       });
-      if(item.delay) index++;
+      if (item.delay) index++;
       animations.push(animation);
     });
 
@@ -206,16 +191,16 @@ export default class TransitionItemsView extends React.Component {
   runAppearAnimation(progress: Animated.Value, toValue: number, config: Object): Promise {
     return swapPromise = new Promise(resolve => {
       Animated.timing(progress, {
-        toValue: toValue,
+        toValue,
         duration: this._fadeTransitionTime,
         easing: Easing.linear,
-        useNativeDriver : config.useNativeDriver,
+        useNativeDriver: config.useNativeDriver,
       }).start(resolve);
     });
   }
 
   render() {
-    return(
+    return (
       <View style={styles.container} ref={(ref) => this._viewRef = ref}>
         {this.props.children}
         <TransitionOverlayView ref={(ref) => this._overlayView = ref} />
@@ -223,27 +208,27 @@ export default class TransitionItemsView extends React.Component {
     );
   }
 
-  async resolveLayouts(sharedElements: Map<TransitionItem>, 
-    transitionElements: Array<TransitionItem>, appear: boolean = false) {
-    if(this._transitionConfig.direction !== -1 || appear) {
+  async resolveLayouts(
+    sharedElements: Map<TransitionItem>,
+    transitionElements: Array<TransitionItem>, appear: boolean = false,
+  ) {
+    if (this._transitionConfig.direction !== -1 || appear) {
       await this.measureItems(sharedElements, transitionElements);
     }
   }
 
   layoutReady(name: string, route: string) {
-    const sharedElements = this._transitionItems.getSharedElements(
-      this._transitionConfig.fromRoute, this._transitionConfig.toRoute);
+    const sharedElements = this._transitionItems.getSharedElements(this._transitionConfig.fromRoute, this._transitionConfig.toRoute);
 
-    const transitionElements = this._transitionItems.getTransitionElements(
-      this._transitionConfig.fromRoute, this._transitionConfig.toRoute);
+    const transitionElements = this._transitionItems.getTransitionElements(this._transitionConfig.fromRoute, this._transitionConfig.toRoute);
 
     const item = this._transitionItems.getItemByNameAndRoute(name, route);
-    if(!item){
+    if (!item) {
       // a stray element that will be removed - lets just bail out
       return;
     }
 
-    if(sharedElements.length === 0 && transitionElements.length === 0) {
+    if (sharedElements.length === 0 && transitionElements.length === 0) {
       this._itemsToMeasure.push(item);
       return;
     }
@@ -251,43 +236,44 @@ export default class TransitionItemsView extends React.Component {
     item.layoutReady = true;
   }
 
-  async measureItems(sharedElements: Map<TransitionItem, TransitionItem>, 
-    transitionElements: Array<TransitionItem>) {
+  async measureItems(
+    sharedElements: Map<TransitionItem, TransitionItem>,
+    transitionElements: Array<TransitionItem>,
+  ) {
     let viewMetrics = {};
     const nodeHandle = findNodeHandle(this._viewRef);
 
     const promise = new Promise(resolve => {
       UIManager.measureInWindow(nodeHandle, (x, y, width, height) => {
-        viewMetrics = {x, y, width, height };
+        viewMetrics = { x, y, width, height };
         resolve();
       });
     });
 
     await promise;
 
-    if(sharedElements) {
-      for(let i=0; i<sharedElements.length; i++){
+    if (sharedElements) {
+      for (let i = 0; i < sharedElements.length; i++) {
         const pair = sharedElements[i];
         await this.measureItem(viewMetrics, pair.fromItem, nodeHandle);
         await this.measureItem(viewMetrics, pair.toItem, nodeHandle);
       }
     }
 
-    if(transitionElements) {
-      for(let i=0; i<transitionElements.length; i++){
+    if (transitionElements) {
+      for (let i = 0; i < transitionElements.length; i++) {
         await this.measureItem(viewMetrics, transitionElements[i], nodeHandle);
       }
     }
   }
 
-  async measureItem(viewMetrics: Metrics, item: TransitionItem, parentNodeHandle: number){
-    if(item.metrics)
-      return;
+  async measureItem(viewMetrics: Metrics, item: TransitionItem, parentNodeHandle: number) {
+    if (item.metrics) { return; }
 
     const self = this;
     return new Promise((resolve, reject) => {
       UIManager.measureInWindow(item.reactElement.getNodeHandle(), (x, y, width, height) => {
-        item.metrics = {x: x - viewMetrics.x, y: y - viewMetrics.y, width, height };
+        item.metrics = { x: x - viewMetrics.x, y: y - viewMetrics.y, width, height };
         resolve();
       });
     });
@@ -299,13 +285,10 @@ export default class TransitionItemsView extends React.Component {
   }
 
   getDirection(name: string, route: string): number {
-    if(!this._transitionConfig.fromRoute)
-      return 0;
+    if (!this._transitionConfig.fromRoute) { return 0; }
 
-    if(route === this._transitionConfig.fromRoute)
-      return -1;
-    else
-      return 1;
+    if (route === this._transitionConfig.fromRoute) { return -1; }
+    return 1;
   }
 
   getReverse(route: string): boolean {
@@ -313,11 +296,10 @@ export default class TransitionItemsView extends React.Component {
   }
 
   getIsSharedElement(name: string, route: string): TransitionItem {
-    if(this._transitionConfig.sharedElements){
+    if (this._transitionConfig.sharedElements) {
       return this._transitionConfig.sharedElements.findIndex(pair =>
         (pair.fromItem.name === name && pair.fromItem.route === route) ||
-        (pair.toItem.name === name && pair.toItem.route === route)
-      ) > -1;
+        (pair.toItem.name === name && pair.toItem.route === route)) > -1;
     }
     return false;
   }
@@ -329,15 +311,14 @@ export default class TransitionItemsView extends React.Component {
 
   getTransitionProgress(name: string, route: string): Animated.Value {
     const item = this._transitionItems.getItemByNameAndRoute(name, route);
-    if(item)
-      return item.progress;
+    if (item) { return item.progress; }
 
     return null;
   }
 
   _lastChildCount: number;
   shouldComponentUpdate(nextProps?: Object, nextState?: Object): boolean {
-    const retVal =  nextProps.children.length !== this._lastChildCount;
+    const retVal = nextProps.children.length !== this._lastChildCount;
     this._lastChildCount = nextProps.children.length;
     return retVal;
   }
@@ -361,7 +342,7 @@ export default class TransitionItemsView extends React.Component {
     getIsSharedElement: PropTypes.func,
     getIsTransitionElement: PropTypes.func,
     layoutReady: PropTypes.func,
-    getMetrics: PropTypes.func
+    getMetrics: PropTypes.func,
   }
 
   getChildContext() {
@@ -385,5 +366,5 @@ export default class TransitionItemsView extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  }
+  },
 });

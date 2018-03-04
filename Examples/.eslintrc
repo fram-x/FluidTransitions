@@ -25,7 +25,10 @@
 		"react/prefer-stateless-function": "off",
 		"import/no-named-as-default": "off",
 		"react/no-unused-prop-types": "off",
-		"object-curly-newline": "off"
+		"object-curly-newline": "off",
+		"no-underscore-dangle": "off",
+		"no-plusplus": "off",
+		"react/sort-comp": "off"
 	},
 	"globals": {
 		"$Keys": true
