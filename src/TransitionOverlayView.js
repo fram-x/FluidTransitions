@@ -75,7 +75,7 @@ class TransitionOverlayView extends React.Component<TransitionOverlayViewProps> 
       const AnimatedComp = Animated.createAnimatedComponent(element.type);
       const props = {
         ...element.props,
-        style: [element.props.style, transitionStyle],
+        style: [element.props.style, styles.sharedElement, transitionStyle],
         key: idx,
       };
 
@@ -145,11 +145,11 @@ class TransitionOverlayView extends React.Component<TransitionOverlayViewProps> 
     const transform = [{ translateX }, { translateY }, { scaleX }, { scaleY }];
     if (rotate) { transform.push({ rotate }); }
 
-    return [styles.sharedElement, {
+    return {
       width: fromItem.metrics.width,
       height: fromItem.metrics.height,
-      transform,
-    }];
+      transform
+    };
   }
 
   getRotation(item: TransitionItem):string {
