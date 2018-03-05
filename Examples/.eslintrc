@@ -32,7 +32,8 @@
 		"no-mixed-operators": "off",
 		"class-methods-use-this": "off",
 		"no-return-assign": "off",
-		"no-multi-assign": "off"
+		"no-multi-assign": "off",
+		"no-use-before-define": "off"
 	},
 	"globals": {
 		"$Keys": true

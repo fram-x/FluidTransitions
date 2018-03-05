@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, InteractionManager, Animated } from 'react-native';
-import { Transitioner, addNavigationHelpers } from 'react-navigation';
+import { addNavigationHelpers } from 'react-navigation';
 
+import Transitioner from './BaseTransitioner';
 import TransitionItemsView from './TransitionItemsView';
 
 const styles = StyleSheet.create({

@@ -25,9 +25,9 @@ export default class TransitionItemsView extends React.Component {
     this._inTransitionPromise = null;
   }
 
-  _fadeTransitionTime: number
-  _delayTransitionTime: number
-  _overlayView: Object
+  _fadeTransitionTime: number;
+  _delayTransitionTime: number;
+  _overlayView: Object;
   _viewRef: Object
   _transitionItems: TransitionItems
   _transitionConfig: TransitionConfiguration
@@ -35,24 +35,24 @@ export default class TransitionItemsView extends React.Component {
   _sharedProgress: Animated.Value
   _hiddenProgress: Animated.Value
 
-  _ownAnimationsPromise: Promise
+  _ownAnimationsPromise: Promise<void>
 
   _isMounted: boolean
-  _appearTransitionPromise: Promise
+  _appearTransitionPromise: Promise<void>
   _appearTransitionPromiseResolve: Function
 
-  _inTransitionPromise: Promise
+  _inTransitionPromise: Promise<void>
   _inTransitionResolveFunc: Function
 
   _itemsToMeasure: Array<TransitionItem>
 
-  async onTransitionStart(props: Object, prevProps?: Object, config: Object): boolean {
+  async onTransitionStart(props: Object, prevProps?: Object, config: Object): boolean | Promise<boolean> {
     if (this._inTransitionPromise) {
       await this._inTransitionPromise;
     }
 
     // console.log("TransitionItemsView onTransitionStart");
-    let ownAnimationsResolve;
+    let ownAnimationsResolve : () => void;
     this._ownAnimationsPromise = new Promise(resolve => ownAnimationsResolve = resolve);
 
     // Get the rest of the data required to run a transition
@@ -64,7 +64,7 @@ export default class TransitionItemsView extends React.Component {
 
     // If we're appearing and there are no appear transition, lets just bail out.
     if (!prevProps && transitionElements.length === 0) {
-      return;
+      return false;
     }
 
     // Configure animations
@@ -115,7 +115,7 @@ export default class TransitionItemsView extends React.Component {
       const delayTime = transitionElements.reduce((accumulator, item) =>
         accumulator + (item.delay ? this._delayTransitionTime : 0), 0);
 
-      if (direction === -1) {
+      if (direction === -1) {
         await new Promise(resolve => setTimeout(resolve, delayTime));
       }
     } else {
@@ -158,7 +158,10 @@ export default class TransitionItemsView extends React.Component {
     }
   }
 
-  configureAnimations(transitionElements: Array<TransitionItem>, progress: Animated.Value, config: Object) {
+  configureAnimations(
+    transitionElements: Array<TransitionItem>,
+    progress: Animated.Value, config: Object,
+  ) {
     const hasDelayedAnimations = transitionElements.find(e => e.delay);
     if (!hasDelayedAnimations) {
       transitionElements.forEach(item => item.progress = progress);
@@ -186,8 +189,8 @@ export default class TransitionItemsView extends React.Component {
     return animations;
   }
 
-  runAppearAnimation(progress: Animated.Value, toValue: number, config: Object): Promise {
-    return swapPromise = new Promise(resolve => {
+  runAppearAnimation(progress: Animated.Value, toValue: number, config: Object): Promise<void> {
+    const swapPromise = new Promise(resolve => {
       Animated.timing(progress, {
         toValue,
         duration: this._fadeTransitionTime,
@@ -195,6 +198,7 @@ export default class TransitionItemsView extends React.Component {
         useNativeDriver: config.useNativeDriver,
       }).start(resolve);
     });
+    return swapPromise;
   }
 
   render() {
@@ -290,6 +294,7 @@ export default class TransitionItemsView extends React.Component {
   }
 
   getReverse(route: string): boolean {
+    if (!this._transitionConfig.fromRoute) { return false; }
     return route === this._transitionConfig.fromRoute;
   }
 
@@ -315,7 +320,7 @@ export default class TransitionItemsView extends React.Component {
   }
 
   _lastChildCount: number;
-  shouldComponentUpdate(nextProps?: Object, nextState?: Object): boolean {
+  shouldComponentUpdate(nextProps?: any): boolean {
     const retVal = nextProps.children.length !== this._lastChildCount;
     this._lastChildCount = nextProps.children.length;
     return retVal;
