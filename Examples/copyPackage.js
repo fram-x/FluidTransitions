@@ -13,11 +13,6 @@ function copy(source, destination) {
 }
 
 copy(
-  '../src',
   'node_modules/react-navigation-fluid-transitions/src',
-);
-
-copy(
-  '../index.js',
-  'node_modules/react-navigation-fluid-transitions/index.js',
+  '../src',
 );

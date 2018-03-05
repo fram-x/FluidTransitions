@@ -20,7 +20,7 @@ export default class TransitionItemsView extends React.Component {
     this._isMounted = false;
     this._overlayView = null;
     this._fadeTransitionTime = 50;
-    this._delayTransitionTime = 80;
+    this._delayTransitionTime = 100;
     this._itemsToMeasure = [];
     this._inTransitionPromise = null;
   }
@@ -58,7 +58,7 @@ export default class TransitionItemsView extends React.Component {
     // Get the rest of the data required to run a transition
     const toRoute = props.scene.route.routeName;
     const fromRoute = prevProps ? prevProps.scene.route.routeName : 'UNKNOWN';
-    const direction = props.index > (prevProps ? prevProps.index : 9999) ? 1 : -1;
+    const direction = props.index > (prevProps ? prevProps.index : -999) ? 1 : -1;
     const sharedElements = this._transitionItems.getSharedElements(fromRoute, toRoute);
     const transitionElements = this._transitionItems.getTransitionElements(fromRoute, toRoute);
 
@@ -177,8 +177,9 @@ export default class TransitionItemsView extends React.Component {
     let index = 0;
     transitionElements.forEach(item => {
       item.progress = new Animated.Value(0);
+      const itemConfig = item.reactElement.getTransitionConfig(transitionConfig);
       const animation = timing(item.progress, {
-        ...transitionConfig,
+        ...itemConfig,
         toValue: 1.0,
         delay: item.delay ? index * this._delayTransitionTime : 0,
       });
@@ -287,15 +288,12 @@ export default class TransitionItemsView extends React.Component {
   }
 
   getDirection(name: string, route: string): number {
-    if (!this._transitionConfig.fromRoute) { return 0; }
-
-    if (route === this._transitionConfig.fromRoute) { return -1; }
-    return 1;
+    if (!this._transitionConfig.direction) { return 0; }
+    return this._transitionConfig.direction;
   }
 
-  getReverse(route: string): boolean {
-    if (!this._transitionConfig.fromRoute) { return false; }
-    return route === this._transitionConfig.fromRoute;
+  getReverse(name: string, route: string): boolean {
+    return route !== this._transitionConfig.toRoute;
   }
 
   getIsSharedElement(name: string, route: string): TransitionItem {

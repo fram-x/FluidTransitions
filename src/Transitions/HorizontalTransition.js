@@ -4,17 +4,30 @@ import { Dimensions, Animated } from 'react-native';
 import BaseTransition from './BaseTransition';
 
 class HorizontalTransition extends BaseTransition {
-  getTransitionStyle(transitionConfiguration) {
-    if (!transitionConfiguration || transitionConfiguration.metrics === undefined)
+  getTransitionStyle(transitionSpecification) {
+    if (!transitionSpecification || transitionSpecification.metrics === undefined)
       return {};
 
-    const { x, width } = transitionConfiguration.metrics;
-    const distanceValue = transitionConfiguration.reverse ?
-      -(width + x + 25) : Dimensions.get('window').width - (x - 25);
+    const { x, width } = transitionSpecification.metrics;
+    let start = 0;
+    let end = 0;
+    if(transitionSpecification.reverse === false && transitionSpecification.direction === 1){
+      start = Dimensions.get('window').width - (x - 25);
+      end = 0;
+    } else if(transitionSpecification.reverse === true && transitionSpecification.direction === 1){
+      start = 0;
+      end = -(width + x + 25);
+    } else if(transitionSpecification.reverse === false && transitionSpecification.direction === -1){
+      start = -(width + x + 25);
+      end = 0;
+    } else if(transitionSpecification.reverse === true && transitionSpecification.direction === -1){
+      start = 0;
+      end = Dimensions.get('window').width - (x - 25);
+    }
 
-    const progress = transitionConfiguration.progress.interpolate({
+    const progress = transitionSpecification.progress.interpolate({
       inputRange: [0, 1],
-      outputRange: transitionConfiguration.direction === -1 ? [0, distanceValue] : [distanceValue, 0]
+      outputRange: [start, end]
     });
 
     return {

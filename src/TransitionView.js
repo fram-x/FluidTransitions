@@ -1,5 +1,5 @@
 import React from 'react';
-import { Animated, StyleSheet, findNodeHandle } from 'react-native';
+import { View, Animated, StyleSheet, findNodeHandle } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
@@ -148,7 +148,6 @@ class Transition extends React.Component<TransitionProps> {
       !getReverse || !getTransitionProgress) { return {}; }
 
     if (this._isInTransition) {
-      const direction = getDirection(this._getName(), this._route);
       const progress = getTransitionProgress(this._getName(), this._route);
       if (progress) {
         this._startOpacity = 1;
@@ -156,18 +155,26 @@ class Transition extends React.Component<TransitionProps> {
         const transitionHelper = this.getTransitionHelper(this.props.appear);
         if (transitionHelper) {
           const transitionConfig = {
+            name: this._getName(),
+            route: this._route,
             progress,
-            direction,
             metrics,
-            start: direction === 1 ? 0 : 1,
-            end: direction === 1 ? 1 : 0,
-            reverse: getReverse(this._route),
+            direction: getDirection(this._getName(), this._route),
+            reverse: getReverse(this._getName(), this._route),            
           };
           return transitionHelper.getTransitionStyle(transitionConfig);
         }
       }
     }
     return { opacity: this._startOpacity };
+  }
+
+  getTransitionConfig(config){
+    const transitionHelper = this.getTransitionHelper(this.props.appear);
+    if(!transitionHelper)
+      return config;
+
+    return transitionHelper.getTransitionConfig(config);
   }
 
   getAppearStyle() {
@@ -209,21 +216,21 @@ class Transition extends React.Component<TransitionProps> {
     return this._name;
   }
 
-  render() {
+  render() {    
     // Get child
-    const element = React.Children.only(this.props.children);
-    const elementProps = element.props;
+    let element = React.Children.only(this.props.children);
+    let elementProps = element.props;
     let animatedComp;
-    const child = null;
+    let child = null;
 
     // Wrap buttons to be able to animate them
-    if (element.type.name === 'Button') {
-      throw new Error('Buttons need to be wrapped in a View.');
-      // element = React.createElement(element.type, {...element.props, collapsable: false});
-      // const wrapper = (<View>{element}</View>);
-      // elementProps = {};
-      // animatedComp = Animated.createAnimatedComponent(wrapper.type);
-      // child = element;
+    if (element.type.prototype.__proto__.constructor.name !== 'ReactClassComponent') {
+      //throw new Error('Buttons need to be wrapped in a View.');
+      element = React.createElement(element.type, {...element.props, collapsable: false});
+      const wrapper = (<View>{element}</View>);
+      elementProps = {};
+      animatedComp = Animated.createAnimatedComponent(wrapper.type);
+      child = element;
     } else {
       // Convert to animated component
       animatedComp = Animated.createAnimatedComponent(element.type);

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, InteractionManager, Animated } from 'react-native';
+import { StyleSheet, InteractionManager, Easing, Animated } from 'react-native';
 import { addNavigationHelpers } from 'react-navigation';
 
 import Transitioner from './BaseTransitioner';
@@ -112,7 +112,8 @@ class FluidTransitioner extends React.Component {
       stiffness: 140,
       damping: 8.5,
       mass: 0.5,
-      duration: 2450,
+      duration: 450,
+      easing: Easing.elastic(1.4),
       ...this.props.transitionConfig,
       isInteraction: true,
       useNativeDriver: true,
@@ -140,7 +141,7 @@ class FluidTransitioner extends React.Component {
     if (prevProps) { diff = (index - transitionProps.index); }
 
     let opacity = 0.0;
-    if (diff <= 1 && diff >= -1) {
+    if (diff <= 1 && diff >= -1) {      
       opacity = position.interpolate({
         inputRange: [index - 1, index - 0.0001, index, index + 0.9999, index + 1],
         outputRange: [0, 1, 1, 1, 0],
