@@ -67,19 +67,19 @@ const Screen1 = (props) => (
         <Circle backgroundColor="#D46A6A" size={140} />
       </Transition>
       <View style={styles.circlesContainer}>
-        <Transition appear="horizontal" delay>
+        <Transition appear="vertical" delay>
           <Circle backgroundColor="#550000" size={40} />
         </Transition>
-        <Transition appear="horizontal" delay>
+        <Transition appear="vertical" delay>
           <Circle backgroundColor="#550000" size={40} />
         </Transition>
-        <Transition appear="horizontal" delay>
+        <Transition appear="vertical" delay>
           <Circle backgroundColor="#550000" size={40} />
         </Transition>
       </View>
     </View>
     <View style={styles.content}>
-      <Transition appear="scale">
+      <Transition appear="horizontal">
         <View>
           <Text style={styles.textBold}>Welcome to this demo!</Text>
           <Text style={styles.text}>It shows you how to build some cool transitions to use in your onboarding screens.</Text>
@@ -113,7 +113,7 @@ const Screen2 = (props) => (
       </View>
     </View>
     <View style={styles.content}>
-      <Transition appear="scale">
+      <Transition appear="horizontal">
         <View>
           <Text style={styles.textBold}>This is the second page</Text>
           <Text style={styles.text}>It uses transitions to add individual transitions in a navigation transition.</Text>
@@ -150,7 +150,7 @@ const Screen3 = (props) => (
       </View>
     </View>
     <View style={styles.content}>
-      <Transition appear="scale">
+      <Transition appear="horizontal">
         <View>
           <Text style={styles.textBold}>This is the last page</Text>
           <Text style={styles.text}>Navigate back to see the reversed transitions.</Text>
