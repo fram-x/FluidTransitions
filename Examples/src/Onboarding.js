@@ -125,7 +125,7 @@ const Screen2 = (props) => (
         <Button title="Back" onPress={() => props.navigation.goBack()} />
       </Transition>
       <Transition appear="horizontal">
-        <Button title="Next" onPress={() => props.navigation.navigate('screen2')} />
+        <Button title="Next" onPress={() => props.navigation.navigate('screen3')} />
       </Transition>
     </View>
   </View>
@@ -133,12 +133,34 @@ const Screen2 = (props) => (
 
 const Screen3 = (props) => (
   <View style={styles.container}>
-    <View style={styles.top} />
+    <View style={[styles.top, { backgroundColor: '#88CC88' }]}>
+      <Transition appear="scale">
+        <Circle backgroundColor="#2D882D" size={140} />
+      </Transition>
+      <View style={styles.circlesContainer}>
+        <Transition appear="horizontal" delay>
+          <Circle backgroundColor="#550000" size={40} />
+        </Transition>
+        <Transition appear="horizontal" delay>
+          <Circle backgroundColor="#550000" size={40} />
+        </Transition>
+        <Transition appear="horizontal" delay>
+          <Circle backgroundColor="#550000" size={40} />
+        </Transition>
+      </View>
+    </View>
     <View style={styles.content}>
-      <Text>Content</Text>
+      <Transition appear="scale">
+        <View>
+          <Text style={styles.textBold}>This is the last page</Text>
+          <Text style={styles.text}>Navigate back to see the reversed transitions.</Text>
+        </View>
+      </Transition>
     </View>
     <View style={styles.footer}>
-      <Button title="Back" onPress={() => props.navigation.goBack()} />
+      <Transition appear="horizontal">
+        <Button title="Back" onPress={() => props.navigation.goBack()} />
+      </Transition>
     </View>
   </View>
 );
