@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, InteractionManager, Animated } from 'react-native';
+import { StyleSheet, InteractionManager, Easing, Animated } from 'react-native';
 import { addNavigationHelpers } from 'react-navigation';
 
 import Transitioner from './BaseTransitioner';
@@ -77,22 +77,22 @@ class FluidTransitioner extends React.Component {
       };
 
       // Start transition
-      const retVal = await this._transitionItemsView.onTransitionStart(props, null, config);
-      if (!retVal) { return; }
+      const animations = [];
+      await this._transitionItemsView.onTransitionStart(props, null, config, animations);
+      if (animations.length === 0) { return; }
+      const animationsToRun = [];
+      animations.forEach(ad => animationsToRun.push(ad.animation));
 
       // Run animation
       const { timing } = config;
       delete config.timing;
-      timing(progress, {
-        toValue: 1.0,
-        ...config,
-      }).start(async () => this._transitionItemsView.onTransitionEnd(props, null, config));
+      Animated.parallel(animationsToRun).start(async () => this._transitionItemsView.onTransitionEnd(props, null, config))
     });
   }
 
-  async _onTransitionStart(props, prevProps) {
-    const config = this._configureTransition();
-    await this._transitionItemsView.onTransitionStart(props, prevProps, config);
+  async _onTransitionStart(props, prevProps, animations) {
+    const config = this._configureTransition();    
+    await this._transitionItemsView.onTransitionStart(props, prevProps, config, animations);
   }
 
   async _onTransitionEnd(props, prevProps) {
@@ -112,7 +112,8 @@ class FluidTransitioner extends React.Component {
       stiffness: 140,
       damping: 8.5,
       mass: 0.5,
-      duration: 2450,
+      duration: 450,
+      easing: Easing.elastic(1.2),
       ...this.props.transitionConfig,
       isInteraction: true,
       useNativeDriver: true,
@@ -140,7 +141,7 @@ class FluidTransitioner extends React.Component {
     if (prevProps) { diff = (index - transitionProps.index); }
 
     let opacity = 0.0;
-    if (diff <= 1 && diff >= -1) {
+    if (diff <= 1 && diff >= -1) {      
       opacity = position.interpolate({
         inputRange: [index - 1, index - 0.0001, index, index + 0.9999, index + 1],
         outputRange: [0, 1, 1, 1, 0],

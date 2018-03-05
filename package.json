@@ -1,0 +1,34 @@
+{
+  "name": "react-navigation-fluid-transitions",
+  "version": "0.1.0",
+  "description": "An extension to to react-navigation providing transitions and shared element transitions.",
+  "main": "./index.js",
+  "scripts": {
+    "test": "echo \\\"Error: no test specified\\\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fram-x/FluidTransitions.git"
+  },
+  "keywords": [
+    "navigation",
+    "react-native",
+    "navigation",
+    "react",
+    "shared elements",
+    "transitions"
+  ],
+  "author": "Christian Falch",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fram-x/FluidTransitions/issues"
+  },
+  "homepage": "https://github.com/fram-x/FluidTransitions#readme",
+  "peerDependencies": {
+    "prop-types": "*",   
+    "lodash": "*",
+    "react": "*",
+    "react-native": "*",
+    "react-navigation": "*"
+  }
+}

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Animated, StyleSheet, findNodeHandle } from 'react-native';
 import PropTypes from 'prop-types';
+import { View, Animated, StyleSheet, Platform, findNodeHandle } from 'react-native';
 
 import TransitionItem from './TransitionItem';
 import { TransitionContext } from './Types';
@@ -148,26 +148,43 @@ class Transition extends React.Component<TransitionProps> {
       !getReverse || !getTransitionProgress) { return {}; }
 
     if (this._isInTransition) {
-      const direction = getDirection(this._getName(), this._route);
       const progress = getTransitionProgress(this._getName(), this._route);
       if (progress) {
+        const hadZeroOpacity = this._startOpacity === 0;
         this._startOpacity = 1;
         const metrics = getMetrics(this._getName(), this._route);
         const transitionHelper = this.getTransitionHelper(this.props.appear);
         if (transitionHelper) {
           const transitionConfig = {
+            name: this._getName(),
+            route: this._route,
             progress,
-            direction,
             metrics,
-            start: direction === 1 ? 0 : 1,
-            end: direction === 1 ? 1 : 0,
-            reverse: getReverse(this._route),
+            direction: getDirection(this._getName(), this._route),
+            reverse: getReverse(this._getName(), this._route),            
           };
+          
+          if(hadZeroOpacity && Platform.OS === 'android'){
+            const opacity = progress.interpolate({
+              inputRange: [0, 0.1, 1],
+              outputRange: [0, 1, 1]
+            });
+            return {...transitionHelper.getTransitionStyle(transitionConfig), opacity};
+          }
+          
           return transitionHelper.getTransitionStyle(transitionConfig);
         }
       }
     }
     return { opacity: this._startOpacity };
+  }
+
+  getTransitionConfig(config){
+    const transitionHelper = this.getTransitionHelper(this.props.appear);
+    if(!transitionHelper)
+      return config;
+
+    return transitionHelper.getTransitionConfig(config);
   }
 
   getAppearStyle() {
@@ -208,22 +225,24 @@ class Transition extends React.Component<TransitionProps> {
     if (this.props.shared) { return this.props.shared; }
     return this._name;
   }
-
-  render() {
+  
+  render() {    
     // Get child
-    const element = React.Children.only(this.props.children);
-    const elementProps = element.props;
+    let element = React.Children.only(this.props.children);
+    let elementProps = element.props;
     let animatedComp;
-    const child = null;
-
+    let child = null;
+    if(!element)
+      return null;
+      
     // Wrap buttons to be able to animate them
-    if (element.type.name === 'Button') {
-      throw new Error('Buttons need to be wrapped in a View.');
-      // element = React.createElement(element.type, {...element.props, collapsable: false});
-      // const wrapper = (<View>{element}</View>);
-      // elementProps = {};
-      // animatedComp = Animated.createAnimatedComponent(wrapper.type);
-      // child = element;
+    if (!element.props.children || element.props.children.length === 0) {
+      //throw new Error('Buttons need to be wrapped in a View.');
+      element = React.createElement(element.type, {...element.props, collapsable: false});
+      const wrapper = (<View>{element}</View>);
+      elementProps = {};
+      animatedComp = Animated.createAnimatedComponent(wrapper.type);
+      child = element;
     } else {
       // Convert to animated component
       animatedComp = Animated.createAnimatedComponent(element.type);
@@ -242,7 +261,9 @@ class Transition extends React.Component<TransitionProps> {
       ref: (ref) => { this._viewRef = ref; },
     };
 
-    if (child) { return React.createElement(animatedComp, props, child); }
+    if (child) { 
+      return React.createElement(animatedComp, props, child); 
+    }
 
     return React.createElement(animatedComp, props);
   }

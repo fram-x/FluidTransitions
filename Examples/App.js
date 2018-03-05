@@ -12,6 +12,7 @@ import SharedElements from './src/SharedElements';
 import AppearingElements from './src/AppearingElements';
 import ImageTransition from './src/ImageTransition';
 import LayoutTransition from './src/LayoutTransition';
+import Onboarding from './src/Onboarding';
 
 const ExampleNavigator = StackNavigator({
   home: { screen: HomeScreen, navigationOptions: { title: 'Fluid Transitions' } },
@@ -19,6 +20,7 @@ const ExampleNavigator = StackNavigator({
   appear: { screen: AppearingElements },
   image: { screen: ImageTransition },
   layout: { screen: LayoutTransition },
+  onboarding: { screen: Onboarding },
 });
 
 class MyApp extends React.Component<any> {

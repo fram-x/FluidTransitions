@@ -1,18 +1,18 @@
 {
-  "name": "Examples",
+  "name": "examples",
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "start": "node copyPackage.js && node node_modules/react-native/local-cli/cli.js start",    
     "test": "jest"
   },
   "dependencies": {
     "prop-types": "^15.6.0",
     "react": "16.2.0",
     "react-native": "0.53.3",
-    "react-native-fast-image": "^2.2.5",
     "react-navigation": "^1.1.1",
-    "lodash": "^4.17.5"
+    "lodash": "^4.17.5",
+    "react-navigation-fluid-transitions": "./../"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.2",
@@ -26,7 +26,12 @@
     "eslint-plugin-react": "^7.4.0",
     "flow-bin": "^0.66.0",
     "jest": "22.4.2",
-    "react-test-renderer": "16.2.0"
+    "react-test-renderer": "16.2.0",
+    "concurrently": "^2.2.0",
+    "fs-extra": "^0.30.0",
+    "minimatch": "^3.0.2",
+    "node-watch": "^0.4.0",
+    "rimraf": "^2.5.4"
   },
   "jest": {
     "preset": "react-native"

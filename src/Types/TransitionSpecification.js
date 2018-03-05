@@ -5,7 +5,7 @@ export type TransitionSpecification = {
   progress: Animated.Value,
   direction: number,
   metrics: Metrics,
-  start: number,
-  end: number,
   reverse: boolean,
+  name: string,
+  route: string,
 }
