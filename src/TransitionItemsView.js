@@ -23,12 +23,14 @@ export default class TransitionItemsView extends React.Component {
     this._delayTransitionTime = 100;
     this._itemsToMeasure = [];
     this._inTransitionPromise = null;
+
+    this._onLayoutResolvePromise = new Promise(resolve => this._onLayoutResolve = resolve);
   }
 
   _fadeTransitionTime: number;
   _delayTransitionTime: number;
   _overlayView: Object;
-  _viewRef: Object
+  _viewRef: any
   _transitionItems: TransitionItems
   _transitionConfig: TransitionConfiguration
 
@@ -42,12 +44,16 @@ export default class TransitionItemsView extends React.Component {
   _inTransitionPromise: Promise<void>
   _inTransitionResolveFunc: Function
 
+  _onLayoutResolve
+  _onLayoutResolvePromise
   _itemsToMeasure: Array<TransitionItem>
 
   async onTransitionStart(props: Object, prevProps?: Object, config: Object, animations: Array<any>): boolean | Promise<boolean> {
     if (this._inTransitionPromise) {
       await this._inTransitionPromise;
     }
+
+    await this._onLayoutResolvePromise;
 
     // Get the rest of the data required to run a transition
     const toRoute = props.scene.route.routeName;
@@ -64,6 +70,8 @@ export default class TransitionItemsView extends React.Component {
     this._transitionConfig = {
       fromRoute, toRoute, sharedElements, transitionElements, direction, config,
     };
+
+
 
     // Configure animations
     const localAnimations = this.configureAnimations(transitionElements, props.progress, config);
@@ -182,11 +190,18 @@ export default class TransitionItemsView extends React.Component {
 
   render() {
     return (
-      <View style={styles.container} ref={(ref) => this._viewRef = ref}>
+      <View style={styles.container} ref={(ref) => this._viewRef = ref} onLayout={this.onLayout.bind(this)}>
         {this.props.children}
-        <TransitionOverlayView ref={(ref) => this._overlayView = ref} />
+        <TransitionOverlayView ref={(ref) => this._overlayView = ref}/>
       </View>
     );
+  }
+
+  onLayout() {
+    if(this._onLayoutResolve){
+      this._onLayoutResolve();
+      this._onLayoutResolve = null;
+    }
   }
 
   async resolveLayouts(
@@ -252,8 +267,9 @@ export default class TransitionItemsView extends React.Component {
     if (item.metrics) { return; }
 
     const self = this;
+    const nodeHandle = item.reactElement.getNodeHandle();
     return new Promise((resolve, reject) => {
-      UIManager.measureInWindow(item.reactElement.getNodeHandle(), (x, y, width, height) => {
+      UIManager.measureInWindow(nodeHandle, (x, y, width, height) => {
         item.metrics = { x: x - viewMetrics.x, y: y - viewMetrics.y, width, height };
         resolve();
       });
