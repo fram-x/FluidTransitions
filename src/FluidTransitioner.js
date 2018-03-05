@@ -77,22 +77,20 @@ class FluidTransitioner extends React.Component {
       };
 
       // Start transition
-      const retVal = await this._transitionItemsView.onTransitionStart(props, null, config);
-      if (!retVal) { return; }
+      const animations = [];
+      await this._transitionItemsView.onTransitionStart(props, null, config, animations);
+      if (animations.length === 0) { return; }
 
       // Run animation
       const { timing } = config;
       delete config.timing;
-      timing(progress, {
-        toValue: 1.0,
-        ...config,
-      }).start(async () => this._transitionItemsView.onTransitionEnd(props, null, config));
+      Animated.parallel(animations).start(async () => this._transitionItemsView.onTransitionEnd(props, null, config))
     });
   }
 
-  async _onTransitionStart(props, prevProps) {
-    const config = this._configureTransition();
-    await this._transitionItemsView.onTransitionStart(props, prevProps, config);
+  async _onTransitionStart(props, prevProps, animations) {
+    const config = this._configureTransition();    
+    await this._transitionItemsView.onTransitionStart(props, prevProps, config, animations);
   }
 
   async _onTransitionEnd(props, prevProps) {
@@ -113,7 +111,7 @@ class FluidTransitioner extends React.Component {
       damping: 8.5,
       mass: 0.5,
       duration: 450,
-      easing: Easing.elastic(1.4),
+      easing: Easing.elastic(1.2),
       ...this.props.transitionConfig,
       isInteraction: true,
       useNativeDriver: true,

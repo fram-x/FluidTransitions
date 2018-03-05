@@ -35,8 +35,6 @@ export default class TransitionItemsView extends React.Component {
   _sharedProgress: Animated.Value
   _hiddenProgress: Animated.Value
 
-  _ownAnimationsPromise: Promise<void>
-
   _isMounted: boolean
   _appearTransitionPromise: Promise<void>
   _appearTransitionPromiseResolve: Function
@@ -46,14 +44,10 @@ export default class TransitionItemsView extends React.Component {
 
   _itemsToMeasure: Array<TransitionItem>
 
-  async onTransitionStart(props: Object, prevProps?: Object, config: Object): boolean | Promise<boolean> {
+  async onTransitionStart(props: Object, prevProps?: Object, config: Object, animations: Array<any>): boolean | Promise<boolean> {
     if (this._inTransitionPromise) {
       await this._inTransitionPromise;
     }
-
-    // console.log("TransitionItemsView onTransitionStart");
-    let ownAnimationsResolve : () => void;
-    this._ownAnimationsPromise = new Promise(resolve => ownAnimationsResolve = resolve);
 
     // Get the rest of the data required to run a transition
     const toRoute = props.scene.route.routeName;
@@ -67,12 +61,13 @@ export default class TransitionItemsView extends React.Component {
       return false;
     }
 
-    // Configure animations
-    const animations = this.configureAnimations(transitionElements, props.progress, config);
-
     this._transitionConfig = {
       fromRoute, toRoute, sharedElements, transitionElements, direction, config,
     };
+
+    // Configure animations
+    const localAnimations = this.configureAnimations(transitionElements, props.progress, config);
+    localAnimations.forEach(a => animations.push(a));
 
     if (sharedElements.length === 0 && transitionElements.length === 0) {
       return false;
@@ -107,26 +102,11 @@ export default class TransitionItemsView extends React.Component {
 
     await this.runAppearAnimation(this._hiddenProgress, 0.0, config);
 
-    // Show all items - they should now have their initial values set correctly
-    // to begin their transition
-    if (animations.length > 0) {
-      // Start transitions: setup individual animation to handle delays
-      Animated.parallel(animations).start(ownAnimationsResolve);
-      const delayTime = transitionElements.reduce((accumulator, item) =>
-        accumulator + (item.delay ? this._delayTransitionTime : 0), 0);
-
-      if (direction === -1) {
-        await new Promise(resolve => setTimeout(resolve, delayTime));
-      }
-    } else {
-      ownAnimationsResolve();
-    }
-
     return true;
   }
 
   async onTransitionEnd(props: Object, prevProps?: Object, config: Object) {
-    await this._ownAnimationsPromise;
+    
     if (this._transitionConfig.toRoute && this._transitionConfig.fromRoute) {
       this._transitionConfig.sharedElements.forEach(pair => {
         pair.fromItem.reactElement.endTransition();
@@ -177,11 +157,12 @@ export default class TransitionItemsView extends React.Component {
     let index = 0;
     transitionElements.forEach(item => {
       item.progress = new Animated.Value(0);
+      const isReverse = this.getReverse(item.name, item.route);
       const itemConfig = item.reactElement.getTransitionConfig(transitionConfig);
       const animation = timing(item.progress, {
         ...itemConfig,
         toValue: 1.0,
-        delay: item.delay ? index * this._delayTransitionTime : 0,
+        delay: 0, //isReverse ? 0 : (item.delay ? index * this._delayTransitionTime : 0), 
       });
       if (item.delay) index++;
       animations.push(animation);
