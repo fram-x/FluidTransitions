@@ -13,6 +13,9 @@
   "keywords": [
     "navigation",
     "react-native",
+    "navigation",
+    "react",
+    "shared elements",
     "transitions"
   ],
   "author": "Christian Falch",
@@ -23,6 +26,9 @@
   "homepage": "https://github.com/fram-x/FluidTransitions#readme",
   "peerDependencies": {
     "prop-types": "*",   
-    "lodash": "*"
+    "lodash": "*",
+    "react": "*",
+    "react-native": "*",
+    "react-navigation": "*"
   }
 }
