@@ -105,19 +105,7 @@ class BaseTransitioner extends React.Component {
     const positionHasChanged = position.__getValue() !== toValue;
 
     // if swiped back, indexHasChanged == true && positionHasChanged == false
-    const animations =
-      indexHasChanged && positionHasChanged
-        ? [
-          timing(progress, {
-            ...transitionSpec,
-            toValue: 1,
-          }),
-          timing(position, {
-            ...transitionSpec,
-            toValue: nextProps.navigation.state.index,
-          }),
-        ]
-        : [];
+    const animations = [];
     
     // update scenes and play the transition
     this._isTransitionRunning = true;
@@ -133,7 +121,24 @@ class BaseTransitioner extends React.Component {
           await result;
         }
       }
-      Animated.parallel(animations).start(this._onTransitionEnd);
+      // Calc delay
+      const delay = animations.reduce((prev, cur) => prev + cur.delay, 0);
+      const animationsToRun = [];
+      animations.forEach(ad => animationsToRun.push(ad.animation));
+      if(indexHasChanged && positionHasChanged){
+        animationsToRun.push(timing(progress, {
+            ...transitionSpec,
+            toValue: 1,
+            delay: delay * 0.5            
+          }));
+          animationsToRun.push(timing(position, {
+            ...transitionSpec,
+            toValue: nextProps.navigation.state.index,
+            delay: delay * 0.5
+          }));
+      }
+
+      Animated.parallel(animationsToRun).start(this._onTransitionEnd);
     });
   }
 

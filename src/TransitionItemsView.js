@@ -164,16 +164,22 @@ export default class TransitionItemsView extends React.Component {
       item.progress = new Animated.Value(0);
       const isReverse = this.getReverse(item.name, item.route);
       const itemConfig = item.reactElement.getTransitionConfig(transitionConfig);
+      const delay = isReverse ? 0 : (item.delay ? index++ * this._delayTransitionTime : 0);
       const animation = timing(item.progress, {
         ...itemConfig,
         toValue: 1.0,
-        delay: 0, //isReverse ? 0 : (item.delay ? index * this._delayTransitionTime : 0), 
-      });
-      if (item.delay) index++;
-      animations.push(animation);
+        delay
+      });      
+      animations.push(this.createAnimationDescriptor(animation, item.name, item.route, delay));
     });
 
     return animations;
+  }
+
+  createAnimationDescriptor(animation: any, name: string, route: string, delay: number){
+    return {
+      animation, name, route, delay
+    }
   }
 
   runAppearAnimation(progress: Animated.Value, toValue: number, config: Object): Promise<void> {
