@@ -1,9 +1,9 @@
 {
-  "name": "Examples",
+  "name": "examples",
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "start": "node copyPackage.js && node node_modules/react-native/local-cli/cli.js start",    
     "test": "jest"
   },
   "dependencies": {
@@ -26,7 +26,12 @@
     "flow-bin": "^0.66.0",
     "jest": "22.4.2",
     "react-test-renderer": "16.2.0",
-    "react-native-fluid-transitions": "file:./../."
+    "concurrently": "^2.2.0",
+    "fs-extra": "^0.30.0",
+    "minimatch": "^3.0.2",
+    "node-watch": "^0.4.0",
+    "rimraf": "^2.5.4",
+    "react-navigation-fluid-transitions": "./../"
   },
   "jest": {
     "preset": "react-native"

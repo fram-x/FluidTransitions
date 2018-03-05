@@ -1,4 +1,4 @@
-import FluidNavigator from './lib/FluidNavigator';
-import Transition from './lib/TransitionView';
+import FluidNavigator from './src/FluidNavigator';
+import Transition from './src/TransitionView';
 
 export { FluidNavigator, Transition };
