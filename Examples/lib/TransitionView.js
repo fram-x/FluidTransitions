@@ -3,6 +3,7 @@ import { Animated, StyleSheet, findNodeHandle } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
+import { TransitionContext } from './Types';
 
 import {
   ScaleTransition,
@@ -20,12 +21,15 @@ let uuidCount: number = 0;
 
 type TransitionEntry = {
   name: string,
-  transitionClass: any
+  transitionClass: BaseTransition
 }
 
 const transitionTypes: Array<TransitionEntry> = [];
 
-export function registerTransitionType(name: string, transitionClass: any): TransitionEntry {
+export function registerTransitionType(
+  name: string,
+  transitionClass: BaseTransition,
+): TransitionEntry {
   transitionTypes.push({ name, transitionClass });
 }
 
@@ -45,18 +49,18 @@ registerTransitionType('horizontal', HorizontalTransition);
 registerTransitionType('vertical', VerticalTransition);
 
 type TransitionProps = {
-  appear: any,
-  shared: string,
-  delay: any,
+  appear?: boolean,
+  shared?: string,
+  delay?: boolean,
   children: Array<any>
 }
 
-class Transition extends React.Component<any> {
+class Transition extends React.Component<TransitionProps> {
+  context: TransitionContext
   static contextTypes = {
     register: PropTypes.func,
     unregister: PropTypes.func,
     route: PropTypes.string,
-    sharedProgress: PropTypes.object,
     hiddenProgress: PropTypes.object,
     getTransitionProgress: PropTypes.func,
     getIsSharedElement: PropTypes.func,
@@ -67,13 +71,14 @@ class Transition extends React.Component<any> {
     getMetrics: PropTypes.func,
   }
 
-  constructor(props: TransitionProps, context: any) {
+  constructor(props: TransitionProps, context: TransitionContext) {
     super(props, context);
+
     this._name = `${uniqueBaseId}-${uuidCount++}`;
     this._transitionHelper = null;
     this._isInTransition = false;
     this._forceUpdate = false;
-    this._startOpacity = this.props.appear ? 0 : 1;
+    this._startOpacity = props.appear ? 0 : 1;
   }
 
   _name: string
@@ -199,7 +204,7 @@ class Transition extends React.Component<any> {
   }
 
 
-  _getName() {
+  _getName(): string {
     if (this.props.shared) { return this.props.shared; }
     return this._name;
   }

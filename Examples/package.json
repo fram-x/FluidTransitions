@@ -11,7 +11,8 @@
     "react": "16.2.0",
     "react-native": "0.53.3",
     "react-native-fast-image": "^2.2.5",
-    "react-navigation": "^1.1.1"
+    "react-navigation": "^1.1.1",
+    "lodash": "^4.17.5"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.2",

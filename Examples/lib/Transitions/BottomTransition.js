@@ -2,17 +2,19 @@ import React from 'react';
 import { Dimensions, Animated } from 'react-native';
 
 import BaseTransition from './BaseTransition';
+import { TransitionSpecification } from './../Types';
 
 class BottomTransition extends BaseTransition {
-  getTransitionStyle(transitionConfiguration) {
-    if(!transitionConfiguration || transitionConfiguration.metrics === undefined)
-      return { };
+  getTransitionStyle(transitionSpecification: TransitionSpecification) {
+    if (!transitionSpecification || transitionSpecification.metrics === undefined) {
+      return {};
+    }
 
-    const { y, height } = transitionConfiguration.metrics;
+    const { y, height } = transitionSpecification.metrics;
     const distanceValue = Dimensions.get('window').height - (y + 25);
-    const progress = transitionConfiguration.progress.interpolate({
+    const progress = transitionSpecification.progress.interpolate({
       inputRange: [0, 1],
-      outputRange: transitionConfiguration.reverse ? [0, distanceValue] : [distanceValue, 0]
+      outputRange: transitionSpecification.reverse ? [0, distanceValue] : [distanceValue, 0],
     });
 
     return { transform: [{ translateY: progress }] };

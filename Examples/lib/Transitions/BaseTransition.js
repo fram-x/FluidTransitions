@@ -1,5 +1,7 @@
+import { TransitionSpecification } from './../Types';
+
 class BaseTransition {
-  getTransitionStyle(transitionSpecification) {
+  getTransitionStyle(transitionSpecification: TransitionSpecification) {
     return { };
   }
 }

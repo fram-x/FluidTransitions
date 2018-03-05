@@ -1,8 +1,12 @@
-export { ScaleTransition } from './ScaleTransitions';
-export { TopTransition } from './TopTransition';
-export { BottomTransition } from './BottomTransition';
-export { LeftTransition } from './LeftTransition';
-export { RightTransition } from './RightTransition';
-export { HorizontalTransition } from './HorizontalTransition';
-export { VerticalTransition } from './VerticalTransition';
-export { BaseTransition } from './BaseTransition';
+import ScaleTransition from './ScaleTransitions';
+import TopTransition from './TopTransition';
+import BottomTransition from './BottomTransition';
+import LeftTransition from './LeftTransition';
+import RightTransition from './RightTransition';
+import HorizontalTransition from './HorizontalTransition';
+import VerticalTransition from './VerticalTransition';
+import BaseTransition from './BaseTransition';
+
+export { ScaleTransition, TopTransition, BottomTransition,
+  LeftTransition, RightTransition, HorizontalTransition,
+  VerticalTransition, BaseTransition };

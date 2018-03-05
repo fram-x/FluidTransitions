@@ -28,7 +28,11 @@
 		"object-curly-newline": "off",
 		"no-underscore-dangle": "off",
 		"no-plusplus": "off",
-		"react/sort-comp": "off"
+		"react/sort-comp": "off",
+		"no-mixed-operators": "off",
+		"class-methods-use-this": "off",
+		"no-return-assign": "off",
+		"no-multi-assign": "off"
 	},
 	"globals": {
 		"$Keys": true

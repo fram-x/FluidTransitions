@@ -46,7 +46,7 @@ export default class TransitionItemsView extends React.Component {
 
   _itemsToMeasure: Array<TransitionItem>
 
-  async onTransitionStart(props: Object, prevProps?: Object, config: Object) {
+  async onTransitionStart(props: Object, prevProps?: Object, config: Object): boolean {
     if (this._inTransitionPromise) {
       await this._inTransitionPromise;
     }
@@ -64,7 +64,6 @@ export default class TransitionItemsView extends React.Component {
 
     // If we're appearing and there are no appear transition, lets just bail out.
     if (!prevProps && transitionElements.length === 0) {
-      console.log('TransitionItemsView onTransitionStart skipping. No transitions.');
       return;
     }
 
@@ -76,7 +75,6 @@ export default class TransitionItemsView extends React.Component {
     };
 
     if (sharedElements.length === 0 && transitionElements.length === 0) {
-      console.log('TransitionItemsView onTransitionStart skip transitions.');
       return false;
     }
 
@@ -346,7 +344,6 @@ export default class TransitionItemsView extends React.Component {
   }
 
   getChildContext() {
-    const self = this;
     return {
       register: (item) => this._transitionItems.add(item),
       unregister: (name, route) => this._transitionItems.remove(name, route),

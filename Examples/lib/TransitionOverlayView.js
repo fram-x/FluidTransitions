@@ -3,25 +3,56 @@ import { View, StyleSheet, Animated } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
-import { TransitionConfiguration } from './Types';
+import { TransitionConfiguration, TransitionContext } from './Types';
 
-class TransitionOverlayView extends React.Component {
-  constructor(props, context) {
+const styles: StyleSheet.NamedStyles = StyleSheet.create({
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  emptyOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  sharedElement: {
+    position: 'absolute',
+    // borderColor: '#34CE34',
+    // borderWidth: 1,
+    margin: 0,
+    left: 0,
+    top: 0,
+  },
+});
+
+type TransitionOverlayViewProps = {
+  onLayout: (event: any) => void
+}
+
+class TransitionOverlayView extends React.Component<TransitionOverlayViewProps> {
+  context: TransitionContext
+  constructor(props: TransitionOverlayViewProps, context: TransitionContext) {
     super(props, context);
     this._transitionConfig = {};
     this._forceUpdate = false;
     this._isMounted = false;
   }
 
-  _transitionConfig: TransitionConfiguration
-  _forceUpdate: boolean
-  _isMounted: boolean
+  _transitionConfig: TransitionConfiguration;
+  _forceUpdate: boolean;
+  _isMounted: boolean;
 
   setTransitionConfig(transitionConfig: TransitionConfiguration) {
     this._transitionConfig = transitionConfig;
     this._forceUpdate = true;
-    if (this._isMounted)
-      {this.forceUpdate();}
+    if (this._isMounted) {
+      this.forceUpdate();
+    }
   }
 
   render() {
@@ -39,8 +70,7 @@ class TransitionOverlayView extends React.Component {
         fromItem.reactElement.props.children :
         toItem.reactElement.props.children);
 
-      if (element.type.name === 'Button')
-        {element = (<View>{element}</View>);}
+      if (element.type.name === 'Button') { element = (<View>{element}</View>); }
 
       const AnimatedComp = Animated.createAnimatedComponent(element.type);
       const props = {
@@ -112,9 +142,8 @@ class TransitionOverlayView extends React.Component {
         fromItem.metrics.height / 2 * (toVsFromScaleY - 1)],
     });
 
-    const transform = [{ translateX  }, { translateY  }, { scaleX }, { scaleY }];
-    if (rotate)
-      {transform.push({ rotate });}
+    const transform = [{ translateX }, { translateY }, { scaleX }, { scaleY }];
+    if (rotate) { transform.push({ rotate }); }
 
     return [styles.sharedElement, {
       width: fromItem.metrics.width,
@@ -123,11 +152,11 @@ class TransitionOverlayView extends React.Component {
     }];
   }
 
-  getRotation(item: TransitionItem): string  {
+  getRotation(item: TransitionItem):string {
     const element = React.Children.only(item.reactElement.props.children);
-    const styles = element.props.style;
-    if (!styles) return null;
-    const s = StyleSheet.flatten(styles);
+    const elementStyles = element.props.style;
+    if (!elementStyles) return null;
+    const s = StyleSheet.flatten(elementStyles);
     if (s.transform) {
       const rotation = s.transform.find(e => e.rotate);
       if (rotation) {
@@ -137,7 +166,7 @@ class TransitionOverlayView extends React.Component {
     return null;
   }
 
-  shouldComponentUpdate(nextProps?: Object, nextState?: Object) {
+  shouldComponentUpdate() {
     const retVal = this._forceUpdate;
     this._forceUpdate = false;
     return retVal;
@@ -155,30 +184,5 @@ class TransitionOverlayView extends React.Component {
     sharedProgress: PropTypes.object,
   }
 }
-
-const styles = StyleSheet.create({
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  emptyOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  sharedElement: {
-    position: 'absolute',
-    // borderColor: '#34CE34',
-    // borderWidth: 1,
-    margin: 0,
-    left: 0,
-    top: 0,
-  },
-});
 
 export default TransitionOverlayView;

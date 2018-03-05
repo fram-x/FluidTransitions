@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, Dimensions, Button, TouchableWithoutFeedback, FlatList, Animated, Easing, Image, StyleSheet } from 'react-native';
-
+import _ from 'lodash';
 import { FluidNavigator, Transition } from './../lib/';
 
 const styles = StyleSheet.create({
@@ -139,7 +139,7 @@ class ImageGrid extends Component {
               <Image
                 source={{ uri: image.url }}
                 style={{ width: this._photoSize, height: this._photoSize }}
-                />
+              />
             </Transition>
           </View>
         </TouchableWithoutFeedback>
