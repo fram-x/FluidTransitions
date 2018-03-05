@@ -80,7 +80,9 @@ export default class TransitionItemsView extends React.Component {
     if (this._itemsToMeasure.length > 0) {
       await this.measureItems(sharedElements, transitionElements);
       this._itemsToMeasure = [];
-    } else { await this.resolveLayouts(sharedElements, transitionElements, prevProps === null); }
+    } else { 
+      await this.resolveLayouts(sharedElements, transitionElements, prevProps === null);
+    }
 
     // Force update the overlay
     if (this._overlayView) {
@@ -142,12 +144,7 @@ export default class TransitionItemsView extends React.Component {
     transitionElements: Array<TransitionItem>,
     progress: Animated.Value, config: Object,
   ) {
-    const hasDelayedAnimations = transitionElements.find(e => e.delay);
-    if (!hasDelayedAnimations) {
-      transitionElements.forEach(item => item.progress = progress);
-      return [];
-    }
-
+    
     const transitionConfig = { ...config };
     const { timing } = transitionConfig;
     delete transitionConfig.timing;
