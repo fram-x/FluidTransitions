@@ -12,17 +12,17 @@ class VerticalTransition extends BaseTransition {
     let start = 0;
     let end = 0;
     if(transitionSpecification.reverse === false && transitionSpecification.direction === 1){
-      start = Dimensions.get('window').height - (y - 25);
+      start = -(height + y + 25);
       end = 0;
     } else if(transitionSpecification.reverse === true && transitionSpecification.direction === 1){
       start = 0;
-      end = -(height + y + 25);
+      end = Dimensions.get('window').height - (y - 25);
     } else if(transitionSpecification.reverse === false && transitionSpecification.direction === -1){
-      start = -(height + y + 25);
+      start = Dimensions.get('window').height - (y - 25);      
       end = 0;
     } else if(transitionSpecification.reverse === true && transitionSpecification.direction === -1){
-      start = 0;
-      end = Dimensions.get('window').height - (y - 25);
+      start = 0;      
+      end = -(height + y + 25);
     }
 
     const progress = transitionSpecification.progress.interpolate({
