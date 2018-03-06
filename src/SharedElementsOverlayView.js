@@ -12,12 +12,10 @@ const styles: StyleSheet.NamedStyles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-  },  
+  },
   sharedElement: {
     position: 'absolute',
-    backgroundColor: '#34CE34',
-    // borderWidth: 1,
-    margin: 0,
+    // backgroundColor:'#00FE21',
     left: 0,
     top: 0,
   },
@@ -35,7 +33,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
   constructor(props: SharedElementsOverlayViewProps, context: TransitionContext) {
     super(props, context);
     this._isMounted = false;
-    this._sharedElements = [];
+    this._sharedElements = null;
   }
 
   _isMounted: boolean;
@@ -43,23 +41,21 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
 
   render() {
     if(!this.props.sharedElements || !this.getMetricsReady()) {
-      this._sharedElements = [];
+      this._sharedElements = null;
       return <View style={styles.overlay} pointerEvents='none'/>;
     }
 
-    if(this._sharedElements.length === 0) {      
+    if(!this._sharedElements) {
+      const self = this;
       this._sharedElements = this.props.sharedElements.map((pair, idx) => {
         const { fromItem, toItem } = pair;
-        const transitionStyle = this.getTransitionStyle(fromItem, toItem);
-        
-        let element = React.Children.only(this.props.direction === -1 ?
-        fromItem.reactElement.props.children :
-        toItem.reactElement.props.children);
-        
-        let animatedComponent = null;
+        const transitionStyle = self.getTransitionStyle(fromItem, toItem);
+
+        let element = React.Children.only(fromItem.reactElement.props.children);
         let elementProps = element.props;
-        let child = null;
-    
+        let animatedComponent;
+        let child;
+
         // Functional components should be wrapped in a view to be usable with
         // Animated.createAnimatedComponent
         const isFunctionalComponent = !element.type.displayName;
@@ -74,13 +70,13 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
         else {
           animatedComponent = Animated.createAnimatedComponent(element.type);
         }
-
+        
         const props = {
           ...element.props,
           style: [element.props.style, styles.sharedElement, transitionStyle],
           key: idx,
         };
-        
+
         return React.createElement(animatedComponent, props, child ? child : element.props.children);
       });
     };
@@ -91,7 +87,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
       </View>
     );
   }
-  
+
   getMetricsReady(): boolean {
     if(this.props.sharedElements) {
       let metricsReady = true;
@@ -104,15 +100,15 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     return false;
   }
 
-  getTransitionStyle(fromItem: TransitionItem, toItem: TransitionItem) {    
+  getTransitionStyle(fromItem: TransitionItem, toItem: TransitionItem) {
     const { getTransitionProgress } = this.context;
-    if (!getTransitionProgress) return {};
+    if (!getTransitionProgress || !fromItem.metrics || !toItem.metrics) return {};
 
     const progress = getTransitionProgress(fromItem.name, fromItem.route);
-    
+
     const toVsFromScaleX = toItem.scaleRelativeTo(fromItem).x;
     const toVsFromScaleY = toItem.scaleRelativeTo(fromItem).y;
-    
+
     // let rotateFrom = this.getRotation(fromItem);
     // let rotateTo = this.getRotation(toItem);
     // let rotate = null;
@@ -166,7 +162,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
   }
 
   static contextTypes = {
-    getTransitionProgress: PropTypes.func,    
+    getTransitionProgress: PropTypes.func,
   }
 }
 

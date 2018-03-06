@@ -278,7 +278,10 @@ export default class TransitionItemsView extends React.Component {
     unregister: PropTypes.func,
     layoutReady: PropTypes.func,
     getVisibilityProgress: PropTypes.func,
-    getTransitionProgress: PropTypes.func
+    getTransitionProgress: PropTypes.func,
+    getDirection: PropTypes.func,
+    getReverse: PropTypes.func,
+    getMetrics: PropTypes.func
   }
 
   getChildContext() {
@@ -287,7 +290,10 @@ export default class TransitionItemsView extends React.Component {
       unregister: (name, route) => this._transitionItems.remove(name, route),
       layoutReady: this.layoutReady.bind(this),
       getVisibilityProgress: this.getVisibilityProgress.bind(this),
-      getTransitionProgress: this.getTransitionProgress.bind(this)
+      getTransitionProgress: this.getTransitionProgress.bind(this),
+      getDirection: this.getDirection.bind(this),
+      getReverse: this.getReverse.bind(this),
+      getMetrics: this.getMetrics.bind(this)
     };
   }
 }

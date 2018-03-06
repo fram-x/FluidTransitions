@@ -10,7 +10,7 @@ type Size = {
 export default class TransitionItem {
   constructor(
     name: string, route: string, reactElement: Object,
-    shared: boolean, appear: boolean, delay: boolean, metrics: Metrics,
+    shared: boolean, appear: string, delay: boolean, metrics: Metrics,
     visibility: Animated.Value, progress: Animated.Value
   ) {
     this.name = name;
@@ -29,7 +29,7 @@ export default class TransitionItem {
   reactElement: Object
   metrics: Metrics
   shared: boolean
-  appear: boolean
+  appear: string
   delay: boolean
   layoutReady: boolean
   visibility: Animated.Value

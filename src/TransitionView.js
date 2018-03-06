@@ -43,7 +43,7 @@ class Transition extends React.Component<TransitionProps> {
       this._route = this.context.route;
       register(new TransitionItem(
         this._getName(), this.context.route,
-        this, this.props.shared !== undefined, this.props.appear !== undefined,
+        this, this.props.shared !== undefined, this.props.appear,
         this.props.delay !== undefined,
       ));
     }

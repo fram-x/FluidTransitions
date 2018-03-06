@@ -1,9 +1,19 @@
 import React from 'react';
-import { View, StyleSheet, Animated } from 'react-native';
+import { View, StyleSheet, Animated, Platform } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
 import { TransitionConfiguration, TransitionContext } from './Types';
+import {
+  ScaleTransition,
+  TopTransition,
+  BottomTransition,
+  LeftTransition,
+  RightTransition,
+  HorizontalTransition,
+  VerticalTransition,
+  BaseTransition }
+  from './Transitions';
 
 const styles: StyleSheet.NamedStyles = StyleSheet.create({
   overlay: {
@@ -15,12 +25,29 @@ const styles: StyleSheet.NamedStyles = StyleSheet.create({
   },
   transitionElement: {
     position: 'absolute',
-    backgroundColor: '#E5D',
+    // backgroundColor: '#E5D',
     margin: 0,
     left: 0,
     top: 0,
   },
 });
+
+const transitionTypes: Array<TransitionEntry> = [];
+
+export function registerTransitionType(
+  name: string,
+  transitionClass: BaseTransition,
+): TransitionEntry {
+  transitionTypes.push({ name, transitionClass });
+}
+
+registerTransitionType('scale', ScaleTransition);
+registerTransitionType('top', TopTransition);
+registerTransitionType('bottom', BottomTransition);
+registerTransitionType('left', LeftTransition);
+registerTransitionType('right', RightTransition);
+registerTransitionType('horizontal', HorizontalTransition);
+registerTransitionType('vertical', VerticalTransition);
 
 type TransitionElementsOverlayViewProps = {
   fromRoute: string,
@@ -34,14 +61,19 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     super(props, context);
     this._isMounted = false;
     this._transitionElements = [];
+    this._transitionHelper = null;
+    this._startOpacity = props.appear ? 0 : 1;
   }
 
   _isMounted: boolean;
   _transitionElements: Array<TransitionItem>
+  _transitionHelper: any
+  _startOpacity: number
 
   render() {
     if(!this.props.transitionElements || !this.getMetricsReady()) {
       this._transitionElements = [];
+      this._transitionHelper = null;
       return <View style={styles.overlay} pointerEvents='none'/>;
     }
 
@@ -62,16 +94,55 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
   }
 
   getTransitionStyle(item: TransitionItem) {
-    const { getTransitionProgress } = this.context;
-    if (!getTransitionProgress) return {};
+    const { getTransitionProgress, getMetrics, getDirection, getReverse, } = this.context;
+    if (!getTransitionProgress || !getMetrics || !getDirection || !getReverse ) return {
+      width: item.metrics.width, height: item.metrics.height,
+      transform: [{ translateX: item.metrics.x }, { translateY: item.metrics.y }]
+    };
 
     const progress = getTransitionProgress(item.name, item.route);
 
-    return {
-      width: item.metrics.width,
-      height: item.metrics.height,
-      transform: [{ translateX: item.metrics.x }, { translateY: item.metrics.y }]
+    if(progress) {
+      const hadZeroOpacity = this._startOpacity === 0;
+      this._startOpacity = 1;
+      const metrics = getMetrics(item.name, item.route);
+      const transitionHelper = this.getTransitionHelper(item.appear);
+      if (transitionHelper) {
+        const transitionConfig = {
+          name: item.name,
+          route: item.route,
+          progress,
+          metrics,
+          direction: getDirection(item.name, item.route),
+          reverse: getReverse(item.name, item.route),
+        };
+
+        if(hadZeroOpacity && Platform.OS === 'android'){
+          const opacity = progress.interpolate({
+            inputRange: [0, 0.1, 1],
+            outputRange: [0, 1, 1]
+          });
+          return {...transitionHelper.getTransitionStyle(transitionConfig), opacity, 
+            width: item.metrics.width, height: item.metrics.height};
+        }
+
+        return {...transitionHelper.getTransitionStyle(transitionConfig), 
+          width: item.metrics.width, height: item.metrics.height};
+      }
     }
+    return { 
+      width: item.metrics.width, height: item.metrics.height, 
+      transform: [{ translateX: item.metrics.x }, { translateY: item.metrics.y }]};
+  }
+
+  getTransitionHelper(appear) {
+    if (this._transitionHelper === null) {
+      if (appear) {
+        const transitionType = transitionTypes.find(e => e.name === appear);
+        if (transitionType) { this._transitionHelper = new transitionType.transitionClass(); }
+      }
+    }
+    return this._transitionHelper;
   }
 
   getAnimatedComponent(renderElement, idx, transitionStyle) {
@@ -82,9 +153,10 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     let child = null;
 
     // Functional components should be wrapped in a view to be usable with
-    // Animated.createAnimatedComponent
+    // Animated.createAnimatedComponent. We also need to wrap buttons in
+    // separate containers. Don't know why!
     const isFunctionalComponent = !element.type.displayName;
-    if(isFunctionalComponent) {
+    if(isFunctionalComponent || element.type.displayName === 'Button') {
       // Wrap in sourrounding view
       element = React.createElement(element.type, element.props);
       const wrapper = (<View/>);
@@ -130,6 +202,9 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
 
   static contextTypes = {
     getTransitionProgress: PropTypes.func,
+    getDirection: PropTypes.func,
+    getReverse: PropTypes.func,
+    getMetrics: PropTypes.func
   }
 }
 
