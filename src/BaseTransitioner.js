@@ -68,8 +68,8 @@ class BaseTransitioner extends React.Component {
       this._queuedTransition = { nextProps, nextScenes, indexHasChanged };
       return;
     }
-    
-    this._startTransition(nextProps, nextScenes, indexHasChanged);    
+
+    this._startTransition(nextProps, nextScenes, indexHasChanged);
   }
 
   _startTransition(nextProps, nextScenes, indexHasChanged) {
@@ -106,7 +106,7 @@ class BaseTransitioner extends React.Component {
 
     // if swiped back, indexHasChanged == true && positionHasChanged == false
     const animations = [];
-    
+
     // update scenes and play the transition
     this._isTransitionRunning = true;
     this.setState(nextState, async () => {
@@ -129,7 +129,7 @@ class BaseTransitioner extends React.Component {
         animationsToRun.push(timing(progress, {
             ...transitionSpec,
             toValue: 1,
-            delay: delay * 0.5            
+            delay: delay * 0.5
           }));
           animationsToRun.push(timing(position, {
             ...transitionSpec,

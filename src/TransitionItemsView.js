@@ -13,9 +13,16 @@ export default class TransitionItemsView extends React.Component {
     this._isMounted = false;
     this._overlayView = null;
     this._viewRef = null;
-
+    this.state = {
+      toRoute: null,
+      fromRoute: null,
+      direction: null,
+      sharedElements: null,
+      transitionElements: null,
+    };
+    this._fadeTransitionTime = 100;
     this._transitionItems = new TransitionItems();
-
+    this._overlayVisibilityProgress = new Animated.Value(0);
     this._onLayoutResolvePromise = new Promise(resolve => this._onLayoutResolve = resolve);
   }
 
@@ -23,10 +30,14 @@ export default class TransitionItemsView extends React.Component {
   _viewRef: any
   _transitionItems: TransitionItems
   _isMounted: boolean
-  _onLayoutResolve
-  _onLayoutResolvePromise
-  
+  _onLayoutResolve: Function
+  _onLayoutResolvePromise: Promise<void>
+  _overlayVisibilityProgress: Animated.Value
+  _fadeTransitionTime: number
+
   async onTransitionStart(props: Object, prevProps?: Object, config: Object, animations: Array<any>): boolean | Promise<boolean> {
+    // Wait for layouts - this is only necessary when running appear animations, but
+    // we'll keep the promise around so that we can wait without any further checking
     await this._onLayoutResolvePromise;
 
     // Get the rest of the data required to run a transition
@@ -37,26 +48,155 @@ export default class TransitionItemsView extends React.Component {
     const transitionElements = this._transitionItems.getTransitionElements(fromRoute, toRoute);
 
     // If we're appearing and there are no appear transition, lets just bail out.
-    if (!prevProps && transitionElements.length === 0) {
+    if ((!prevProps && transitionElements.length === 0) ||
+      (sharedElements.length === 0 && transitionElements.length === 0)) {
       return false;
     }
-  
-    if (sharedElements.length === 0 && transitionElements.length === 0) {
-      return false;
-    }
-  
+
+    // Now we can loop through elements that should transition or be part of
+    // a shared element transition and measure them
+    await this.measureItems(sharedElements, transitionElements);
+
+    // Configure individual animations for transitions
+    const currentAnimations = this.configureAnimations(sharedElements, transitionElements, config);
+    currentAnimations.forEach(animation => animations.push(animation));
+
+    // Save info about the current transition
+    this.setState({
+      ...this.state,
+      toRoute,
+      fromRoute,
+      direction,
+      sharedElements,
+      transitionElements,
+    });
+
+    // We should now be ready to swap out visibility for elements in
+    // transition
+    await this.runOverlayVisibilityAnimation(1);
+    await this.runVisibilityAnimation(0);
+
     return true;
   }
 
   async onTransitionEnd(props: Object, prevProps?: Object, config: Object) {
-    
+
+    // Run animation on visibility for transition items
+    await this.runVisibilityAnimation(1);
+    await this.runOverlayVisibilityAnimation(0);
+
+    this.setState({
+      ...this.state,
+      toRoute: null,
+      fromRoute: null,
+      direction: null,
+      sharedElements: null,
+      transitionElements: null,
+    });
   }
-  
+
+  runVisibilityAnimation(toValue: number): Promise<void> {
+    // Get all elements part of a transition or a shared element transition
+    const transitionElements = [];
+    if(this.state.sharedElements){
+      this.state.sharedElements.forEach(pair => {
+        transitionElements.push(pair.fromItem);
+        transitionElements.push(pair.toItem);
+      });
+    }
+
+    if(this.state.transitionElements){
+      this.state.transitionElements.forEach(item => transitionElements.push(item));
+    }
+
+    if(transitionElements.length === 0)
+      return;
+
+    // Hide/show by changing the progress value
+    const animations = [];
+    transitionElements.forEach(item => {
+      animations.push(Animated.timing(item.visibility, {
+        toValue,
+        duration: this._fadeTransitionTime,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }));
+    });
+
+    const promise = new Promise(resolve =>
+      Animated.parallel(animations).start(resolve));
+
+    return promise;
+  }
+
+  runOverlayVisibilityAnimation(toValue: number): Promise<void> {
+    const promise = new Promise(resolve =>
+      Animated.timing(this._overlayVisibilityProgress, {
+        toValue,
+        duration: this._fadeTransitionTime,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }).start(resolve));
+
+    return promise;
+  }
+
+  configureAnimations(sharedElements: Array<any>,
+    transitionElements: Array<TransitionItem>,
+    config: Object,
+  ) {
+
+    // Create animations
+    const animations = [];
+    let index = 0;
+    transitionElements.forEach(item =>
+      animations.push(this.configureAnimation(item, null, config))
+    );
+    sharedElements.forEach(pair => {
+      const animationDescriptor = this.configureAnimation(pair.fromItem, null, config);
+      animations.push(animationDescriptor);
+      animations.push(this.configureAnimation(pair.toItem, animationDescriptor.progress, config));
+    });
+
+    return animations;
+  }
+
+  configureAnimation(item: TransitionItem, progress: null, config: any) {
+    const transitionConfig = { ...config };
+    const { timing } = transitionConfig;
+    delete transitionConfig.timing;
+
+    item.progress = progress ? progress : new Animated.Value(0);
+    const isReverse = this.getReverse(item.name, item.route);
+    const delay = isReverse ? 0 : (item.delay ? index++ * this._delayTransitionTime : 0);
+    const animation = timing(item.progress, {
+      ...transitionConfig,
+      toValue: 1.0,
+      delay
+    });
+    return this.createAnimationDescriptor(animation, item.name, item.route, delay, item.progress);
+  }
+
+  createAnimationDescriptor(animation: any, name: string, route: string, delay: number){
+    return {
+      animation, name, route, delay
+    }
+  }
+
   render() {
     return (
-      <View style={styles.container} ref={(ref) => this._viewRef = ref} onLayout={this.onLayout.bind(this)}>
+      <View
+        style={styles.container}
+        ref={(ref) => this._viewRef = ref}
+        onLayout={this.onLayout.bind(this)}>
         {this.props.children}
-        <TransitionOverlayView ref={(ref) => this._overlayView = ref}/>
+        <TransitionOverlayView
+          ref={(ref) => this._overlayView = ref}
+          transitionElements={this.state.transitionElements}
+          sharedElements={this.state.sharedElements}
+          visibility={this._overlayVisibilityProgress}
+          direction={this.state.direction}
+        />
       </View>
     );
   }
@@ -68,32 +208,39 @@ export default class TransitionItemsView extends React.Component {
     }
   }
 
-  async resolveLayouts(
-    sharedElements: Map<TransitionItem>,
-    transitionElements: Array<TransitionItem>, appear: boolean = false,
-  ) {
-    if (this._transitionConfig.direction !== -1 || appear) {
-      await this.measureItems(sharedElements, transitionElements);
-    }
-  }
-
   layoutReady(name: string, route: string) {
-    return;
-    const sharedElements = this._transitionItems.getSharedElements(this._transitionConfig.fromRoute, this._transitionConfig.toRoute);
-    const transitionElements = this._transitionItems.getTransitionElements(this._transitionConfig.fromRoute, this._transitionConfig.toRoute);
-
     const item = this._transitionItems.getItemByNameAndRoute(name, route);
     if (!item) {
       // a stray element that will be removed - lets just bail out
       return;
     }
-
-    if (sharedElements.length === 0 && transitionElements.length === 0) {
-      this._itemsToMeasure.push(item);
-      return;
-    }
-
     item.layoutReady = true;
+  }
+
+  getVisibilityProgress(name: string, route: string): Animated.Value {
+    const item = this._transitionItems.getItemByNameAndRoute(name, route);
+    if (!item) return null;
+    return item.visibility;
+  }
+
+  getTransitionProgress(name: string, route: string): Animated.Value {
+    const item = this._transitionItems.getItemByNameAndRoute(name, route);
+    if (!item) return null;
+    return item.progress;
+  }
+
+  getMetrics(name: string, route: string): Metrics {
+    const item = this._transitionItems.getItemByNameAndRoute(name, route);
+    return item.metrics;
+  }
+
+  getDirection(name: string, route: string): number {
+    if (!this.state.direction) { return 0; }
+    return this.state.direction;
+  }
+
+  getReverse(name: string, route: string): boolean {
+    return route !== this.state.toRoute;
   }
 
   async measureItems(
@@ -151,14 +298,18 @@ export default class TransitionItemsView extends React.Component {
   static childContextTypes = {
     register: PropTypes.func,
     unregister: PropTypes.func,
-    layoutReady: PropTypes.func,    
+    layoutReady: PropTypes.func,
+    getVisibilityProgress: PropTypes.func,
+    getTransitionProgress: PropTypes.func
   }
 
   getChildContext() {
     return {
       register: (item) => this._transitionItems.add(item),
       unregister: (name, route) => this._transitionItems.remove(name, route),
-      layoutReady: this.layoutReady.bind(this),    
+      layoutReady: this.layoutReady.bind(this),
+      getVisibilityProgress: this.getVisibilityProgress.bind(this),
+      getTransitionProgress: this.getTransitionProgress.bind(this)
     };
   }
 }

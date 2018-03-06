@@ -8,13 +8,6 @@ import { TransitionContext } from './Types';
 const uniqueBaseId: string = `transitionCompId-${Date.now()}`;
 let uuidCount: number = 0;
 
-const styles = StyleSheet.create({
-  transitionElement: {
-    // borderColor: '#FF0000',
-    // borderWidth: 1,
-  },
-});
-
 type TransitionProps = {
   appear?: boolean,
   shared?: string,
@@ -29,6 +22,7 @@ class Transition extends React.Component<TransitionProps> {
     unregister: PropTypes.func,
     layoutReady: PropTypes.func,
     route: PropTypes.string,
+    getVisibilityProgress: PropTypes.func
   }
 
   constructor(props: TransitionProps, context: TransitionContext) {
@@ -67,6 +61,10 @@ class Transition extends React.Component<TransitionProps> {
     }
   }
 
+  getNodeHandle(): number {
+    return findNodeHandle(this._viewRef);
+  }
+
   onLayout() {
     const { layoutReady } = this.context;
     if (!layoutReady) return;
@@ -76,10 +74,6 @@ class Transition extends React.Component<TransitionProps> {
   _getName(): string {
     if (this.props.shared) { return this.props.shared; }
     return this._name;
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    return true;
   }
 
   render() {
@@ -106,14 +100,17 @@ class Transition extends React.Component<TransitionProps> {
     else if(!this._animatedComponent)
       this._animatedComponent = Animated.createAnimatedComponent(element.type);    
 
+    // Visibility
+    const visibilityStyle = this.getVisibilityStyle();
+
     // Build styles
-    const style = [elementProps.style];
+    const style = [elementProps.style, visibilityStyle];
     const props = {
       ...elementProps,
       key: this._getName(),
       onLayout: this.onLayout.bind(this),
       collapsable: false,
-      style: [style, styles.transitionElement],
+      style: style,
       ref: (ref) => { this._viewRef = ref; },
     };
 
@@ -121,6 +118,15 @@ class Transition extends React.Component<TransitionProps> {
       return React.createElement(this._animatedComponent, props, child);
 
     return React.createElement(this._animatedComponent, props);
+  }
+
+  getVisibilityStyle() {
+    const { getVisibilityProgress } = this.context;
+    if(!getVisibilityProgress) return {};
+    const progress = getVisibilityProgress(this._getName(), this._route);
+    return {
+      opacity: progress
+    }
   }
 }
 

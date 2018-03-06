@@ -79,7 +79,10 @@ class FluidTransitioner extends React.Component {
       // Start transition
       const animations = [];
       await this._transitionItemsView.onTransitionStart(props, null, config, animations);
-      if (animations.length === 0) { return; }
+      if (animations.length === 0) { 
+        this._transitionItemsView.onTransitionEnd(props, null, config)
+        return; 
+      }
       const animationsToRun = [];
       animations.forEach(ad => animationsToRun.push(ad.animation));
 
