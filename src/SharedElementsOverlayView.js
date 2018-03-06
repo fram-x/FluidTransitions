@@ -99,7 +99,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     if (!getTransitionProgress || !fromItem.metrics || !toItem.metrics) return {};
 
     const progress = getTransitionProgress(fromItem.name, fromItem.route);
-
+    
     const toVsFromScaleX = toItem.scaleRelativeTo(fromItem).x;
     const toVsFromScaleY = toItem.scaleRelativeTo(fromItem).y;
     

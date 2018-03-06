@@ -6,6 +6,7 @@ import { Metrics, TransitionConfiguration } from './Types';
 import TransitionItem from './TransitionItem';
 import TransitionItems from './TransitionItems';
 import TransitionOverlayView from './TransitionOverlayView';
+import { configureTransitionAnimations, configureSharedElementAnimations } from './TransitionAnimations';
 
 export default class TransitionItemsView extends React.Component {
   constructor(props) {
@@ -58,8 +59,10 @@ export default class TransitionItemsView extends React.Component {
     await this.measureItems(sharedElements, transitionElements);
 
     // Configure individual animations for transitions
-    const currentAnimations = this.configureAnimations(sharedElements, transitionElements, config);
-    currentAnimations.forEach(animation => animations.push(animation));
+    const transitionAnimations = configureTransitionAnimations(transitionElements, config);
+    const sharedElementAnimations = configureSharedElementAnimations(sharedElements, props.progress, config);
+    transitionAnimations.forEach(animation => animations.push(animation));
+    sharedElementAnimations.forEach(animation => animations.push(animation));
 
     // Save info about the current transition
     this.setState({
@@ -81,9 +84,20 @@ export default class TransitionItemsView extends React.Component {
 
   async onTransitionEnd(props: Object, prevProps?: Object, config: Object) {
 
+    if(this.state.transitionElements === null || 
+    this.state.sharedElements === null) 
+      return;
+
     // Run animation on visibility for transition items
     await this.runVisibilityAnimation(1);
     await this.runOverlayVisibilityAnimation(0);
+
+    // Clear item progress
+    this.state.transitionElements.forEach(item => item.progress = null);
+    this.state.sharedElements.forEach(pair => {
+      pair.fromItem.progress = null;
+      pair.toItem.progress = null;
+    });
 
     this.setState({
       ...this.state,
@@ -139,48 +153,6 @@ export default class TransitionItemsView extends React.Component {
       }).start(resolve));
 
     return promise;
-  }
-
-  configureAnimations(sharedElements: Array<any>,
-    transitionElements: Array<TransitionItem>,
-    config: Object,
-  ) {
-
-    // Create animations
-    const animations = [];
-    let index = 0;
-    transitionElements.forEach(item =>
-      animations.push(this.configureAnimation(item, null, config))
-    );
-    sharedElements.forEach(pair => {
-      const animationDescriptor = this.configureAnimation(pair.fromItem, null, config);
-      animations.push(animationDescriptor);
-      animations.push(this.configureAnimation(pair.toItem, animationDescriptor.progress, config));
-    });
-
-    return animations;
-  }
-
-  configureAnimation(item: TransitionItem, progress: null, config: any) {
-    const transitionConfig = { ...config };
-    const { timing } = transitionConfig;
-    delete transitionConfig.timing;
-
-    item.progress = progress ? progress : new Animated.Value(0);
-    const isReverse = this.getReverse(item.name, item.route);
-    const delay = isReverse ? 0 : (item.delay ? index++ * this._delayTransitionTime : 0);
-    const animation = timing(item.progress, {
-      ...transitionConfig,
-      toValue: 1.0,
-      delay
-    });
-    return this.createAnimationDescriptor(animation, item.name, item.route, delay, item.progress);
-  }
-
-  createAnimationDescriptor(animation: any, name: string, route: string, delay: number){
-    return {
-      animation, name, route, delay
-    }
   }
 
   render() {
