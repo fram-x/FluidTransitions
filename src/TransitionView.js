@@ -98,7 +98,7 @@ class Transition extends React.Component<TransitionProps> {
       child = element;
     }
     else if(!this._animatedComponent)
-      this._animatedComponent = Animated.createAnimatedComponent(element.type);    
+      this._animatedComponent = Animated.createAnimatedComponent(element.type);
 
     // Visibility
     const visibilityStyle = this.getVisibilityStyle();
