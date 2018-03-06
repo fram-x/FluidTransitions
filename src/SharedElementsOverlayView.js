@@ -15,9 +15,7 @@ const styles: StyleSheet.NamedStyles = StyleSheet.create({
   },
   sharedElement: {
     position: 'absolute',
-    // backgroundColor:'#00FE21',
-    left: 0,
-    top: 0,
+    backgroundColor:'#00FE21',
   },
 });
 
@@ -70,7 +68,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
         else {
           animatedComponent = Animated.createAnimatedComponent(element.type);
         }
-        
+
         const props = {
           ...element.props,
           style: [element.props.style, styles.sharedElement, transitionStyle],
@@ -102,24 +100,17 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
 
   getTransitionStyle(fromItem: TransitionItem, toItem: TransitionItem) {
     const { getTransitionProgress } = this.context;
-    if (!getTransitionProgress || !fromItem.metrics || !toItem.metrics) return {};
+    if (!getTransitionProgress || !fromItem.metrics || !toItem.metrics) return {
+      width: fromItem.metrics.width,
+      height: fromItem.metrics.height,
+      left: fromItem.metrics.x,
+      top: fromItem.metrics.y,
+    };
 
     const progress = getTransitionProgress(fromItem.name, fromItem.route);
 
     const toVsFromScaleX = toItem.scaleRelativeTo(fromItem).x;
     const toVsFromScaleY = toItem.scaleRelativeTo(fromItem).y;
-
-    // let rotateFrom = this.getRotation(fromItem);
-    // let rotateTo = this.getRotation(toItem);
-    // let rotate = null;
-    // if (rotateFrom || rotateTo) {
-    //   if (!rotateFrom) rotateFrom = '0deg';
-    //   if (!rotateTo) rotateTo = '0deg';
-    //   rotate = progress.interpolate({
-    //     inputRange: [0, 1],
-    //     outputRange: [rotateFrom, rotateTo],
-    //   });
-    // }
 
     const scaleX = progress.interpolate({
       inputRange: [0, 1],
@@ -143,13 +134,12 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
         fromItem.metrics.height / 2 * (toVsFromScaleY - 1)],
     });
 
-    // const transform = [{ translateX }, { translateY }, { scaleX }, { scaleY }];
-    // if (rotate) { transform.push({ rotate }); }
-
     return {
       width: fromItem.metrics.width,
       height: fromItem.metrics.height,
-      transform: [{ translateX }, { translateY }, { scaleX }, { scaleY }]
+      left: fromItem.metrics.x,
+      top: fromItem.metrics.y,
+      //transform: [{ translateX }, { translateY }, { scaleX }, { scaleY }]
     };
   }
 

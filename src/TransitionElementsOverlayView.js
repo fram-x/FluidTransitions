@@ -25,10 +25,8 @@ const styles: StyleSheet.NamedStyles = StyleSheet.create({
   },
   transitionElement: {
     position: 'absolute',
-    // backgroundColor: '#E5D',
+    backgroundColor: '#E5D',    
     margin: 0,
-    left: 0,
-    top: 0,
   },
 });
 
@@ -61,28 +59,22 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     super(props, context);
     this._isMounted = false;
     this._transitionElements = [];
-    this._transitionHelper = null;
-    this._startOpacity = props.appear ? 0 : 1;
   }
 
   _isMounted: boolean;
   _transitionElements: Array<TransitionItem>
   _transitionHelper: any
-  _startOpacity: number
 
   render() {
     if(!this.props.transitionElements || !this.getMetricsReady()) {
       this._transitionElements = [];
-      this._transitionHelper = null;
       return <View style={styles.overlay} pointerEvents='none'/>;
     }
 
     if(this._transitionElements.length === 0) {
       this._transitionElements = this.props.transitionElements.map((item, idx) => {
-        // Get correct style
-        const transitionStyle = this.getTransitionStyle(item);
         let element = React.Children.only(item.reactElement.props.children);
-        return this.getAnimatedComponent(element, idx, transitionStyle);
+        return this.getAnimatedComponent(element, idx, this.getStyle(item));
       });
     }
 
@@ -93,61 +85,50 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     );
   }
 
+  getStyle(item: TransitionItem) {
+    return { 
+      left: item.metrics.x, top: item.metrics.y,
+      width: item.metrics.width, height: item.metrics.height,
+      ...this.getTransitionStyle(item)
+    };
+  }
+
   getTransitionStyle(item: TransitionItem) {
     const { getTransitionProgress, getMetrics, getDirection, getReverse, } = this.context;
-    if (!getTransitionProgress || !getMetrics || !getDirection || !getReverse ) return {
-      width: item.metrics.width, height: item.metrics.height,
-      transform: [{ translateX: item.metrics.x }, { translateY: item.metrics.y }]
-    };
+    if (!getTransitionProgress || !getMetrics || !getDirection || !getReverse )
+      return {};
 
     const progress = getTransitionProgress(item.name, item.route);
 
     if(progress) {
-      const hadZeroOpacity = this._startOpacity === 0;
-      this._startOpacity = 1;
-      const metrics = getMetrics(item.name, item.route);
       const transitionHelper = this.getTransitionHelper(item.appear);
       if (transitionHelper) {
-        const transitionConfig = {
+        const transitionSpecification = {
           name: item.name,
           route: item.route,
           progress,
-          metrics,
+          metrics: item.metrics,
           direction: getDirection(item.name, item.route),
           reverse: getReverse(item.name, item.route),
         };
-
-        if(hadZeroOpacity && Platform.OS === 'android'){
-          const opacity = progress.interpolate({
-            inputRange: [0, 0.1, 1],
-            outputRange: [0, 1, 1]
-          });
-          return {transform: [{ translateX: item.metrics.x }, { translateY: item.metrics.y }],
-            ...transitionHelper.getTransitionStyle(transitionConfig), opacity, 
-            width: item.metrics.width, height: item.metrics.height};
-        }
-
-        return {transform: [{ translateX: item.metrics.x }, { translateY: item.metrics.y }],
-          ...transitionHelper.getTransitionStyle(transitionConfig), 
-          width: item.metrics.width, height: item.metrics.height};
+        const transitionStyle = transitionHelper.getTransitionStyle(transitionSpecification);
+        return transitionStyle;
       }
     }
-    return { 
-      width: item.metrics.width, height: item.metrics.height, 
-      transform: [{ translateX: item.metrics.x }, { translateY: item.metrics.y }]};
+    return { };
   }
 
   getTransitionHelper(appear) {
-    if (this._transitionHelper === null) {
-      if (appear) {
-        const transitionType = transitionTypes.find(e => e.name === appear);
-        if (transitionType) { this._transitionHelper = new transitionType.transitionClass(); }
+    if (appear) {
+      const transitionType = transitionTypes.find(e => e.name === appear);
+      if (transitionType) {
+        return new transitionType.transitionClass();
       }
     }
-    return this._transitionHelper;
+    return null;
   }
 
-  getAnimatedComponent(renderElement, idx, transitionStyle) {
+  getAnimatedComponent(renderElement, idx, style) {
 
     let element = renderElement;
     let animatedComponent = null;
@@ -169,10 +150,10 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     else {
       animatedComponent = Animated.createAnimatedComponent(element.type);
     }
-
+    
     const props = {
       ...element.props,
-      style: [element.props.style, styles.transitionElement, transitionStyle],
+      style: [element.props.style, styles.transitionElement, style],
       key: idx,
     };
 

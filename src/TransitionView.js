@@ -8,6 +8,12 @@ import { TransitionContext } from './Types';
 const uniqueBaseId: string = `transitionCompId-${Date.now()}`;
 let uuidCount: number = 0;
 
+const styles = StyleSheet.create({
+  transition: {
+    backgroundColor: '#0000FF',    
+  }
+});
+
 type TransitionProps = {
   appear?: boolean,
   shared?: string,
@@ -29,6 +35,7 @@ class Transition extends React.Component<TransitionProps> {
     super(props, context);
     this._name = `${uniqueBaseId}-${uuidCount++}`;
     this._animatedComponent = null;
+    this._initialOpacity = props.appear ? 0 : 1;
   }
 
   _name: string
@@ -36,6 +43,7 @@ class Transition extends React.Component<TransitionProps> {
   _isMounted: boolean;
   _viewRef: any;
   _animatedComponent: any;
+  _initialOpacity: number;
 
   componentWillMount() {
     const { register } = this.context;
@@ -61,6 +69,7 @@ class Transition extends React.Component<TransitionProps> {
     }
   }
 
+ 
   getNodeHandle(): number {
     return findNodeHandle(this._viewRef);
   }
@@ -87,7 +96,7 @@ class Transition extends React.Component<TransitionProps> {
     // Functional components should be wrapped in a view to be usable with
     // Animated.createAnimatedComponent
     const isFunctionalComponent = !element.type.displayName;
-    if(isFunctionalComponent) {
+    if(isFunctionalComponent || element.type.displayName == 'Button') {
       // Wrap in sourrounding view
       element = React.createElement(element.type, element.props);
       if(!this._animatedComponent) {
@@ -101,16 +110,20 @@ class Transition extends React.Component<TransitionProps> {
       this._animatedComponent = Animated.createAnimatedComponent(element.type);
 
     // Visibility
-    const visibilityStyle = this.getVisibilityStyle();
+    let visibilityStyle = this.getVisibilityStyle();
+    // if(this._initialOpacity === 0){
+    //   visibilityStyle = {opacity: 0};
+    //   this._initialOpacity = 1;
+    // }
 
     // Build styles
-    const style = [elementProps.style, visibilityStyle];
+    const style = [elementProps.style, visibilityStyle, {backgroundColor: '#00FF00'}];
     const props = {
       ...elementProps,
       key: this._getName(),
       onLayout: this.onLayout.bind(this),
       collapsable: false,
-      style: style,
+      style,
       ref: (ref) => { this._viewRef = ref; },
     };
 
@@ -124,9 +137,7 @@ class Transition extends React.Component<TransitionProps> {
     const { getVisibilityProgress } = this.context;
     if(!getVisibilityProgress) return {};
     const progress = getVisibilityProgress(this._getName(), this._route);
-    return {
-      opacity: progress
-    }
+    return { opacity: progress };
   }
 }
 

@@ -58,7 +58,6 @@ class FluidTransitioner extends React.Component {
     // Add appear transitions here
     InteractionManager.runAfterInteractions(async () => {
       if (!this._transitionItemsView) {
-        // console.log("FluidTransitioner componentDidMount after interactions - bailing out.");
         return;
       }
 
@@ -89,7 +88,8 @@ class FluidTransitioner extends React.Component {
       // Run animation
       const { timing } = config;
       delete config.timing;
-      Animated.parallel(animationsToRun).start(async () => this._transitionItemsView.onTransitionEnd(props, null, config))
+      Animated.parallel(animationsToRun).start(async () =>
+        this._transitionItemsView.onTransitionEnd(props, null, config))
     });
   }
 
@@ -111,11 +111,11 @@ class FluidTransitioner extends React.Component {
 
   _configureTransition() {
     return {
-      timing: Animated.spring,
+      timing: Animated.timing,
       stiffness: 140,
       damping: 8.5,
       mass: 0.5,
-      duration: 450,
+      duration: 2450,
       easing: Easing.elastic(1.2),
       ...this.props.transitionConfig,
       isInteraction: true,

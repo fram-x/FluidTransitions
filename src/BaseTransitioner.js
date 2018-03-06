@@ -96,9 +96,6 @@ class BaseTransitioner extends React.Component {
       ...transitionUserSpec,
     };
 
-    const { timing } = transitionSpec;
-    delete transitionSpec.timing;
-
     const toValue = nextProps.navigation.state.index;
     const positionHasChanged = position.__getValue() !== toValue;
 
@@ -119,24 +116,23 @@ class BaseTransitioner extends React.Component {
           await result;
         }
       }
-      // Calc delay
-      const delay = animations.reduce((prev, cur) => prev + cur.delay, 0);
-      const animationsToRun = [];
-      animations.forEach(ad => animationsToRun.push(ad.animation));
-      if(indexHasChanged && positionHasChanged){
-        animationsToRun.push(timing(progress, {
-            ...transitionSpec,
-            toValue: 1,
-            delay: delay * 0.5
-          }));
-          animationsToRun.push(timing(position, {
-            ...transitionSpec,
-            toValue: nextProps.navigation.state.index,
-            delay: delay * 0.5
-          }));
-      }
 
-      Animated.parallel(animationsToRun).start(this._onTransitionEnd);
+      if(indexHasChanged && positionHasChanged){
+        const { timing } = transitionSpec;
+        delete transitionSpec.timing;
+
+        const delay = animations.reduce((prev, cur) => prev + cur.delay, 0);
+        const animationsToRun = [];
+        animations.forEach(ad => animationsToRun.push(ad.animation));
+
+        animationsToRun.push(timing(position, {
+          ...transitionSpec,
+          toValue: nextProps.navigation.state.index,
+          delay: delay * 0.5
+        }));
+
+        Animated.parallel(animationsToRun).start(this._onTransitionEnd);
+      }
     });
   }
 
@@ -201,7 +197,7 @@ class BaseTransitioner extends React.Component {
     }
 
     this.setState(nextState, async () => {
-      
+
 
       if (this._queuedTransition) {
         this._startTransition(

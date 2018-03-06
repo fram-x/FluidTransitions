@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Button, TouchableOpacity, StyleSheet } from 'react-native';
 
 import { FluidNavigator, Transition } from 'react-navigation-fluid-transitions';
 
@@ -40,21 +40,48 @@ const styles = StyleSheet.create({
 });
 
 const Circle = (props) => (
-  <View style={{
-    backgroundColor: props.background,
-    width: props.size,
-    height: props.size,
-    borderRadius: props.size / 2,
-  }}
+  <View
+    style={{
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: props.background,
+      width: props.size,
+      height: props.size,
+      borderRadius: props.size / 2,
+    }}
   />
 );
+
+// class Circle extends React.Component {
+//   constructor(props) {
+//     super(props);
+//     this.state = { count: 1 };
+//   }
+//   render() {
+//     return (
+//       <TouchableOpacity
+//         style={{
+//           justifyContent: 'center',
+//           alignItems: 'center',
+//           borderColor: this.props.background,
+//           borderWidth: 2,
+//           width: this.props.size,
+//           height: this.props.size,
+//         }}
+//         onPress={() => { this.setState({ count: this.state.count + 1 }); }}
+//       >
+//         <Text>{this.state.count}</Text>
+//       </TouchableOpacity>
+//     );
+//   }
+// }
 
 const Screen1 = (props) => (
   <View style={styles.container}>
     <Text>Screen 1</Text>
     <View style={styles.screen1}>
       <Transition shared="circle">
-        <Circle background="#FF0000" size={40} />
+        <Circle background="#FF0000" size={20} />
       </Transition>
     </View>
     <Button
