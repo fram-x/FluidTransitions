@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
 
 const Circle = (props) => (
   <View style={{
-    backgroundColor: props.backgroundColor,
+    backgroundColor: props.background,
     width: props.size,
     height: props.size,
     borderRadius: props.size / 2,
@@ -53,7 +53,7 @@ const Circle = (props) => (
 
 const Square = (props) => (
   <View style={{
-    backgroundColor: props.backgroundColor,
+    backgroundColor: props.background,
     width: props.size,
     height: props.size,
     margin: 14 }}
@@ -64,17 +64,17 @@ const Screen1 = (props) => (
   <View style={styles.container}>
     <View style={[styles.top, { backgroundColor: '#AA3939' }]}>
       <Transition appear="scale">
-        <Circle backgroundColor="#D46A6A" size={140} />
+        <Circle background="#D46A6A" size={140} />
       </Transition>
       <View style={styles.circlesContainer}>
         <Transition appear="vertical" delay>
-          <Circle backgroundColor="#550000" size={40} />
+          <Circle background="#550000" size={40} />
         </Transition>
         <Transition appear="vertical" delay>
-          <Circle backgroundColor="#550000" size={40} />
+          <Circle background="#550000" size={40} />
         </Transition>
         <Transition appear="vertical" delay>
-          <Circle backgroundColor="#550000" size={40} />
+          <Circle background="#550000" size={40} />
         </Transition>
       </View>
     </View>
@@ -98,17 +98,17 @@ const Screen2 = (props) => (
   <View style={styles.container}>
     <View style={[styles.top, { backgroundColor: '#2E4272' }]}>
       <Transition appear="scale">
-        <Square backgroundColor="#4F628E" size={140} />
+        <Square background="#4F628E" size={140} />
       </Transition>
       <View style={styles.circlesContainer}>
         <Transition appear="horizontal" delay>
-          <Square backgroundColor="#061539" size={40} />
+          <Square background="#061539" size={40} />
         </Transition>
         <Transition appear="horizontal" delay>
-          <Square backgroundColor="#061539" size={40} />
+          <Square background="#061539" size={40} />
         </Transition>
         <Transition appear="horizontal" delay>
-          <Square backgroundColor="#061539" size={40} />
+          <Square background="#061539" size={40} />
         </Transition>
       </View>
     </View>
@@ -135,17 +135,17 @@ const Screen3 = (props) => (
   <View style={styles.container}>
     <View style={[styles.top, { backgroundColor: '#88CC88' }]}>
       <Transition appear="scale">
-        <Circle backgroundColor="#2D882D" size={140} />
+        <Circle background="#2D882D" size={140} />
       </Transition>
       <View style={styles.circlesContainer}>
         <Transition appear="horizontal" delay>
-          <Circle backgroundColor="#550000" size={40} />
+          <Circle background="#550000" size={40} />
         </Transition>
         <Transition appear="horizontal" delay>
-          <Circle backgroundColor="#550000" size={40} />
+          <Circle background="#550000" size={40} />
         </Transition>
         <Transition appear="horizontal" delay>
-          <Circle backgroundColor="#550000" size={40} />
+          <Circle background="#550000" size={40} />
         </Transition>
       </View>
     </View>
