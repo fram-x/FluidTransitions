@@ -2,6 +2,8 @@ import { Animated } from 'react-native';
 
 import TransitionItem from './TransitionItem';
 
+const DelayTransitionTime = 90;
+
 const configureTransitionAnimations = 
   (transitionElements: Array<TransitionItem>, config: Object ) => {
 
@@ -13,7 +15,7 @@ const configureTransitionAnimations =
 
   transitionElements.forEach(item => {
     item.progress = new Animated.Value(0);
-    const delay = (item.delay ? index++ * _delayTransitionTime : 0);
+    const delay = (item.delay ? index++ * DelayTransitionTime : 0);
     const animation = timing(item.progress, {
       ...transitionConfig,
       toValue: 1.0,

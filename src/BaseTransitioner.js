@@ -27,7 +27,7 @@ class BaseTransitioner extends React.Component {
     this.state = {
       layout,
       position: new Animated.Value(this.props.navigation.state.index),
-      progress: new Animated.Value(1),
+      progress: new Animated.Value(0),
       scenes: NavigationScenesReducer([], this.props.navigation.state),
     };
 
@@ -79,8 +79,6 @@ class BaseTransitioner extends React.Component {
     };
 
     const { position, progress } = nextState;
-
-    progress.setValue(0);
 
     this._prevTransitionProps = this._transitionProps;
     this._transitionProps = buildTransitionProps(nextProps, nextState);
@@ -177,7 +175,7 @@ class BaseTransitioner extends React.Component {
     this.setState(nextState);
   }
 
-  _onTransitionEnd() {
+  async _onTransitionEnd() {
     if (!this._isMounted) {
       return;
     }
@@ -191,17 +189,19 @@ class BaseTransitioner extends React.Component {
 
     this._transitionProps = buildTransitionProps(this.props, nextState);
 
-    this.setState(nextState, async () => {
-      if (this.props.onTransitionEnd) {
-        const result = this.props.onTransitionEnd(
-          this._transitionProps,
-          prevTransitionProps,
-        );
+    if (this.props.onTransitionEnd) {
+      const result = this.props.onTransitionEnd(
+        this._transitionProps,
+        prevTransitionProps,
+      );
 
-        if (result instanceof Promise) {
-          await result;
-        }
+      if (result instanceof Promise) {
+        await result;
       }
+    }
+
+    this.setState(nextState, async () => {
+      
 
       if (this._queuedTransition) {
         this._startTransition(

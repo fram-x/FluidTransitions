@@ -10,7 +10,7 @@ import TransitionElementsOverlayView from './TransitionElementsOverlayView';
 const styles: StyleSheet.NamedStyles = StyleSheet.create({
   overlay: {
     position: 'absolute',
-    backgroundColor: '#FF000055',
+    // backgroundColor: '#FF000022',
     top: 0,
     left: 0,
     right: 0,

@@ -79,9 +79,9 @@ class FluidTransitioner extends React.Component {
       // Start transition
       const animations = [];
       await this._transitionItemsView.onTransitionStart(props, null, config, animations);
-      if (animations.length === 0) { 
+      if (animations.length === 0) {
         this._transitionItemsView.onTransitionEnd(props, null, config)
-        return; 
+        return;
       }
       const animationsToRun = [];
       animations.forEach(ad => animationsToRun.push(ad.animation));
@@ -94,7 +94,7 @@ class FluidTransitioner extends React.Component {
   }
 
   async _onTransitionStart(props, prevProps, animations) {
-    const config = this._configureTransition();    
+    const config = this._configureTransition();
     await this._transitionItemsView.onTransitionStart(props, prevProps, config, animations);
   }
 
@@ -144,7 +144,7 @@ class FluidTransitioner extends React.Component {
     if (prevProps) { diff = (index - transitionProps.index); }
 
     let opacity = 0.0;
-    if (diff <= 1 && diff >= -1) {      
+    if (diff <= 1 && diff >= -1) {
       opacity = position.interpolate({
         inputRange: [index - 1, index - 0.0001, index, index + 0.9999, index + 1],
         outputRange: [0, 1, 1, 1, 0],

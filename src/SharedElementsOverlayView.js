@@ -22,8 +22,8 @@ const styles: StyleSheet.NamedStyles = StyleSheet.create({
     },
   sharedElement: {
     position: 'absolute',
-    borderColor: '#34CE34',
-    borderWidth: 1,
+    // borderColor: '#34CE34',
+    // borderWidth: 1,
     margin: 0,
     left: 0,
     top: 0,

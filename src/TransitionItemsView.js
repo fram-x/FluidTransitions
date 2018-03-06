@@ -59,10 +59,8 @@ export default class TransitionItemsView extends React.Component {
     await this.measureItems(sharedElements, transitionElements);
 
     // Configure individual animations for transitions
-    const transitionAnimations = configureTransitionAnimations(transitionElements, config);
-    const sharedElementAnimations = configureSharedElementAnimations(sharedElements, props.progress, config);
-    transitionAnimations.forEach(animation => animations.push(animation));
-    sharedElementAnimations.forEach(animation => animations.push(animation));
+    this.configureAnimations(sharedElements, transitionElements, 
+      animations, props.progress, config);
 
     // Save info about the current transition
     this.setState({
@@ -153,6 +151,14 @@ export default class TransitionItemsView extends React.Component {
       }).start(resolve));
 
     return promise;
+  }
+
+  configureAnimations(sharedElements: Array<any>, transitionElements: Array<TransitionItem>, 
+    animations: Array, progress: Animated.Value, config: any) {
+    const transitionAnimations = configureTransitionAnimations(transitionElements, config);
+    const sharedElementAnimations = configureSharedElementAnimations(sharedElements, progress, config);
+    transitionAnimations.forEach(animation => animations.push(animation));
+    sharedElementAnimations.forEach(animation => animations.push(animation));
   }
 
   render() {
