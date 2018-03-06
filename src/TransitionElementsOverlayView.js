@@ -122,11 +122,13 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
             inputRange: [0, 0.1, 1],
             outputRange: [0, 1, 1]
           });
-          return {...transitionHelper.getTransitionStyle(transitionConfig), opacity, 
+          return {transform: [{ translateX: item.metrics.x }, { translateY: item.metrics.y }],
+            ...transitionHelper.getTransitionStyle(transitionConfig), opacity, 
             width: item.metrics.width, height: item.metrics.height};
         }
 
-        return {...transitionHelper.getTransitionStyle(transitionConfig), 
+        return {transform: [{ translateX: item.metrics.x }, { translateY: item.metrics.y }],
+          ...transitionHelper.getTransitionStyle(transitionConfig), 
           width: item.metrics.width, height: item.metrics.height};
       }
     }
