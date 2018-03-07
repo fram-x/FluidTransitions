@@ -4,7 +4,7 @@
 
 # Xcode
 #
-.vscode/
+.vscode/.react
 build/
 *.pbxuser
 !default.pbxuser

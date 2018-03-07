@@ -1,3 +1,5 @@
+import { Animated } from 'react-native';
+
 import { Metrics } from './Types';
 
 type Size = {
@@ -8,8 +10,8 @@ type Size = {
 export default class TransitionItem {
   constructor(
     name: string, route: string, reactElement: Object,
-    shared: boolean, appear: boolean, delay: boolean, metrics: Metrics,
-  ) {
+    shared: boolean, appear: string, delay: boolean, metrics: Metrics) {
+      
     this.name = name;
     this.route = route;
     this.reactElement = reactElement;
@@ -17,6 +19,8 @@ export default class TransitionItem {
     this.appear = appear;
     this.delay = delay;
     this.metrics = metrics;
+    this.visibility = new Animated.Value(1);
+    this.progress = null;
   }
 
   name: string
@@ -24,9 +28,11 @@ export default class TransitionItem {
   reactElement: Object
   metrics: Metrics
   shared: boolean
-  appear: boolean
+  appear: string
   delay: boolean
   layoutReady: boolean
+  visibility: Animated.Value
+  progress: Animated.Value
 
   scaleRelativeTo(other: TransitionItem): Size {
     const validate = i => {
@@ -40,16 +46,5 @@ export default class TransitionItem {
       x: this.metrics.width / other.metrics.width,
       y: this.metrics.height / other.metrics.height,
     };
-  }
-
-  getReactElement(): Object {
-    return this.reactElement.getReactElement();
-  }
-
-  clone(): TransitionItem {
-    return new TransitionItem(
-      this.name, this.route, this.reactElement,
-      this.shared, this.appear, this.delay, this.metrics,
-    );
   }
 }

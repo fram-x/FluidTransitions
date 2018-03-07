@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Button, TouchableOpacity, StyleSheet } from 'react-native';
 
 import { FluidNavigator, Transition } from 'react-navigation-fluid-transitions';
 
@@ -37,26 +37,44 @@ const styles = StyleSheet.create({
   buttons: {
     flexDirection: 'row',
   },
-  circle: {
-    width: 20,
-    height: 20,
-    borderRadius: 20,
-    backgroundColor: '#EF4444',
-  },
-  circle2: {
-    width: 100,
-    height: 100,
-    borderRadius: 100,
-    backgroundColor: '#EF4444',
-  },
 });
+
+// const Circle = (props) => (
+//   <View
+//     style={{
+//       justifyContent: 'center',
+//       alignItems: 'center',
+//       backgroundColor: props.background,
+//       width: props.size,
+//       height: props.size,
+//       borderRadius: props.size / 2,
+//     }}
+//   />
+// );
+
+class Circle extends React.Component {
+  render() {
+    return (
+      <TouchableOpacity
+        style={{ ...this.props.style,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: this.props.background,
+          width: this.props.size,
+          height: this.props.size,
+          borderRadius: this.props.size / 2,
+        }}
+      />
+    );
+  }
+}
 
 const Screen1 = (props) => (
   <View style={styles.container}>
     <Text>Screen 1</Text>
     <View style={styles.screen1}>
       <Transition shared="circle">
-        <View style={styles.circle} />
+        <Circle background="#FF0000" size={20} />
       </Transition>
     </View>
     <Button
@@ -71,7 +89,7 @@ const Screen2 = (props) => (
     <Text>Screen 2</Text>
     <View style={styles.screen2}>
       <Transition shared="circle">
-        <View style={styles.circle} />
+        <Circle background="#FF0000" size={60} />
       </Transition>
     </View>
     <View style={styles.buttons}>
@@ -92,7 +110,7 @@ const Screen3 = (props) => (
     <Text>Screen 3</Text>
     <View style={styles.screen3}>
       <Transition shared="circle">
-        <View style={styles.circle2} />
+        <Circle background="#FF0000" size={100} />
       </Transition>
     </View>
     <Button

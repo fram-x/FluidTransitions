@@ -19,6 +19,12 @@
 ; Ignore metro
 .*/node_modules/metro/.*
 
+; Ignore Examples
+.*/Examples/.*
+
+; Ignore node modules
+.*/node_modules/.*
+
 [include]
 
 [libs]

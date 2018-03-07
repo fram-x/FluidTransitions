@@ -4,7 +4,7 @@
   "description": "An extension to to react-navigation providing transitions and shared element transitions.",
   "main": "./index.js",
   "scripts": {
-    "test": "echo \\\"Error: no test specified\\\" && exit 1"
+    "test": "jest --watchAll"
   },
   "repository": {
     "type": "git",
@@ -25,10 +25,39 @@
   },
   "homepage": "https://github.com/fram-x/FluidTransitions#readme",
   "peerDependencies": {
-    "prop-types": "*",   
     "lodash": "*",
+    "prop-types": "*",
     "react": "*",
     "react-native": "*",
     "react-navigation": "*"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.2.2",
+    "babel-jest": "22.4.1",
+    "babel-preset-flow": "^6.23.0",
+    "babel-preset-react-native": "4.0.0",
+    "concurrently": "^2.2.0",
+    "eslint": "^4.18.2",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jest": "^21.13.0",
+    "eslint-plugin-jsx-a11y": "^6.0.2",
+    "eslint-plugin-react": "^7.4.0",
+    "flow-bin": "^0.66.0",
+    "fs-extra": "^0.30.0",
+    "jest": "22.4.2",
+    "minimatch": "^3.0.2",
+    "node-watch": "^0.4.0",
+    "prop-types": "^15.6.0",
+    "react": "16.2.0",
+    "react-native": "0.53.3",
+    "react-test-renderer": "16.2.0",
+    "rimraf": "^2.5.4"
+  },
+  "jest": {
+    "preset": "react-native",
+    "modulePathIgnorePatterns": [
+      "Examples/node_modules"
+    ]
   }
 }

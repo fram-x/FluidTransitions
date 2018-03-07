@@ -14,16 +14,10 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flex: 1,
-    paddingTop: 20,
-    paddingBottom: 20,
     justifyContent: 'flex-end',
   },
-  rotated: {
-    transform: [{ rotate: '180deg' }],
-  },
   textContainer: {
-    paddingTop: 10,
-    paddingBottom: 10,
+
   },
   image: {
     width: Dimensions.get('window').width - 40,
@@ -53,10 +47,10 @@ const InitialScreen = (props) => (
     <Text style={styles.header}>Lorem ipsum</Text>
     <Transition shared="text1">
       <Text style={styles.textContainer}>
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum
-				magna ut tortor vehicula tincidunt. Vestibulum nisi libero, lacinia ac consequat id,
-				porttitor ac nisi. Praesent luctus ex sem. Integer vel elit eleifend, semper enim ut,
-				euismod arcu.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum
+        magna ut tortor vehicula tincidunt. Vestibulum nisi libero, lacinia ac consequat id,
+        porttitor ac nisi. Praesent luctus ex sem. Integer vel elit eleifend, semper enim ut,
+        euismod arcu.
       </Text>
     </Transition>
     <Transition shared="image1">
@@ -64,10 +58,10 @@ const InitialScreen = (props) => (
     </Transition>
     <Transition shared="text2">
       <Text style={styles.textContainer}>
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum
-				magna ut tortor vehicula tincidunt. Vestibulum nisi libero, lacinia ac consequat id,
-				porttitor ac nisi. Praesent luctus ex sem. Integer vel elit eleifend, semper enim ut,
-				euismod arcu.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum
+        magna ut tortor vehicula tincidunt. Vestibulum nisi libero, lacinia ac consequat id,
+        porttitor ac nisi. Praesent luctus ex sem. Integer vel elit eleifend, semper enim ut,
+        euismod arcu.
       </Text>
     </Transition>
     <Transition shared="image2">
@@ -79,16 +73,16 @@ const InitialScreen = (props) => (
 const Screen = (props) => (
   <ScrollView contentContainerStyle={styles.container}>
     <Transition shared="buttons">
-      <View style={[styles.buttonContainer, styles.rotated]}>
+      <View style={[styles.buttonContainer]}>
         <Button title="Toggle" onPress={() => props.navigation.goBack()} />
       </View>
     </Transition>
     <Transition shared="text1">
       <Text style={styles.textContainer}>
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum
-				magna ut tortor vehicula tincidunt. Vestibulum nisi libero, lacinia ac consequat id,
-				porttitor ac nisi. Praesent luctus ex sem. Integer vel elit eleifend, semper enim ut,
-				euismod arcu.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum
+        magna ut tortor vehicula tincidunt. Vestibulum nisi libero, lacinia ac consequat id,
+        porttitor ac nisi. Praesent luctus ex sem. Integer vel elit eleifend, semper enim ut,
+        euismod arcu.
       </Text>
     </Transition>
     <View style={styles.imageContainer}>
@@ -101,10 +95,10 @@ const Screen = (props) => (
     </View>
     <Transition shared="text2">
       <Text style={styles.textContainer}>
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum
-				magna ut tortor vehicula tincidunt. Vestibulum nisi libero, lacinia ac consequat id,
-				porttitor ac nisi. Praesent luctus ex sem. Integer vel elit eleifend, semper enim ut,
-				euismod arcu.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum
+        magna ut tortor vehicula tincidunt. Vestibulum nisi libero, lacinia ac consequat id,
+        porttitor ac nisi. Praesent luctus ex sem. Integer vel elit eleifend, semper enim ut,
+        euismod arcu.
       </Text>
     </Transition>
   </ScrollView>
@@ -117,7 +111,7 @@ const Navigator = FluidNavigator({
   transitionConfig: {
     timing: Animated.timing,
     duration: 350,
-    easing: Easing.inOut(Easing.ease),
+    easing: Easing.poly(4),
   },
 });
 
