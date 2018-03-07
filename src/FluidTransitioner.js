@@ -97,29 +97,30 @@ class FluidTransitioner extends React.Component {
       setTimeout(runAppearAnimations, 200);
   }
 
-  async _onTransitionStart(props, prevProps, animations) {
+  _onTransitionStart(props, prevProps, animations) {
     const config = this._configureTransition();
-    await this._transitionItemsView.onTransitionStart(props, prevProps, config, animations);
+    return this._transitionItemsView.onTransitionStart(props, prevProps, config, animations);
   }
 
-  async _onTransitionEnd(props, prevProps) {
+  _onTransitionEnd(props, prevProps) {
     const config = this._configureTransition();
-    await this._transitionItemsView.onTransitionEnd(props, prevProps, config);
-
+    
     // Fix issue with nativeDriver and position
     // https://github.com/react-navigation/react-navigation/issues/3157
     if (this._configureTransition().useNativeDriver) {
       props.position.setValue(props.navigation.state.index);
     }
+
+    return this._transitionItemsView.onTransitionEnd(props, prevProps, config);
   }
 
   _configureTransition() {
     return {
       timing: Animated.spring,
-      stiffness: 140,
-      damping: 8.5,
-      mass: 0.5,
-      duration: 350,
+      stiffness: 1400,
+      damping: 85,
+      mass: 3,
+      duration: 2350,
       easing: Easing.elastic(1.2),
       ...this.props.transitionConfig,
       isInteraction: true,
