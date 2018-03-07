@@ -4,7 +4,7 @@
   "description": "An extension to to react-navigation providing transitions and shared element transitions.",
   "main": "./index.js",
   "scripts": {
-    "test": "echo \\\"Error: no test specified\\\" && exit 1"
+    "test": "jest --watchAll"
   },
   "repository": {
     "type": "git",
@@ -25,10 +25,14 @@
   },
   "homepage": "https://github.com/fram-x/FluidTransitions#readme",
   "peerDependencies": {
-    "prop-types": "*",   
     "lodash": "*",
+    "prop-types": "*",
     "react": "*",
     "react-native": "*",
     "react-navigation": "*"
+  },
+  "devDependencies": {
+    "jest": "^22.4.2",
+    "react-test-renderer": "^16.2.0"
   }
 }

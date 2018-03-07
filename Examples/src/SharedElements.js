@@ -39,42 +39,42 @@ const styles = StyleSheet.create({
   },
 });
 
-const Circle = (props) => (
-  <View
-    style={{
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: props.background,
-      width: props.size,
-      height: props.size,
-      borderRadius: props.size / 2,
-    }}
-  />
-);
+// const Circle = (props) => (
+//   <View
+//     style={{
+//       justifyContent: 'center',
+//       alignItems: 'center',
+//       backgroundColor: props.background,
+//       width: props.size,
+//       height: props.size,
+//       borderRadius: props.size / 2,
+//     }}
+//   />
+// );
 
-// class Circle extends React.Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = { count: 1 };
-//   }
-//   render() {
-//     return (
-//       <TouchableOpacity
-//         style={{
-//           justifyContent: 'center',
-//           alignItems: 'center',
-//           borderColor: this.props.background,
-//           borderWidth: 2,
-//           width: this.props.size,
-//           height: this.props.size,
-//         }}
-//         onPress={() => { this.setState({ count: this.state.count + 1 }); }}
-//       >
-//         <Text>{this.state.count}</Text>
-//       </TouchableOpacity>
-//     );
-//   }
-// }
+class Circle extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { count: 1 };
+  }
+  render() {
+    return (
+      <TouchableOpacity
+        style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderColor: this.props.background,
+          borderWidth: 2,
+          width: this.props.size,
+          height: this.props.size,
+        }}
+        onPress={() => { this.setState({ count: this.state.count + 1 }); }}
+      >
+        <Text>{this.state.count}</Text>
+      </TouchableOpacity>
+    );
+  }
+}
 
 const Screen1 = (props) => (
   <View style={styles.container}>
