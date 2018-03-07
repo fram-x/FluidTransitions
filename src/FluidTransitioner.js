@@ -138,12 +138,11 @@ class FluidTransitioner extends React.Component {
   _renderScene(transitionProps, prevProps) {
     const { position, scene } = transitionProps;
     const { index } = scene;
-    // console.log('FluidTransitioner renderScene ' + index);
-
+    
+    // Ensure we hide bottom scenes
     let diff = 0;
-    if (prevProps) { diff = (index - transitionProps.index); }
-
-    let opacity = 0.0;
+    if (prevProps) { diff = (index - position.__getValue())};
+    let opacity = 0.0;    
     if (diff <= 1 && diff >= -1) {
       opacity = position.interpolate({
         inputRange: [index - 1, index - 0.0001, index, index + 0.9999, index + 1],

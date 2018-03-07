@@ -50,7 +50,7 @@ class BaseTransitioner extends React.Component {
   componentWillUnmount() {
     this._isMounted = false;
   }
-
+  
   componentWillReceiveProps(nextProps) {
     const nextScenes = NavigationScenesReducer(
       this.state.scenes,
