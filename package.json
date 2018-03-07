@@ -55,6 +55,9 @@
     "rimraf": "^2.5.4"
   },
   "jest": {
-    "preset": "jest-react-native"
+    "preset": "react-native",
+    "modulePathIgnorePatterns": [
+      "Examples/node_modules"
+    ]
   }
 }

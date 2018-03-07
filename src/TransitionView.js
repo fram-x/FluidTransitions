@@ -10,8 +10,8 @@ let uuidCount: number = 0;
 
 const styles = StyleSheet.create({
   transition: {
-    backgroundColor: '#0000FF',    
-  }
+    backgroundColor: '#0000FF',
+  },
 });
 
 type TransitionProps = {
@@ -28,7 +28,7 @@ class Transition extends React.Component<TransitionProps> {
     unregister: PropTypes.func,
     layoutReady: PropTypes.func,
     route: PropTypes.string,
-    getVisibilityProgress: PropTypes.func
+    getVisibilityProgress: PropTypes.func,
   }
 
   constructor(props: TransitionProps, context: TransitionContext) {
@@ -69,7 +69,7 @@ class Transition extends React.Component<TransitionProps> {
     }
   }
 
- 
+
   getNodeHandle(): number {
     return findNodeHandle(this._viewRef);
   }
@@ -90,34 +90,33 @@ class Transition extends React.Component<TransitionProps> {
     let element = React.Children.only(this.props.children);
     let elementProps = element.props;
     let child = null;
-    if(!element)
-      return null;
+    if (!element) { return null; }
 
     // Functional components should be wrapped in a view to be usable with
     // Animated.createAnimatedComponent
     const isFunctionalComponent = !element.type.displayName;
-    if(isFunctionalComponent || element.type.displayName == 'Button') {
+    if (isFunctionalComponent || element.type.displayName === 'Button') {
       // Wrap in sourrounding view
       element = React.createElement(element.type, element.props);
-      if(!this._animatedComponent) {
-        const wrapper = (<View/>);
+      if (!this._animatedComponent) {
+        const wrapper = (<View />);
         this._animatedComponent = Animated.createAnimatedComponent(wrapper.type);
       }
       elementProps = {};
       child = element;
-    }
-    else if(!this._animatedComponent)
+    } else if (!this._animatedComponent) {
       this._animatedComponent = Animated.createAnimatedComponent(element.type);
+    }
 
     // Visibility
-    let visibilityStyle = this.getVisibilityStyle();
+    const visibilityStyle = this.getVisibilityStyle();
     // if(this._initialOpacity === 0){
     //   visibilityStyle = {opacity: 0};
     //   this._initialOpacity = 1;
     // }
 
     // Build styles
-    const style = [elementProps.style, visibilityStyle, {backgroundColor: '#00FF00'}];
+    const style = [elementProps.style, visibilityStyle, styles.transition];
     const props = {
       ...elementProps,
       key: this._getName(),
@@ -127,15 +126,14 @@ class Transition extends React.Component<TransitionProps> {
       ref: (ref) => { this._viewRef = ref; },
     };
 
-    if(child)
-      return React.createElement(this._animatedComponent, props, child);
+    if (child) { return React.createElement(this._animatedComponent, props, child); }
 
     return React.createElement(this._animatedComponent, props);
   }
 
   getVisibilityStyle() {
     const { getVisibilityProgress } = this.context;
-    if(!getVisibilityProgress) return {};
+    if (!getVisibilityProgress) return {};
     const progress = getVisibilityProgress(this._getName(), this._route);
     return { opacity: progress };
   }

@@ -3,13 +3,13 @@ import { View } from 'react-native';
 
 class CircleInClass extends React.Component {
   render() {
-      return (
+    return (
       <View
-          style={{
-            width: this.props.size,
-            height: this.props.size,
-            borderRadius: this.props.size / 2,
-          }}
+        style={{
+          width: this.props.size,
+          height: this.props.size,
+          borderRadius: this.props.size / 2,
+        }}
       />);
   }
 }
