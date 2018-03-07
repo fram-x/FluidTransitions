@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Easing, UIManager, Animated, findNodeHandle } from 'react-native';
+import { View, StyleSheet, Easing, UIManager, Platform, Animated, findNodeHandle } from 'react-native';
 import PropTypes from 'prop-types';
 
 import { Metrics, TransitionConfiguration } from './Types';
@@ -109,13 +109,43 @@ export default class TransitionItemsView extends React.Component {
   }
 
   async runTransitionDoneAnimations() {
-    await this.runVisibilityAnimation(1);
-    await this.runOverlayVisibilityAnimation(0);
+    if(Platform.OS === 'android'){
+      let animations = createVisibilityAnimations(
+        1, this.state.sharedElements, this.state.transitionElements);
+      
+      animations = animations.concat(createOverlayVisibilityAnimation(
+        0, this._overlayVisibilityProgress));
+
+      if(animations.length === 0)
+        return;
+
+      await new Promise(resolve =>
+        Animated.parallel(animations).start(resolve));
+
+    } else {
+      await this.runVisibilityAnimation(1);
+      await this.runOverlayVisibilityAnimation(0);
+    }
   }
 
   async runTransitionStartAnimations() {
-    await this.runOverlayVisibilityAnimation(1);
-    await this.runVisibilityAnimation(0);
+    if(Platform.OS === 'android'){
+      let animations = createVisibilityAnimations(
+        0, this.state.sharedElements, this.state.transitionElements);
+      
+      animations = animations.concat(createOverlayVisibilityAnimation(
+        1, this._overlayVisibilityProgress));
+
+      if(animations.length === 0)
+        return;
+
+      await new Promise(resolve =>
+        Animated.parallel(animations).start(resolve));
+
+    } else {
+      await this.runOverlayVisibilityAnimation(1);
+      await this.runVisibilityAnimation(0);
+    }
   }
 
   runVisibilityAnimation(toValue: number): Promise<void> {
