@@ -70,13 +70,13 @@ const createVisibilityAnimations = (toValue: number, sharedElements: Array<any>,
 
   // Hide/show by changing the progress value
   return elements.map(item => {
-    return Animated.timing(item.visibility, {
-      toValue,
-      duration: FadeTransitionTime,
-      easing: Easing.linear,
-      useNativeDriver: true,
+      return Animated.timing(item.visibility, {
+        toValue,
+        duration: FadeTransitionTime,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      });
     });
-  });
 }
 
 const createOverlayVisibilityAnimation = (toValue: number, progress: Animated.value) => {

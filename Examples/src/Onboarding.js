@@ -63,7 +63,7 @@ const Square = (props) => (
 const Screen1 = (props) => (
   <View style={styles.container}>
     <View style={[styles.top, { backgroundColor: '#AA3939' }]}>
-      <Transition appear="scale">
+      <Transition appear="horizontal">
         <Circle background="#D46A6A" size={140} />
       </Transition>
       <View style={styles.circlesContainer}>
@@ -97,7 +97,7 @@ const Screen1 = (props) => (
 const Screen2 = (props) => (
   <View style={styles.container}>
     <View style={[styles.top, { backgroundColor: '#2E4272' }]}>
-      <Transition appear="scale">
+      <Transition appear="horizontal">
         <Square background="#4F628E" size={140} />
       </Transition>
       <View style={styles.circlesContainer}>
@@ -134,7 +134,7 @@ const Screen2 = (props) => (
 const Screen3 = (props) => (
   <View style={styles.container}>
     <View style={[styles.top, { backgroundColor: '#88CC88' }]}>
-      <Transition appear="scale">
+      <Transition appear="horizontal">
         <Circle background="#2D882D" size={140} />
       </Transition>
       <View style={styles.circlesContainer}>

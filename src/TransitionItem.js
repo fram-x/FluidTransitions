@@ -19,7 +19,7 @@ export default class TransitionItem {
     this.appear = appear;
     this.delay = delay;
     this.metrics = metrics;
-    this.visibility = new Animated.Value(1);
+    this.visibility = new Animated.Value(appear ? 0 : 1);
     this.progress = null;
   }
 

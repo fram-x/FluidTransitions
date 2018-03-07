@@ -10,6 +10,7 @@ let uuidCount: number = 0;
 
 const styles = StyleSheet.create({
   transition: {    
+    // backgroundColor: '#FF000022'
   },
 });
 
@@ -33,7 +34,7 @@ class Transition extends React.Component<TransitionProps> {
   constructor(props: TransitionProps, context: TransitionContext) {
     super(props, context);
     this._name = `${uniqueBaseId}-${uuidCount++}`;
-    this._animatedComponent = null;
+    this._animatedComponent = null;    
   }
 
   _name: string
@@ -41,7 +42,7 @@ class Transition extends React.Component<TransitionProps> {
   _isMounted: boolean;
   _viewRef: any;
   _animatedComponent: any;
-
+  
   componentWillMount() {
     const { register } = this.context;
     if (register) {
@@ -66,7 +67,6 @@ class Transition extends React.Component<TransitionProps> {
     }
   }
 
-
   getNodeHandle(): number {
     return findNodeHandle(this._viewRef);
   }
@@ -90,9 +90,8 @@ class Transition extends React.Component<TransitionProps> {
     if (!element) { return null; }
 
     // Functional components should be wrapped in a view to be usable with
-    // Animated.createAnimatedComponent
-    const isFunctionalComponent = !element.type.displayName;
-    if (isFunctionalComponent || element.type.displayName === 'Button') {
+    // Animated.createAnimatedComponent    
+    if (element.type.displayName !== 'View' && element.type.displayName !== 'Image') {
       // Wrap in sourrounding view
       element = React.createElement(element.type, element.props);
       if (!this._animatedComponent) {
@@ -125,8 +124,8 @@ class Transition extends React.Component<TransitionProps> {
   getVisibilityStyle() {
     const { getVisibilityProgress } = this.context;
     if (!getVisibilityProgress) return {};
-    const progress = getVisibilityProgress(this._getName(), this._route);
-    return { opacity: progress };
+    const visibilityProgress = getVisibilityProgress(this._getName(), this._route);
+    return { opacity: visibilityProgress };
   }
 }
 

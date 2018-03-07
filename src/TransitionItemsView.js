@@ -32,12 +32,12 @@ export default class TransitionItemsView extends React.Component {
   }
 
   _overlayView: Object;
-  _viewRef: any
-  _transitionItems: TransitionItems
-  _isMounted: boolean
-  _onLayoutResolve: Function
-  _onLayoutResolvePromise: Promise<void>
-  _overlayVisibilityProgress: Animated.Value  
+  _viewRef: any;
+  _transitionItems: TransitionItems;
+  _isMounted: boolean;
+  _onLayoutResolve: Function;
+  _onLayoutResolvePromise: Promise<void>;
+  _overlayVisibilityProgress: Animated.Value;
 
   async onTransitionStart(props: Object, prevProps?: Object, config: Object, 
     animations: Array<any>): Promise<void> {
