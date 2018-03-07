@@ -6,17 +6,10 @@ import Transition from './../TransitionView';
 import { CircleFunc, CircleInClass } from './mocks';
 
 describe('TransitionView', () => {
-  it('Wraps a functional component', () => {
-    const tree = renderer.create(<Transition>
-      <CircleFunc />
-    </Transition>).toJSON();
+  it('Renders a functional component the same as a class component', () => {
+    const functionalTree = renderer.create(<Transition><CircleFunc /></Transition>).toJSON();
+    const classTree = renderer.create(<Transition><CircleInClass /></Transition>).toJSON();
 
-    console.log(tree);
-  });
-
-  it('Wraps a class component', () => {
-    const tree = renderer.create(<Transition>
-      <CircleInClass />
-    </Transition>).toJSON();
+    expect(classTree.toString()).toEqual(functionalTree.toString());
   });
 });

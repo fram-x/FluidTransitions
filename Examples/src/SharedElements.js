@@ -63,10 +63,10 @@ class Circle extends React.Component {
         style={{
           justifyContent: 'center',
           alignItems: 'center',
-          borderColor: this.props.background,
-          borderWidth: 2,
+          backgroundColor: this.props.background,
           width: this.props.size,
           height: this.props.size,
+          borderRadius: this.props.size / 2,
         }}
         onPress={() => { this.setState({ count: this.state.count + 1 }); }}
       >
