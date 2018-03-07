@@ -14,13 +14,10 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flex: 1,
-    paddingTop: 20,
-    paddingBottom: 20,
     justifyContent: 'flex-end',
   },
   textContainer: {
-    paddingTop: 10,
-    paddingBottom: 10,
+
   },
   image: {
     width: Dimensions.get('window').width - 40,
@@ -114,7 +111,7 @@ const Navigator = FluidNavigator({
   transitionConfig: {
     timing: Animated.timing,
     duration: 350,
-    easing: Easing.inOut(Easing.ease),
+    easing: Easing.poly(4),
   },
 });
 

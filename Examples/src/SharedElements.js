@@ -53,14 +53,10 @@ const styles = StyleSheet.create({
 // );
 
 class Circle extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { count: 1 };
-  }
   render() {
     return (
       <TouchableOpacity
-        style={{
+        style={{ ...this.props.style,
           justifyContent: 'center',
           alignItems: 'center',
           backgroundColor: this.props.background,
@@ -68,10 +64,7 @@ class Circle extends React.Component {
           height: this.props.size,
           borderRadius: this.props.size / 2,
         }}
-        onPress={() => { this.setState({ count: this.state.count + 1 }); }}
-      >
-        <Text>{this.state.count}</Text>
-      </TouchableOpacity>
+      />
     );
   }
 }

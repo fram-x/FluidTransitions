@@ -7,7 +7,7 @@ import { TransitionConfiguration, TransitionContext } from './Types';
 
 const styles: StyleSheet.NamedStyles = StyleSheet.create({
   overlay: {
-    position: 'absolute',
+    position: 'absolute',    
     top: 0,
     left: 0,
     right: 0,
@@ -15,7 +15,8 @@ const styles: StyleSheet.NamedStyles = StyleSheet.create({
   },
   sharedElement: {
     position: 'absolute',
-    backgroundColor:'#00FE21',
+    padding: 0,
+    margin: 0,
   },
 });
 
@@ -31,7 +32,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
   constructor(props: SharedElementsOverlayViewProps, context: TransitionContext) {
     super(props, context);
     this._isMounted = false;
-    this._sharedElements = null;
+    this._sharedElements = [];
   }
 
   _isMounted: boolean;
@@ -39,11 +40,11 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
 
   render() {
     if(!this.props.sharedElements || !this.getMetricsReady()) {
-      this._sharedElements = null;
+      this._sharedElements = [];
       return <View style={styles.overlay} pointerEvents='none'/>;
     }
 
-    if(!this._sharedElements) {
+    if(this._sharedElements.length === 0) {
       const self = this;
       this._sharedElements = this.props.sharedElements.map((pair, idx) => {
         const { fromItem, toItem } = pair;
@@ -66,7 +67,10 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
           child = element;
         }
         else {
-          animatedComponent = Animated.createAnimatedComponent(element.type);
+          const wrapper = (<View/>);
+          animatedComponent = Animated.createAnimatedComponent(wrapper.type);
+          elementProps = {};
+          child = element;
         }
 
         const props = {
@@ -75,7 +79,8 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
           key: idx,
         };
 
-        return React.createElement(animatedComponent, props, child ? child : element.props.children);
+        return React.createElement(animatedComponent, props, child ? 
+          child : element.props.children);
       });
     };
 
@@ -136,10 +141,8 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
 
     return {
       width: fromItem.metrics.width,
-      height: fromItem.metrics.height,
-      left: fromItem.metrics.x,
-      top: fromItem.metrics.y,
-      //transform: [{ translateX }, { translateY }, { scaleX }, { scaleY }]
+      height: fromItem.metrics.height,      
+      transform: [{ translateX }, { translateY }, { scaleX }, { scaleY }]
     };
   }
 

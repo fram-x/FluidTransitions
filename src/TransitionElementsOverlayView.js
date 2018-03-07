@@ -24,8 +24,7 @@ const styles: StyleSheet.NamedStyles = StyleSheet.create({
     bottom: 0,
   },
   transitionElement: {
-    position: 'absolute',
-    backgroundColor: '#E5D',    
+    position: 'absolute',    
     margin: 0,
   },
 });

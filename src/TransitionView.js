@@ -9,8 +9,7 @@ const uniqueBaseId: string = `transitionCompId-${Date.now()}`;
 let uuidCount: number = 0;
 
 const styles = StyleSheet.create({
-  transition: {
-    backgroundColor: '#0000FF',
+  transition: {    
   },
 });
 
@@ -35,7 +34,6 @@ class Transition extends React.Component<TransitionProps> {
     super(props, context);
     this._name = `${uniqueBaseId}-${uuidCount++}`;
     this._animatedComponent = null;
-    this._initialOpacity = props.appear ? 0 : 1;
   }
 
   _name: string
@@ -43,7 +41,6 @@ class Transition extends React.Component<TransitionProps> {
   _isMounted: boolean;
   _viewRef: any;
   _animatedComponent: any;
-  _initialOpacity: number;
 
   componentWillMount() {
     const { register } = this.context;
@@ -110,10 +107,6 @@ class Transition extends React.Component<TransitionProps> {
 
     // Visibility
     const visibilityStyle = this.getVisibilityStyle();
-    // if(this._initialOpacity === 0){
-    //   visibilityStyle = {opacity: 0};
-    //   this._initialOpacity = 1;
-    // }
 
     // Build styles
     const style = [elementProps.style, visibilityStyle, styles.transition];
@@ -126,9 +119,7 @@ class Transition extends React.Component<TransitionProps> {
       ref: (ref) => { this._viewRef = ref; },
     };
 
-    if (child) { return React.createElement(this._animatedComponent, props, child); }
-
-    return React.createElement(this._animatedComponent, props);
+    return React.createElement(this._animatedComponent, props, child ? child : props.children);
   }
 
   getVisibilityStyle() {

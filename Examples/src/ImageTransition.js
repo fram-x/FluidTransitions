@@ -154,7 +154,7 @@ const Navigator = FluidNavigator({
   transitionConfig: {
     timing: Animated.timing,
     duration: 350,
-    easing: Easing.cubic,
+    easing: Easing.poly(4),
   },
 });
 

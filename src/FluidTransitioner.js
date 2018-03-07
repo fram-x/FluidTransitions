@@ -111,7 +111,7 @@ class FluidTransitioner extends React.Component {
 
   _configureTransition() {
     return {
-      timing: Animated.timing,
+      timing: Animated.spring,
       stiffness: 140,
       damping: 8.5,
       mass: 0.5,
