@@ -113,10 +113,16 @@ const Screen3 = (props) => (
         <Circle background="#FF0000" size={100} />
       </Transition>
     </View>
-    <Button
-      title="Back"
-      onPress={() => props.navigation.goBack()}
-    />
+    <View style={styles.buttons}>
+      <Button
+        title="Back"
+        onPress={() => props.navigation.goBack()}
+      />
+      <Button
+        title="Reset"
+        onPress={() => props.navigation.pop(2)}
+      />
+    </View>
   </View>
 );
 
