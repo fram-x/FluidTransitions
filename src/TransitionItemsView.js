@@ -65,7 +65,7 @@ export default class TransitionItemsView extends React.Component {
 
     // Configure individual animations for transitions
     this.configureAnimations(sharedElements, transitionElements, 
-      animations, props.progress, config);
+      animations, props.progress, direction, config);
 
     // Save info about the current transition
     this.setState({
@@ -132,9 +132,9 @@ export default class TransitionItemsView extends React.Component {
   }
 
   configureAnimations(sharedElements: Array<any>, transitionElements: Array<TransitionItem>, 
-    animations: Array, progress: Animated.Value, config: any) {
+    animations: Array, progress: Animated.Value, direction: number, config: any) {
     
-    const transitionAnimations = configureTransitionAnimations(transitionElements, config);
+    const transitionAnimations = configureTransitionAnimations(transitionElements, direction, config);
     transitionAnimations.forEach(animation => animations.push(animation));
     animations.push(configureSharedElementAnimation(sharedElements, progress, config));
   }

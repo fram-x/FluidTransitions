@@ -6,26 +6,30 @@ const DelayTransitionTime = 90;
 const FadeTransitionTime = 40;
 
 const configureTransitionAnimations =
-  (transitionElements: Array<TransitionItem>, config: Object ) => {
+  (transitionElements: Array<TransitionItem>, direction: number, config: Object ) => {
 
   const transitionConfig = { ...config };
   const { timing } = transitionConfig;
   delete transitionConfig.timing;
 
   let index = 0;
+  const animations = [];
+  let elements = [].concat(transitionElements);
+  if(direction === -1) 
+    elements = elements.reverse();
 
-  return transitionElements.map(item => {
-    item.progress = new Animated.Value(0);    
+  for(let i=0; i<elements.length; i++){
+    const item = elements[i];
+    item.progress = new Animated.Value(0);
     const delay = (item.delay ? index++ * DelayTransitionTime : 0);
-    const animation = timing(item.progress, {
+    animations.push(createAnimationDescriptor(timing(item.progress, {
       ...transitionConfig,
       toValue: 1.0,
       delay
-    });
+    }), item.name, item.route, delay, item.progress));
+  }
 
-    return createAnimationDescriptor(
-      animation, item.name, item.route, delay, item.progress);
-  });
+  return animations;
 }
 
 const configureSharedElementAnimation =
