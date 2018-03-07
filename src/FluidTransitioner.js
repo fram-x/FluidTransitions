@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, InteractionManager, Easing, Animated } from 'react-native';
+import { StyleSheet, InteractionManager, Platform, Easing, Animated } from 'react-native';
 import { addNavigationHelpers } from 'react-navigation';
 
 import Transitioner from './BaseTransitioner';
@@ -91,7 +91,10 @@ class FluidTransitioner extends React.Component {
         this._transitionItemsView.onTransitionEnd(props, null, config))
     }
     
-    InteractionManager.runAfterInteractions(runAppearAnimations);
+    if(Platform.OS === 'android')
+      InteractionManager.runAfterInteractions(runAppearAnimations);
+    else
+      setTimeout(runAppearAnimations, 200);
   }
 
   async _onTransitionStart(props, prevProps, animations) {

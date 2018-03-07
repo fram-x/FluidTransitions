@@ -78,7 +78,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     }
 
     return (
-      <View style={styles.emptyOverlay} pointerEvents='none'>
+      <View style={styles.overlay} pointerEvents='none'>
         {this._transitionElements}
       </View>
     );
@@ -97,8 +97,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     if (!getTransitionProgress || !getMetrics || !getDirection || !getReverse )
       return {};
 
-    const progress = getTransitionProgress(item.name, item.route);
-
+    const progress = getTransitionProgress(item.name, item.route);    
     if(progress) {
       const transitionHelper = this.getTransitionHelper(item.appear);
       if (transitionHelper) {

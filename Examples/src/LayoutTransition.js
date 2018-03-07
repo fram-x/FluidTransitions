@@ -30,6 +30,8 @@ const styles = StyleSheet.create({
   imageContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    paddingTop: 14,
+    paddingBottom: 14,
   },
   header: {
     fontWeight: 'bold',
@@ -45,6 +47,7 @@ const InitialScreen = (props) => (
       </View>
     </Transition>
     <Text style={styles.header}>Lorem ipsum</Text>
+    <View style={{ height: 15 }} />
     <Transition shared="text1">
       <Text style={styles.textContainer}>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum
@@ -53,9 +56,11 @@ const InitialScreen = (props) => (
         euismod arcu.
       </Text>
     </Transition>
+    <View style={{ height: 15 }} />
     <Transition shared="image1">
       <Image source={{ uri: 'https://picsum.photos/200/100?image=12' }} style={styles.image} />
     </Transition>
+    <View style={{ height: 15 }} />
     <Transition shared="text2">
       <Text style={styles.textContainer}>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum
@@ -64,6 +69,7 @@ const InitialScreen = (props) => (
         euismod arcu.
       </Text>
     </Transition>
+    <View style={{ height: 15 }} />
     <Transition shared="image2">
       <Image source={{ uri: 'https://picsum.photos/200/100?image=22' }} style={styles.image} />
     </Transition>

@@ -3,7 +3,7 @@ import { Animated, Easing } from 'react-native';
 import TransitionItem from './TransitionItem';
 
 const DelayTransitionTime = 90;
-const FadeTransitionTime = 40;
+const FadeTransitionTime = 15;
 
 const configureTransitionAnimations =
   (transitionElements: Array<TransitionItem>, direction: number, config: Object ) => {
