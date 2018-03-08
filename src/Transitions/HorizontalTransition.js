@@ -1,40 +1,36 @@
-import React from 'react';
-import { Dimensions, Animated } from 'react-native';
-
 import BaseTransition from './BaseTransition';
+import { TransitionSpecification } from './../Types/TransitionSpecification';
 
 class HorizontalTransition extends BaseTransition {
-  getTransitionStyle(transitionSpecification) {
+  getTransitionStyle(transitionSpecification: TransitionSpecification) {
     if (!transitionSpecification || transitionSpecification.metrics === undefined)
       return {};
 
-    const { x, width } = transitionSpecification.metrics;
+    const { metrics, dimensions } = transitionSpecification;
+    const { x, width } = metrics;
+    
     let start = 0;
     let end = 0;
     if(transitionSpecification.reverse === false && transitionSpecification.direction === 1){
-      start = Dimensions.get('window').width + (x - 25);
+      start = dimensions.width + 25;
       end = 0;
     } else if(transitionSpecification.reverse === true && transitionSpecification.direction === 1){
       start = 0;
-      end = -(width + x + 25);
+      end = -(dimensions.width + 25);
     } else if(transitionSpecification.reverse === false && transitionSpecification.direction === -1){
-      start = -(width + x + 25);
+      start = -(dimensions.width + 25);
       end = 0;
     } else if(transitionSpecification.reverse === true && transitionSpecification.direction === -1){
       start = 0;
-      end = Dimensions.get('window').width - (x - 25);
+      end = dimensions.width - 25;
     }
-console.log(start + "," + end);
-    const progress = transitionSpecification.progress.interpolate({
+        
+    const transitionProgress = transitionSpecification.progress.interpolate({
       inputRange: [0, 1],
       outputRange: [start, end]
     });
 
-    return {
-      transform: [{
-        translateX: progress
-      }]
-    };
+    return { transform: [{ translateX: transitionProgress }] };
   }
 }
 

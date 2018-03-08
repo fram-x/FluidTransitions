@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, StyleSheet, Animated, Platform } from 'react-native';
+import { View, StyleSheet, Animated, Dimensions, Platform } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
-import { TransitionConfiguration, TransitionContext } from './Types';
+import { TransitionConfiguration, TransitionContext, TransitionSpecification } from './Types';
 import {
   ScaleTransition,
   TopTransition,
@@ -24,7 +24,7 @@ const styles: StyleSheet.NamedStyles = StyleSheet.create({
     bottom: 0,
   },
   transitionElement: {
-    position: 'absolute',    
+    position: 'absolute',
     margin: 0,
   },
 });
@@ -85,9 +85,11 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
   }
 
   getStyle(item: TransitionItem) {
-    return { 
-      left: item.metrics.x, top: item.metrics.y,
-      width: item.metrics.width, height: item.metrics.height,
+    return {
+      left: item.metrics.x, 
+      top: item.metrics.y,
+      width: item.metrics.width, 
+      height: item.metrics.height,
       ...this.getTransitionStyle(item)
     };
   }
@@ -97,17 +99,18 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     if (!getTransitionProgress || !getMetrics || !getDirection || !getReverse )
       return {};
 
-    const progress = getTransitionProgress(item.name, item.route);    
-    if(progress) {
+    const progress = getTransitionProgress(item.name, item.route);
+    if(progress) {      
       const transitionHelper = this.getTransitionHelper(item.appear);
       if (transitionHelper) {
-        const transitionSpecification = {
-          name: item.name,
-          route: item.route,
+        const transitionSpecification: TransitionSpecification = {
           progress,
+          name: item.name,
+          route: item.route,          
           metrics: item.metrics,
           direction: getDirection(item.name, item.route),
           reverse: getReverse(item.name, item.route),
+          dimensions: Dimensions.get('window'),
         };
         const transitionStyle = transitionHelper.getTransitionStyle(transitionSpecification);
         return transitionStyle;
@@ -148,7 +151,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     else {
       animatedComponent = Animated.createAnimatedComponent(element.type);
     }
-    
+
     const props = {
       ...element.props,
       style: [element.props.style, styles.transitionElement, style],
