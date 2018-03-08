@@ -151,20 +151,21 @@ export default class TransitionItemsView extends React.Component<
 
   componentDidMount() {
     this._isMounted = true;
-
     InteractionManager.runAfterInteractions(async ()=> {
       // Wait for layouts
       await this._onLayoutResolvePromise;
 
       // Get routes
       const routes = this._transitionItems.getRoutes();
-      const sharedElements = this._transitionItems.getSharedElements(routes.fromRoute, routes.toRoute);
-      const transitionElements = this._transitionItems.getTransitionElements(routes.fromRoute, routes.toRoute);
+      const sharedElements = this._transitionItems.getSharedElements(
+        routes.fromRoute, routes.toRoute);
+      const transitionElements = this._transitionItems.getTransitionElements(
+        routes.fromRoute, routes.toRoute);
 
       if(sharedElements.length === 0 && transitionElements === 0)
         return;
 
-      const direction = 1;
+      const direction = 1; // TODO: Fix?
 
       await this.measureItems(sharedElements, transitionElements);
 
