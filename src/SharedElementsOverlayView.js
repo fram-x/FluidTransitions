@@ -7,7 +7,7 @@ import { TransitionConfiguration, TransitionContext } from './Types';
 
 const styles: StyleSheet.NamedStyles = StyleSheet.create({
   overlay: {
-    position: 'absolute',    
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
@@ -79,7 +79,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
           key: idx,
         };
 
-        return React.createElement(animatedComponent, props, child ? 
+        return React.createElement(animatedComponent, props, child ?
           child : element.props.children);
       });
     };
@@ -141,7 +141,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
 
     return {
       width: fromItem.metrics.width,
-      height: fromItem.metrics.height,      
+      height: fromItem.metrics.height,
       transform: [{ translateX }, { translateY }, { scaleX }, { scaleY }]
     };
   }

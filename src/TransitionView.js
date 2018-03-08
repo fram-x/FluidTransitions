@@ -29,6 +29,7 @@ class Transition extends React.Component<TransitionProps> {
     layoutReady: PropTypes.func,
     route: PropTypes.string,
     getVisibilityProgress: PropTypes.func,
+    getDirection: PropTypes.func
   }
 
   constructor(props: TransitionProps, context: TransitionContext) {
@@ -122,10 +123,21 @@ class Transition extends React.Component<TransitionProps> {
   }
 
   getVisibilityStyle() {
-    const { getVisibilityProgress } = this.context;
-    if (!getVisibilityProgress) return {};
+    const { getVisibilityProgress, getDirection } = this.context;
+    if (!getVisibilityProgress || !getDirection) return {};
     const visibilityProgress = getVisibilityProgress(this._getName(), this._route);
-    return { opacity: visibilityProgress };
+    const myDirection = getDirection(this._getName(), this._route);
+    if(myDirection === 1)
+      return { opacity: visibilityProgress.interpolate({
+          inputRange:[0, 0.0001, 1],
+          outputRange: [1, 0, 0]
+        }) 
+      };
+    return { opacity: visibilityProgress.interpolate({
+        inputRange:[0, 0.999, 0.9999, 1],
+        outputRange: [0, 0, 1, 1]
+      }) 
+    };
   }
 }
 

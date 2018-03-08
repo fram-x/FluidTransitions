@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Text, Button, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Button, Slider, Animated, Easing, StyleSheet } from 'react-native';
 
-import { FluidNavigator, Transition } from 'react-navigation-fluid-transitions';
+import { Transition, TransitionView, TransitionRouteView } from 'react-navigation-fluid-transitions';
 
 const styles = StyleSheet.create({
   container: {
@@ -39,99 +39,136 @@ const styles = StyleSheet.create({
   },
 });
 
-// const Circle = (props) => (
-//   <View
-//     style={{
-//       justifyContent: 'center',
-//       alignItems: 'center',
-//       backgroundColor: props.background,
-//       width: props.size,
-//       height: props.size,
-//       borderRadius: props.size / 2,
-//     }}
-//   />
-// );
+const Circle = (props) => (
+  <View
+    style={{
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: props.background,
+      width: props.size,
+      height: props.size,
+      borderRadius: props.size / 2,
+    }}
+  />
+);
 
-class Circle extends React.Component {
-  render() {
-    return (
-      <TouchableOpacity
-        style={{ ...this.props.style,
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: this.props.background,
-          width: this.props.size,
-          height: this.props.size,
-          borderRadius: this.props.size / 2,
-        }}
-      />
-    );
-  }
-}
+// class Circle extends React.Component {
+//   render() {
+//     return (
+//       <TouchableOpacity
+//         style={{ ...this.props.style,
+//           justifyContent: 'center',
+//           alignItems: 'center',
+//           backgroundColor: this.props.background,
+//           width: this.props.size,
+//           height: this.props.size,
+//           borderRadius: this.props.size / 2,
+//         }}
+//       />
+//     );
+//   }
+// }
 
-const Screen1 = (props) => (
+const Screen1 = () => (
   <View style={styles.container}>
-    <Text>Screen 1</Text>
+    <Transition appear="scale">
+      <Text>Screen 1</Text>
+    </Transition>
     <View style={styles.screen1}>
       <Transition shared="circle">
         <Circle background="#FF0000" size={20} />
       </Transition>
     </View>
-    <Button
-      title="Next"
-      onPress={() => props.navigation.navigate('screen2')}
-    />
+    <View style={{ flexDirection: 'row' }}>
+      <Transition appear="horizontal">
+        <Circle background="#BB0000" size={10} />
+      </Transition>
+      <View style={{ width: 20 }} />
+      <Transition appear="horizontal">
+        <Circle background="#BB0000" size={10} />
+      </Transition>
+      <View style={{ width: 20 }} />
+      <Transition appear="horizontal">
+        <Circle background="#BB0000" size={10} />
+      </Transition>
+    </View>
   </View>
 );
 
-const Screen2 = (props) => (
+const Screen2 = () => (
   <View style={styles.container}>
-    <Text>Screen 2</Text>
+    <Transition appear="scale">
+      <Text>Screen 2</Text>
+    </Transition>
     <View style={styles.screen2}>
       <Transition shared="circle">
         <Circle background="#FF0000" size={60} />
       </Transition>
     </View>
-    <View style={styles.buttons}>
-      <Button
-        title="Back"
-        onPress={() => props.navigation.goBack()}
-      />
-      <Button
-        title="Next"
-        onPress={() => props.navigation.navigate('screen3')}
-      />
-    </View>
-  </View>
-);
-
-const Screen3 = (props) => (
-  <View style={styles.container}>
-    <Text>Screen 3</Text>
-    <View style={styles.screen3}>
-      <Transition shared="circle">
-        <Circle background="#FF0000" size={100} />
+    <View style={{ flexDirection: 'row' }}>
+      <Transition appear="horizontal">
+        <Circle background="#BB0000" size={10} />
+      </Transition>
+      <View style={{ width: 20 }} />
+      <Transition appear="horizontal">
+        <Circle background="#BB0000" size={10} />
+      </Transition>
+      <View style={{ width: 20 }} />
+      <Transition appear="horizontal">
+        <Circle background="#BB0000" size={10} />
       </Transition>
     </View>
-    <View style={styles.buttons}>
-      <Button
-        title="Back"
-        onPress={() => props.navigation.goBack()}
-      />
-      <Button
-        title="Reset"
-        onPress={() => props.navigation.pop(2)}
-      />
-    </View>
   </View>
 );
 
-const Navigator = FluidNavigator({
-  screen1: { screen: Screen1 },
-  screen2: { screen: Screen2 },
-  screen3: { screen: Screen3 },
-});
+class Screen extends React.Component<any> {
+  constructor(props) {
+    super(props);
+    this._progress = new Animated.Value(0);
+    this._animate = this._animate.bind(this);
+    this._toggled = false;
+  }
+  _progress: Animated.Value;
+  _toggled: boolean;
+  _animation: ?Animated.CompositeAnimation;
+  _animate = () => {
+    if (this._animation) {
+      this._animation.stop();
+    }
 
-export default () => (
-  <Navigator />
-);
+    this._animation = Animated.timing(this._progress, {
+      toValue: this._toggled ? 0 : 1,
+      duration: 1000,
+      easing: Easing.out(Easing.poly(4)),
+      useNativeDriver: true,
+    });
+    this._animation.start(() => {
+      this._animation = null;
+      this._toggled = !this._toggled;
+    });
+  }
+  render() {
+    return (
+      <TransitionView style={{ flex: 1 }} progress={this._progress}>
+        <TransitionRouteView route="screen1" style={{ flex: 1 }}>
+          <Screen1 />
+        </TransitionRouteView>
+        <View style={{ justifyContent: 'center', padding: 10, paddingLeft: 20, paddingRight: 20, backgroundColor: '#AAA' }} >
+          <Slider
+            minimumValue={0}
+            maximumValue={100}
+            step={1}
+            onValueChange={val => this._progress.setValue(val * 0.01)}
+            // value={this._progress}
+          />
+          <Button title="Animate" onPress={this._animate} />
+        </View>
+        <TransitionRouteView route="screen2" style={{ flex: 1 }}>
+          <Screen2 />
+        </TransitionRouteView>
+      </TransitionView>
+    );
+  }
+}
+
+export default Screen;

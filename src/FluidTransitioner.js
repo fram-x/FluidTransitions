@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, InteractionManager, Platform, Easing, Animated } from 'react-native';
+import { StyleSheet, View, Text, InteractionManager, Platform, Easing, Animated } from 'react-native';
 import { addNavigationHelpers } from 'react-navigation';
 
 import Transitioner from './BaseTransitioner';
@@ -22,6 +22,13 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
   },
+  sceneContent: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  }
 });
 
 class FluidTransitioner extends React.Component {
@@ -90,7 +97,7 @@ class FluidTransitioner extends React.Component {
       Animated.parallel(animationsToRun).start(async () =>
         this._transitionItemsView.onTransitionEnd(props, null, config))
     }
-    
+
     if(Platform.OS === 'android')
       InteractionManager.runAfterInteractions(runAppearAnimations);
     else
@@ -98,25 +105,28 @@ class FluidTransitioner extends React.Component {
   }
 
   _onTransitionStart(props, prevProps, animations) {
-    const config = this._configureTransition();
-    return this._transitionItemsView.onTransitionStart(props, prevProps, config, animations);
+
+    //const config = this._configureTransition();
+    //return this._transitionItemsView.onTransitionStart(props, prevProps, config, animations);
   }
 
-  _onTransitionEnd(props, prevProps) {
+  async _onTransitionEnd(props, prevProps) {
     const config = this._configureTransition();
-    
     // Fix issue with nativeDriver and position
     // https://github.com/react-navigation/react-navigation/issues/3157
     if (this._configureTransition().useNativeDriver) {
       props.position.setValue(props.navigation.state.index);
     }
 
-    return this._transitionItemsView.onTransitionEnd(props, prevProps, config);
+    await this._transitionItemsView.onTransitionEnd(props, prevProps, config);
+
+    if(this.props.onTransitionEnd)
+      this.props.onTransitionEnd();
   }
 
   _configureTransition() {
     return {
-      timing: Animated.spring,
+      timing: Animated.timing,
       stiffness: 1400,
       damping: 85,
       mass: 3,
@@ -129,11 +139,14 @@ class FluidTransitioner extends React.Component {
   }
 
   _render(props, prevProps) {
+    console.log("======");
     const scenes = props.scenes.map(scene => this._renderScene({ ...props, scene }, prevProps));
     return (
       <TransitionItemsView
         navigation={this.props.navigation}
         ref={ref => this._transitionItemsView = ref}
+        transitionProps={props}
+        prevTransitionProps={prevProps}
       >
         {scenes}
       </TransitionItemsView>
@@ -143,8 +156,8 @@ class FluidTransitioner extends React.Component {
   _renderScene(transitionProps, prevProps) {
     const { position, scene } = transitionProps;
     const { index } = scene;
+    console.log("SCENE " + index);
 
-    // Ensure we hide bottom scenes
     let diff = 0;
     if (prevProps) { diff = (index - position.__getValue())};
     let opacity = 0.0;
@@ -155,17 +168,15 @@ class FluidTransitioner extends React.Component {
       });
     }
 
-    const style = { opacity };
     const navigation = this._getChildNavigation(scene);
-
     const Scene = this.props.router.getComponentForRouteName(scene.route.routeName);
 
     return (
       <Animated.View
         key={transitionProps.scene.route.key}
-        style={[style, styles.scene]}
+        style={[styles.scene, { opacity}]}
       >
-        <Scene navigation={navigation} />
+          <Scene navigation={navigation}/>
       </Animated.View>
     );
   }

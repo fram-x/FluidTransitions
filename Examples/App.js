@@ -26,7 +26,7 @@ const ExampleNavigator = StackNavigator({
 class MyApp extends React.Component<any> {
   render() {
     return (
-      <ExampleNavigator />
+      <SharedElements />
     );
   }
 }

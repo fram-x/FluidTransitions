@@ -96,6 +96,9 @@ class BaseTransitioner extends React.Component {
       ...transitionUserSpec,
     };
 
+    const { timing } = transitionSpec;
+    delete transitionSpec.timing;
+
     const toValue = nextProps.navigation.state.index;
     const positionHasChanged = position.__getValue() !== toValue;
 
@@ -117,22 +120,54 @@ class BaseTransitioner extends React.Component {
         }
       }
 
-      if(indexHasChanged && positionHasChanged){
-        const { timing } = transitionSpec;
-        delete transitionSpec.timing;
+      // if(indexHasChanged && positionHasChanged){
+      //   const { timing } = transitionSpec;
+      //   delete transitionSpec.timing;
 
-        const delay = animations.reduce((prev, cur) => prev + cur.delay, 0);
-        const animationsToRun = [];
-        animations.forEach(ad => animationsToRun.push(ad.animation));
+      //   const delay = animations.reduce((prev, cur) => prev + cur.delay, 0);
+      //   const animationsToRun = [];
+      //   animations.forEach(ad => animationsToRun.push(ad.animation));
 
-        animationsToRun.push(timing(position, {
-          ...transitionSpec,
-          toValue: nextProps.navigation.state.index,
-          delay: delay * 0.5
-        }));
+      //   animationsToRun.push(timing(position, {
+      //     ...transitionSpec,
+      //     toValue: nextProps.navigation.state.index,
+      //     delay: delay * 0.5
+      //   }));
 
-        Animated.parallel(animationsToRun).start(this._onTransitionEnd);
+      //   Animated.parallel(animationsToRun).start(this._onTransitionEnd);
+      // }
+      // else {
+      //   this._onTransitionEnd();
+      // }
+      const animations =
+      indexHasChanged && positionHasChanged
+        ? [
+            timing(progress, {
+              ...transitionSpec,
+              toValue: 1,
+            }),
+            timing(position, {
+              ...transitionSpec,
+              toValue: nextProps.navigation.state.index,
+            }),
+          ]
+        : [];
+
+    // update scenes and play the transition
+    this._isTransitionRunning = true;
+    this.setState(nextState, async () => {
+      if (nextProps.onTransitionStart) {
+        const result = nextProps.onTransitionStart(
+          this._transitionProps,
+          this._prevTransitionProps
+        );
+
+        if (result instanceof Promise) {
+          await result;
+        }
       }
+      Animated.parallel(animations).start(this._onTransitionEnd);
+    });
     });
   }
 

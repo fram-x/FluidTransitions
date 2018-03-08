@@ -12,7 +12,7 @@ class HorizontalTransition extends BaseTransition {
     let start = 0;
     let end = 0;
     if(transitionSpecification.reverse === false && transitionSpecification.direction === 1){
-      start = Dimensions.get('window').width - (x - 25);
+      start = Dimensions.get('window').width + (x - 25);
       end = 0;
     } else if(transitionSpecification.reverse === true && transitionSpecification.direction === 1){
       start = 0;
@@ -24,7 +24,7 @@ class HorizontalTransition extends BaseTransition {
       start = 0;
       end = Dimensions.get('window').width - (x - 25);
     }
-
+console.log(start + "," + end);
     const progress = transitionSpecification.progress.interpolate({
       inputRange: [0, 1],
       outputRange: [start, end]

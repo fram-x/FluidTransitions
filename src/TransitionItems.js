@@ -30,6 +30,20 @@ export default class TransitionItems {
     return false;
   }
 
+  getRoutes() {
+    const routes = [];    
+    for(var i = 0; i < this._items.length; i++) {
+        if(!routes.includes(this._items[i].route)) {
+            routes.push(this._items[i].route);
+        }
+    }
+    if(routes.length != 2) {
+      throw new Error("Number of routes should be 2, was " + routes.length);
+    }
+
+    return { fromRoute: routes[0], toRoute: routes[1] };
+  }
+
   getItemByNameAndRoute(name: string, route: string): TransitionItem {
     return this._items.find(e => e.name === name && e.route === route);
   }
