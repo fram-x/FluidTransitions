@@ -81,15 +81,15 @@ const Screen1 = () => (
     </View>
     <View style={{ flexDirection: 'row' }}>
       <Transition appear="horizontal">
-        <Circle background="#BB0000" size={10} />
+        <Circle background="#55AA55" size={20} />
       </Transition>
       <View style={{ width: 20 }} />
       <Transition appear="horizontal">
-        <Circle background="#BB0000" size={10} />
+        <Circle background="#55AA55" size={20} />
       </Transition>
       <View style={{ width: 20 }} />
       <Transition appear="horizontal">
-        <Circle background="#BB0000" size={10} />
+        <Circle background="#55AA55" size={20} />
       </Transition>
     </View>
   </View>
@@ -107,15 +107,15 @@ const Screen2 = () => (
     </View>
     <View style={{ flexDirection: 'row' }}>
       <Transition appear="horizontal">
-        <Circle background="#BB0000" size={10} />
+        <Circle background="#55AA55" size={20} />
       </Transition>
       <View style={{ width: 20 }} />
       <Transition appear="horizontal">
-        <Circle background="#BB0000" size={10} />
+        <Circle background="#55AA55" size={20} />
       </Transition>
       <View style={{ width: 20 }} />
       <Transition appear="horizontal">
-        <Circle background="#BB0000" size={10} />
+        <Circle background="#55AA55" size={20} />
       </Transition>
     </View>
   </View>
@@ -153,7 +153,11 @@ class Screen extends React.Component<any> {
         <TransitionRouteView route="screen1" style={{ flex: 1 }}>
           <Screen1 />
         </TransitionRouteView>
-        <View style={{ justifyContent: 'center', padding: 10, paddingLeft: 20, paddingRight: 20, backgroundColor: '#AAA' }} >
+        <View style={{ height: 1, backgroundColor: '#AAA' }} />
+        <TransitionRouteView route="screen2" style={{ flex: 1 }}>
+          <Screen2 />
+        </TransitionRouteView>
+        <View style={{ justifyContent: 'center', padding: 10, paddingLeft: 20, paddingRight: 20, backgroundColor: '#ECECEC' }} >
           <Slider
             minimumValue={0}
             maximumValue={100}
@@ -163,9 +167,6 @@ class Screen extends React.Component<any> {
           />
           <Button title="Animate" onPress={this._animate} />
         </View>
-        <TransitionRouteView route="screen2" style={{ flex: 1 }}>
-          <Screen2 />
-        </TransitionRouteView>
       </TransitionView>
     );
   }
