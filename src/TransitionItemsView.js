@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Easing, UIManager, Platform, Animated, findNodeHandle } from 'react-native';
+import { View, StyleSheet, UIManager, InteractionManager, Animated, findNodeHandle } from 'react-native';
 import PropTypes from 'prop-types';
 
 import { Metrics, TransitionConfiguration } from './Types';
@@ -26,7 +26,7 @@ export default class TransitionItemsView extends React.Component<
     super(props);
     this._isMounted = false;
     this._overlayView = null;
-    this._viewRef = null;    
+    this._viewRef = null;
     this.state = {
       toRoute: null,
       fromRoute: null,
@@ -102,8 +102,8 @@ export default class TransitionItemsView extends React.Component<
     return route !== this.state.toRoute;
   }
 
-  async getViewMetrics(): Promise<void> {    
-    let viewMetrics = {};
+  async getViewMetrics(): Metrics {
+    let viewMetrics: Metrics;
     const nodeHandle = findNodeHandle(this._viewRef);
 
     const promise = new Promise(resolve => {
@@ -120,7 +120,7 @@ export default class TransitionItemsView extends React.Component<
     sharedElements: Map<TransitionItem, TransitionItem>,
     transitionElements: Array<TransitionItem>,
   ) {
-    const viewMetrics = await this.getViewMetrics();    
+    const viewMetrics = await this.getViewMetrics();
     if (sharedElements) {
       for (let i = 0; i < sharedElements.length; i++) {
         const pair = sharedElements[i];
@@ -149,32 +149,34 @@ export default class TransitionItemsView extends React.Component<
     });
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     this._isMounted = true;
 
-    // Wait for layouts
-    await this._onLayoutResolvePromise;
+    InteractionManager.runAfterInteractions(async ()=> {
+      // Wait for layouts
+      await this._onLayoutResolvePromise;
 
-    // Get routes
-    const routes = this._transitionItems.getRoutes();
-    const sharedElements = this._transitionItems.getSharedElements(routes.fromRoute, routes.toRoute);
-    const transitionElements = this._transitionItems.getTransitionElements(routes.fromRoute, routes.toRoute);
+      // Get routes
+      const routes = this._transitionItems.getRoutes();
+      const sharedElements = this._transitionItems.getSharedElements(routes.fromRoute, routes.toRoute);
+      const transitionElements = this._transitionItems.getTransitionElements(routes.fromRoute, routes.toRoute);
 
-    if(sharedElements.length === 0 && transitionElements === 0)
-      return;
+      if(sharedElements.length === 0 && transitionElements === 0)
+        return;
 
-    const direction = 1;
+      const direction = 1;
 
-    await this.measureItems(sharedElements, transitionElements);
+      await this.measureItems(sharedElements, transitionElements);
 
-    this.setState({
-      ...this.state,
-      toRoute: routes.toRoute,
-      fromRoute: routes.fromRoute,
-      direction,
-      progress: this._transitionProgress,
-      sharedElements,
-      transitionElements,
+      this.setState({
+        ...this.state,
+        toRoute: routes.toRoute,
+        fromRoute: routes.fromRoute,
+        direction,
+        progress: this._transitionProgress,
+        sharedElements,
+        transitionElements,
+      });
     });
   }
 

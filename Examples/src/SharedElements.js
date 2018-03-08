@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 80,
+    padding: 20,
   },
   screen1: {
     flex: 1,
@@ -76,7 +76,7 @@ const Screen1 = () => (
     </Transition>
     <View style={styles.screen1}>
       <Transition shared="circle">
-        <Circle background="#FF0000" size={20} />
+        <Circle background="#FF0000" size={10} />
       </Transition>
     </View>
     <View style={{ flexDirection: 'row' }}>
@@ -102,7 +102,7 @@ const Screen2 = () => (
     </Transition>
     <View style={styles.screen2}>
       <Transition shared="circle">
-        <Circle background="#FF0000" size={60} />
+        <Circle background="#FF0000" size={40} />
       </Transition>
     </View>
     <View style={{ flexDirection: 'row' }}>
