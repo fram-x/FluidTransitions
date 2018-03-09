@@ -11,7 +11,7 @@ import * as Constants from './TransitionConstants';
 const styles: StyleSheet.NamedStyles = StyleSheet.create({
   overlay: {
     position: 'absolute',
-    backgroundColor: '#EC000022',
+    // backgroundColor: '#EC000022',
     top: 0,
     left: 0,
     right: 0,

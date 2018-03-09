@@ -55,7 +55,7 @@ const Circle = (props) => (
 // class Circle extends React.Component {
 //   render() {
 //     return (
-//       <TouchableOpacity
+//       <View
 //         style={{ ...this.props.style,
 //           justifyContent: 'center',
 //           alignItems: 'center',
@@ -129,6 +129,8 @@ class Screen extends React.Component<any> {
     this._animate = this._animate.bind(this);
     this._increase = this._increase.bind(this);
     this._decrease = this._decrease.bind(this);
+    this._increaseMore = this._increaseMore.bind(this);
+    this._decreaseMore = this._decreaseMore.bind(this);
     this._toggled = false;
     this._step = 0.0001;
   }
@@ -140,20 +142,25 @@ class Screen extends React.Component<any> {
   _animation: ?Animated.CompositeAnimation;
   _step: number;
 
-  _increase = () => {
-    if (this._value < 1.0 - this._step) {
-      this._value += this._step;
+  _increaseMore = () => this._inc(0.01);
+  _decreaseMore = () => this._dec(0.01);
+  _increase = () => this._inc(this._step);
+  _decrease = () => this._dec(this._step);
+  _dec(step) {
+    if (this._value >= step) {
+      this._value -= step;
       this._progress.setValue(this._value);
       console.log(this._value);
     }
-  };
-  _decrease = () => {
-    if (this._value > this._step) {
-      this._value -= this._step;
+  }
+  _inc(step) {
+    if (this._value <= 1.0 - step) {
+      this._value += step;
       this._progress.setValue(this._value);
       console.log(this._value);
     }
-  };
+  }
+
   _animate = () => {
     if (this._animation) {
       this._animation.stop();
@@ -200,9 +207,11 @@ class Screen extends React.Component<any> {
             }}
           />
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <Button title="< <" onPress={this._decreaseMore} />
             <Button title="<" onPress={this._decrease} />
             <Button title="Animate" onPress={this._animate} />
             <Button title=">" onPress={this._increase} />
+            <Button title="> >" onPress={this._increaseMore} />
           </View>
         </View>
       </TransitionView>

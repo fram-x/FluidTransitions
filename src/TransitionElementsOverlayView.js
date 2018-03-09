@@ -25,7 +25,7 @@ const styles: StyleSheet.NamedStyles = StyleSheet.create({
   },
   transitionElement: {
     position: 'absolute',
-    backgroundColor: '#00FF0022',
+    // backgroundColor: '#00FF0022',
     margin: 0,
   },
 });
@@ -65,7 +65,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
   }
 
   _isMounted: boolean;
-  _transitionElements: Array<TransitionItem>  
+  _transitionElements: Array<TransitionItem>
 
   render() {
     if(!this.props.transitionElements || !this.getMetricsReady()) {
@@ -89,9 +89,9 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
 
   getStyle(item: TransitionItem) {
     return {
-      left: item.metrics.x, 
+      left: item.metrics.x,
       top: item.metrics.y,
-      width: item.metrics.width, 
+      width: item.metrics.width,
       height: item.metrics.height,
       ...this.getTransitionStyle(item)
     };
@@ -103,13 +103,13 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
       return {};
 
     const progress = getTransitionProgress(item.name, item.route);
-    if(progress) {      
+    if(progress) {
       const transitionFunction = this.getTransitionFunction(item.appear);
       if (transitionFunction) {
         const transitionSpecification: TransitionSpecification = {
           progress,
           name: item.name,
-          route: item.route,          
+          route: item.route,
           metrics: item.metrics,
           direction: getDirection(item.name, item.route),
           reverse: getReverse(item.name, item.route),
@@ -140,8 +140,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     let child = null;
 
     // Functional components should be wrapped in a view to be usable with
-    // Animated.createAnimatedComponent. We also need to wrap buttons in
-    // separate containers. Don't know why!
+    // Animated.createAnimatedComponent
     const isFunctionalComponent = !element.type.displayName;
     if(isFunctionalComponent || element.type.displayName === 'Button') {
       // Wrap in sourrounding view
@@ -157,14 +156,12 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
 
     const props = {
       ...element.props,
+      collapsable: false,
       style: [element.props.style, styles.transitionElement, style],
       key: idx,
     };
 
-    if(child)
-      return React.createElement(animatedComponent, props, child);
-
-    return React.createElement(animatedComponent, props);
+    return React.createElement(animatedComponent, props, child ? child : props.children);
   }
 
   getMetricsReady(): boolean {

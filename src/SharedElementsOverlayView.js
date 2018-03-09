@@ -14,7 +14,8 @@ const styles: StyleSheet.NamedStyles = StyleSheet.create({
     bottom: 0,
   },
   sharedElement: {
-    position: 'absolute',    
+    position: 'absolute',
+    // backgroundColor: '#FF000022',
     padding: 0,
     margin: 0,
   },
@@ -75,6 +76,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
 
         const props = {
           ...element.props,
+              
           style: [element.props.style, styles.sharedElement, transitionStyle],
           key: idx,
         };

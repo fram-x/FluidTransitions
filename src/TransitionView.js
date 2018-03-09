@@ -10,8 +10,7 @@ const uniqueBaseId: string = `transitionCompId-${Date.now()}`;
 let uuidCount: number = 0;
 
 const styles = StyleSheet.create({
-  transition: {    
-    backgroundColor: '#FF000022'
+  transition: {
   },
 });
 
@@ -36,7 +35,7 @@ class Transition extends React.Component<TransitionProps> {
   constructor(props: TransitionProps, context: TransitionContext) {
     super(props, context);
     this._name = `${uniqueBaseId}-${uuidCount++}`;
-    this._animatedComponent = null;    
+    this._animatedComponent = null;
   }
 
   _name: string
@@ -44,7 +43,7 @@ class Transition extends React.Component<TransitionProps> {
   _isMounted: boolean;
   _viewRef: any;
   _animatedComponent: any;
-  
+
   componentWillMount() {
     const { register } = this.context;
     if (register) {
@@ -92,7 +91,7 @@ class Transition extends React.Component<TransitionProps> {
     if (!element) { return null; }
 
     // Functional components should be wrapped in a view to be usable with
-    // Animated.createAnimatedComponent    
+    // Animated.createAnimatedComponent
     if (element.type.displayName !== 'View' && element.type.displayName !== 'Image') {
       // Wrap in sourrounding view
       element = React.createElement(element.type, element.props);
@@ -132,12 +131,12 @@ class Transition extends React.Component<TransitionProps> {
       return { opacity: visibilityProgress.interpolate({
           inputRange:[0, 0.0001, 0.009, 1],
           outputRange: [1, 1, 0, 0]
-        }) 
+        })
       };
     return { opacity: visibilityProgress.interpolate({
         inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE,
         outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE
-      }) 
+      })
     };
   }
 }
