@@ -168,7 +168,7 @@ class Screen extends React.Component<any> {
     const toValue = this._toggled ? 0 : 1;
     this._animation = Animated.timing(this._progress, {
       toValue,
-      duration: 3000,
+      duration: 1000,
       easing: Easing.out(Easing.poly(4)),
       useNativeDriver: true,
     });
