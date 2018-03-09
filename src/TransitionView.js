@@ -11,7 +11,7 @@ let uuidCount: number = 0;
 
 const styles = StyleSheet.create({
   transition: {    
-    // backgroundColor: '#FF000022'
+    backgroundColor: '#FF000022'
   },
 });
 

@@ -12,6 +12,6 @@ export const getScaleTransition = (transitionSpecification: TransitionSpecificat
     outputRange: [start, end],
   });
   return {
-    transform: [{ scaleX: scaleInterpolation }, { scaleY: scaleInterpolation }],
+    transform: [{ scale: scaleInterpolation }],
   };
 }
