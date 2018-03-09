@@ -4,6 +4,7 @@ import { View, Animated, StyleSheet, Platform, StyleSheetValidation, findNodeHan
 
 import TransitionItem from './TransitionItem';
 import { TransitionContext } from './Types';
+import * as Constants from './TransitionConstants';
 
 const uniqueBaseId: string = `transitionCompId-${Date.now()}`;
 let uuidCount: number = 0;
@@ -129,13 +130,13 @@ class Transition extends React.Component<TransitionProps> {
     const myDirection = getDirection(this._getName(), this._route);
     if(myDirection === 1)
       return { opacity: visibilityProgress.interpolate({
-          inputRange:[0, 0.0001, 1],
-          outputRange: [1, 0, 0]
+          inputRange:[0, 0.0001, 0.009, 1],
+          outputRange: [1, 1, 0, 0]
         }) 
       };
     return { opacity: visibilityProgress.interpolate({
-        inputRange:[0, 0.999, 0.9999, 1],
-        outputRange: [0, 0, 1, 1]
+        inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE,
+        outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE
       }) 
     };
   }

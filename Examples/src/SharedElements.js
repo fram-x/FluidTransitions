@@ -72,7 +72,7 @@ const Circle = (props) => (
 const Screen1 = () => (
   <View style={styles.container}>
     <Transition appear="scale">
-      <Text>Screen 1</Text>
+      <Text>1.Screen</Text>
     </Transition>
     <View style={styles.screen1}>
       <Transition shared="circle">
@@ -98,7 +98,7 @@ const Screen1 = () => (
 const Screen2 = () => (
   <View style={styles.container}>
     <Transition appear="scale">
-      <Text>Screen 2</Text>
+      <Text>2.Screen</Text>
     </Transition>
     <View style={styles.screen2}>
       <Transition shared="circle">
@@ -124,29 +124,55 @@ const Screen2 = () => (
 class Screen extends React.Component<any> {
   constructor(props) {
     super(props);
-    this._progress = new Animated.Value(0);
+    this._value = 0;
+    this._progress = new Animated.Value(this._value);
     this._animate = this._animate.bind(this);
+    this._increase = this._increase.bind(this);
+    this._decrease = this._decrease.bind(this);
     this._toggled = false;
+    this._step = 0.0001;
   }
+
+  _value: number;
   _progress: Animated.Value;
   _toggled: boolean;
+  _slider: ?Slider;
   _animation: ?Animated.CompositeAnimation;
+  _step: number;
+
+  _increase = () => {
+    if (this._value < 1.0 - this._step) {
+      this._value += this._step;
+      this._progress.setValue(this._value);
+      console.log(this._value);
+    }
+  };
+  _decrease = () => {
+    if (this._value > this._step) {
+      this._value -= this._step;
+      this._progress.setValue(this._value);
+      console.log(this._value);
+    }
+  };
   _animate = () => {
     if (this._animation) {
       this._animation.stop();
     }
-
+    const toValue = this._toggled ? 0 : 1;
     this._animation = Animated.timing(this._progress, {
-      toValue: this._toggled ? 0 : 1,
-      duration: 1000,
+      toValue,
+      duration: 3000,
       easing: Easing.out(Easing.poly(4)),
       useNativeDriver: true,
     });
+
     this._animation.start(() => {
       this._animation = null;
       this._toggled = !this._toggled;
+      this._value = toValue;
     });
   }
+
   render() {
     return (
       <TransitionView style={{ flex: 1 }} progress={this._progress}>
@@ -157,15 +183,27 @@ class Screen extends React.Component<any> {
         <TransitionRouteView route="screen2" style={{ flex: 1 }}>
           <Screen2 />
         </TransitionRouteView>
-        <View style={{ justifyContent: 'center', padding: 10, paddingLeft: 20, paddingRight: 20, backgroundColor: '#ECECEC' }} >
+        <View style={{ justifyContent: 'center',
+          padding: 10,
+          paddingLeft: 20,
+          paddingRight: 20,
+          backgroundColor: '#ECECEC' }}
+        >
           <Slider
             minimumValue={0}
             maximumValue={100}
             step={1}
-            onValueChange={val => this._progress.setValue(val * 0.01)}
-            // value={this._progress}
+            ref={(ref) => this._slider = ref}
+            onValueChange={val => {
+              this._value = val * 0.01;
+              this._progress.setValue(this._value);
+            }}
           />
-          <Button title="Animate" onPress={this._animate} />
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <Button title="<" onPress={this._decrease} />
+            <Button title="Animate" onPress={this._animate} />
+            <Button title=">" onPress={this._increase} />
+          </View>
         </View>
       </TransitionView>
     );

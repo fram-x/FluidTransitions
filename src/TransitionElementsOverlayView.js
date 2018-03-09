@@ -5,14 +5,14 @@ import PropTypes from 'prop-types';
 import TransitionItem from './TransitionItem';
 import { TransitionConfiguration, TransitionContext, TransitionSpecification } from './Types';
 import {
-  ScaleTransition,
-  TopTransition,
-  BottomTransition,
-  LeftTransition,
-  RightTransition,
-  HorizontalTransition,
-  VerticalTransition,
-  BaseTransition }
+  getScaleTransition,
+  getTopTransition,
+  getBottomTransition,
+  getLeftTransition,
+  getRightTransition,
+  getHorizontalTransition,
+  getVerticalTransition
+}
   from './Transitions';
 
 const styles: StyleSheet.NamedStyles = StyleSheet.create({
@@ -29,22 +29,25 @@ const styles: StyleSheet.NamedStyles = StyleSheet.create({
   },
 });
 
-const transitionTypes: Array<TransitionEntry> = [];
-
-export function registerTransitionType(
+type TransitionEntry = {
   name: string,
-  transitionClass: BaseTransition,
-): TransitionEntry {
-  transitionTypes.push({ name, transitionClass });
+  transitionFunction: Function
 }
 
-registerTransitionType('scale', ScaleTransition);
-registerTransitionType('top', TopTransition);
-registerTransitionType('bottom', BottomTransition);
-registerTransitionType('left', LeftTransition);
-registerTransitionType('right', RightTransition);
-registerTransitionType('horizontal', HorizontalTransition);
-registerTransitionType('vertical', VerticalTransition);
+const transitionTypes: Array<TransitionEntry> = [];
+
+// This function can be called to register other transition functions
+export function registerTransitionType(name: string, transitionFunction: Function): TransitionEntry {
+  transitionTypes.push({ name, transitionFunction });
+}
+
+registerTransitionType('scale', getScaleTransition);
+registerTransitionType('top', getTopTransition);
+registerTransitionType('bottom', getBottomTransition);
+registerTransitionType('left', getLeftTransition);
+registerTransitionType('right', getRightTransition);
+registerTransitionType('horizontal', getHorizontalTransition);
+registerTransitionType('vertical', getVerticalTransition);
 
 type TransitionElementsOverlayViewProps = {
   fromRoute: string,
@@ -61,8 +64,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
   }
 
   _isMounted: boolean;
-  _transitionElements: Array<TransitionItem>
-  _transitionHelper: any
+  _transitionElements: Array<TransitionItem>  
 
   render() {
     if(!this.props.transitionElements || !this.getMetricsReady()) {
@@ -101,8 +103,8 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
 
     const progress = getTransitionProgress(item.name, item.route);
     if(progress) {      
-      const transitionHelper = this.getTransitionHelper(item.appear);
-      if (transitionHelper) {
+      const transitionFunction = this.getTransitionFunction(item.appear);
+      if (transitionFunction) {
         const transitionSpecification: TransitionSpecification = {
           progress,
           name: item.name,
@@ -112,18 +114,18 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
           reverse: getReverse(item.name, item.route),
           dimensions: Dimensions.get('window'),
         };
-        const transitionStyle = transitionHelper.getTransitionStyle(transitionSpecification);
+        const transitionStyle = transitionFunction(transitionSpecification);
         return transitionStyle;
       }
     }
     return { };
   }
 
-  getTransitionHelper(appear) {
+  getTransitionFunction(appear) {
     if (appear) {
       const transitionType = transitionTypes.find(e => e.name === appear);
       if (transitionType) {
-        return new transitionType.transitionClass();
+        return transitionType.transitionFunction;
       }
     }
     return null;

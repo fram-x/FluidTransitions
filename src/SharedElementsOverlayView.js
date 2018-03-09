@@ -14,7 +14,7 @@ const styles: StyleSheet.NamedStyles = StyleSheet.create({
     bottom: 0,
   },
   sharedElement: {
-    position: 'absolute',
+    position: 'absolute',    
     padding: 0,
     margin: 0,
   },

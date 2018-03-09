@@ -6,10 +6,12 @@ import TransitionItem from './TransitionItem';
 import { TransitionConfiguration, TransitionContext } from './Types';
 import SharedElementsOverlayView from './SharedElementsOverlayView';
 import TransitionElementsOverlayView from './TransitionElementsOverlayView';
+import * as Constants from './TransitionConstants';
 
 const styles: StyleSheet.NamedStyles = StyleSheet.create({
   overlay: {
     position: 'absolute',
+    backgroundColor: '#EC000022',
     top: 0,
     left: 0,
     right: 0,
@@ -56,10 +58,10 @@ class TransitionOverlayView extends React.Component<TransitionOverlayViewProps> 
     const visibilityProgress = getTransitionProgress();
     return {
       opacity: visibilityProgress.interpolate({
-        inputRange:[0, 0.0001, 0.9999, 1],
-          outputRange: [0, 1, 1, 0]
-      })
-    };
+          inputRange: Constants.OVERLAY_VIEWS_VISIBILITY_INPUT_RANGE,
+          outputRange: Constants.OVERLAY_VIEWS_VISIBILITY_OUTPUT_RANGE
+        })
+      };
   }
 
   componentDidMount() {

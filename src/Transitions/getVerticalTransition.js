@@ -1,28 +1,26 @@
-import BaseTransition from './BaseTransition';
 import { TransitionSpecification } from './../Types/TransitionSpecification';
 
-class HorizontalTransition extends BaseTransition {
-  getTransitionStyle(transitionSpecification: TransitionSpecification) {
-    if (!transitionSpecification || transitionSpecification.metrics === undefined)
-      return {};
-
+export const getVerticalTransition = (transitionSpecification: TransitionSpecification) => {
+  if(!transitionSpecification || transitionSpecification.metrics === undefined)
+    return { };
+      
     const { metrics, dimensions } = transitionSpecification;
-    const { x, width } = metrics;
+    const { y, height } = metrics;
     
     let start = 0;
     let end = 0;
     if(transitionSpecification.reverse === false && transitionSpecification.direction === 1){
-      start = dimensions.width + 25;
+      start = dimensions.height + 25;
       end = 0;
     } else if(transitionSpecification.reverse === true && transitionSpecification.direction === 1){
       start = 0;
-      end = -(dimensions.width + 25);
+      end = -(dimensions.height + 25);
     } else if(transitionSpecification.reverse === false && transitionSpecification.direction === -1){
-      start = -(dimensions.width + 25);
+      start = -(dimensions.height + 25);
       end = 0;
     } else if(transitionSpecification.reverse === true && transitionSpecification.direction === -1){
       start = 0;
-      end = dimensions.width - 25;
+      end = dimensions.height - 25;
     }
         
     const transitionProgress = transitionSpecification.progress.interpolate({
@@ -30,8 +28,5 @@ class HorizontalTransition extends BaseTransition {
       outputRange: [start, end]
     });
 
-    return { transform: [{ translateX: transitionProgress }] };
-  }
+  return { transform: [{ translateY: transitionProgress }] };
 }
-
-export default HorizontalTransition;

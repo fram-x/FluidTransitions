@@ -1,12 +1,11 @@
-import ScaleTransition from './ScaleTransitions';
-import TopTransition from './TopTransition';
-import BottomTransition from './BottomTransition';
-import LeftTransition from './LeftTransition';
-import RightTransition from './RightTransition';
-import HorizontalTransition from './HorizontalTransition';
-import VerticalTransition from './VerticalTransition';
-import BaseTransition from './BaseTransition';
+import { getScaleTransition } from './getScaleTransitions';
+import { getTopTransition } from './getTopTransition';
+import { getBottomTransition } from './getBottomTransition';
+import { getLeftTransition } from './getLeftTransition';
+import { getRightTransition } from './getRightTransition';
+import { getHorizontalTransition } from './getHorizontalTransition';
+import { getVerticalTransition } from './getVerticalTransition';
 
-export { ScaleTransition, TopTransition, BottomTransition,
-  LeftTransition, RightTransition, HorizontalTransition,
-  VerticalTransition, BaseTransition };
+export { getScaleTransition, getTopTransition, getBottomTransition,
+  getLeftTransition, getRightTransition, getHorizontalTransition,
+  getVerticalTransition };
