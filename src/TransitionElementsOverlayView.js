@@ -14,6 +14,7 @@ import {
   getVerticalTransition
 }
   from './Transitions';
+import * as Constants from './TransitionConstants';
 
 const styles: StyleSheet.NamedStyles = StyleSheet.create({
   overlay: {
@@ -74,9 +75,30 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     }
 
     if(this._transitionElements.length === 0) {
+      const { getDirection } = this.context;
+      if(!getDirection)
+        return [];
+
+      let delayCountFrom = this.props.transitionElements.reduce((prevValue, item) => 
+        item.delay && getDirection(item.name, item.route) === 1 ? prevValue + 1: prevValue, 0);
+
+      let delayCountTo = this.props.transitionElements.reduce((prevValue, item) => 
+        item.delay && getDirection(item.name, item.route) === -1 ? prevValue + 1: prevValue, 0);
+
+      let delayIndexFrom = 0;
+      let delayIndexTo = delayCountTo-1;
+
       this._transitionElements = this.props.transitionElements.map((item, idx) => {
         let element = React.Children.only(item.reactElement.props.children);
-        return this.getAnimatedComponent(element, idx, this.getStyle(item));
+        const direction = getDirection(item.name, item.route);
+        const comp = this.getAnimatedComponent(element, idx, 
+          this.getStyle(item, direction === 1 ? delayCountFrom : delayCountTo, 
+            direction === 1 ? delayIndexFrom : delayIndexTo));
+
+        if(item.delay) {
+          direction === 1 ? delayIndexFrom++ : delayIndexTo--;
+        }
+        return comp;
       });
     }
 
@@ -87,17 +109,17 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     );
   }
 
-  getStyle(item: TransitionItem) {
-    return {      
+  getStyle(item: TransitionItem, delayCount: number, delayIndex: number) {
+    return {
       left: item.metrics.x,
       top: item.metrics.y,
       width: item.metrics.width,
       height: item.metrics.height,
-      ...this.getTransitionStyle(item)
+      ...this.getTransitionStyle(item, delayCount, delayIndex)
     };
   }
 
-  getTransitionStyle(item: TransitionItem) {
+  getTransitionStyle(item: TransitionItem, delayCount: number, delayIndex: number) {
     const { getTransitionProgress, getMetrics, getDirection, getReverse, } = this.context;
     if (!getTransitionProgress || !getMetrics || !getDirection || !getReverse )
       return {};
@@ -106,14 +128,37 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     if(progress) {
       const transitionFunction = this.getTransitionFunction(item.appear);
       if (transitionFunction) {
+        // Calculate start/end to handle delayed transitions
+        let start = Constants.TRANSITION_PROGRESS_START;
+        let end = Constants.TRANSITION_PROGRESS_END;
+        const direction = getDirection(item.name, item.route);
+        const distance = 1.0 - (Constants.TRANSITION_PROGRESS_START +
+          (1.0 - Constants.TRANSITION_PROGRESS_END));
+
+        if(item.delay){
+          const delayStep = distance / delayCount;
+          start = start + (delayStep * delayIndex);
+         // end = start + delayStep;
+        }
+        else {
+          // Start/stop first/last half of transition
+          if(direction === 1) {
+            end -= distance * 0.5;
+          } else {
+            start += distance * 0.5;
+          }          
+        }
+
         const transitionSpecification: TransitionSpecification = {
           progress,
           name: item.name,
           route: item.route,
           metrics: item.metrics,
-          direction: getDirection(item.name, item.route),
+          direction: direction,
           reverse: getReverse(item.name, item.route),
           dimensions: Dimensions.get('window'),
+          start,
+          end
         };
         const transitionStyle = transitionFunction(transitionSpecification);
         return transitionStyle;

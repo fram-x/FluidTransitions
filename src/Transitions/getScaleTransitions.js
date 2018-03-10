@@ -7,17 +7,17 @@ export const getScaleTransition = (transitionSpecification: TransitionSpecificat
     return { opacity: 0 };
   }
   // When scaling we need to handle Android's scaling issues
-  let start = transitionSpecification.reverse ? 1 : 0.005;
-  let end = transitionSpecification.reverse ? 0.005 : 1;
+  let startPosition = transitionSpecification.reverse ? 1 : 0.005;
+  let endPosition = transitionSpecification.reverse ? 0.005 : 1;
 
   if(Platform.OS === 'ios'){
-    start = transitionSpecification.reverse ? 1 : 0;
-    end = transitionSpecification.reverse ? 0 : 1;
+    startPosition = transitionSpecification.reverse ? 1 : 0;
+    endPosition = transitionSpecification.reverse ? 0 : 1;
   }
-
-  const scaleInterpolation = transitionSpecification.progress.interpolate({
-    inputRange: [0, 1],
-    outputRange: [start, end],
+  const { progress, start, end } = transitionSpecification;
+  const scaleInterpolation = progress.interpolate({
+    inputRange: [0, start, end, 1],
+    outputRange: [startPosition, startPosition, endPosition, endPosition],
   });
 
   return { transform: [

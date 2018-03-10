@@ -80,15 +80,15 @@ const Screen1 = () => (
       </Transition>
     </View>
     <View style={{ flexDirection: 'row' }}>
-      <Transition appear="horizontal">
+      <Transition appear="horizontal" delay>
         <Circle background="#55AA55" size={20} />
       </Transition>
       <View style={{ width: 20 }} />
-      <Transition appear="horizontal">
+      <Transition appear="horizontal" delay>
         <Circle background="#55AA55" size={20} />
       </Transition>
       <View style={{ width: 20 }} />
-      <Transition appear="horizontal">
+      <Transition appear="horizontal" delay>
         <Circle background="#55AA55" size={20} />
       </Transition>
     </View>
@@ -106,15 +106,15 @@ const Screen2 = () => (
       </Transition>
     </View>
     <View style={{ flexDirection: 'row' }}>
-      <Transition appear="horizontal">
+      <Transition appear="horizontal" delay>
         <Circle background="#55AA55" size={20} />
       </Transition>
       <View style={{ width: 20 }} />
-      <Transition appear="horizontal">
+      <Transition appear="horizontal" delay>
         <Circle background="#55AA55" size={20} />
       </Transition>
       <View style={{ width: 20 }} />
-      <Transition appear="horizontal">
+      <Transition appear="horizontal" delay>
         <Circle background="#55AA55" size={20} />
       </Transition>
     </View>
@@ -168,7 +168,8 @@ class Screen extends React.Component<any> {
     const toValue = this._toggled ? 0 : 1;
     this._animation = Animated.timing(this._progress, {
       toValue,
-      duration: 450,
+      duration: 1500,
+      easing: Easing.inOut(Easing.poly(4)),
       useNativeDriver: true,
     });
 

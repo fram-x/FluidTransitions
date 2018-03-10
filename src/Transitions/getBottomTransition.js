@@ -4,12 +4,12 @@ export const getBottomTransition = (transitionSpecification: TransitionSpecifica
   if (!transitionSpecification || transitionSpecification.metrics === undefined) {
     return {};
   }
-  const { metrics, dimensions } = transitionSpecification;
+  const { start, end, metrics, reverse, dimensions } = transitionSpecification;
   const { y, height } = metrics;
   const distanceValue = dimensions.height - (y + 25);
   const progress = transitionSpecification.progress.interpolate({
-    inputRange: [0, 1],
-    outputRange: transitionSpecification.reverse ? [0, distanceValue] : [distanceValue, 0],
+    inputRange: [0, start, end, 1],
+    outputRange: reverse ? [0, 0, distanceValue, distanceValue] : [distanceValue, distanceValue, 0, 0],
   });
 
   return { transform: [{ translateY: progress }] };

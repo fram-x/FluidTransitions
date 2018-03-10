@@ -4,28 +4,28 @@ export const getHorizontalTransition = (transitionSpecification: TransitionSpeci
   if (!transitionSpecification || transitionSpecification.metrics === undefined)
     return {};
 
-  const { metrics, dimensions } = transitionSpecification;
+  const { start, end, metrics, dimensions } = transitionSpecification;
   const { x, width } = metrics;
   
-  let start = 0;
-  let end = 0;
+  let startPosition = 0;
+  let endPosition = 0;
   if(transitionSpecification.reverse === false && transitionSpecification.direction === 1){
-    start = dimensions.width + 25;
-    end = 0;
+    startPosition = dimensions.width + 25;
+    endPosition = 0;
   } else if(transitionSpecification.reverse === true && transitionSpecification.direction === 1){
-    start = 0;
-    end = -(dimensions.width + 25);
+    startPosition = 0;
+    endPosition = -(dimensions.width + 25);
   } else if(transitionSpecification.reverse === false && transitionSpecification.direction === -1){
-    start = -(dimensions.width + 25);
-    end = 0;
+    startPosition = -(dimensions.width + 25);
+    endPosition = 0;
   } else if(transitionSpecification.reverse === true && transitionSpecification.direction === -1){
-    start = 0;
-    end = dimensions.width - 25;
+    startPosition = 0;
+    endPosition = dimensions.width - 25;
   }
       
   const transitionProgress = transitionSpecification.progress.interpolate({
-    inputRange: [0, 1],
-    outputRange: [start, end]
+    inputRange: [0, start, end, 1],
+    outputRange: [startPosition, startPosition, endPosition, endPosition]
   });
 
   return { transform: [{ translateX: transitionProgress }] };
