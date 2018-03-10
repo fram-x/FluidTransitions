@@ -10,7 +10,7 @@ const uniqueBaseId: string = `transitionCompId-${Date.now()}`;
 let uuidCount: number = 0;
 
 const styles = StyleSheet.create({
-  transition: {
+  transition: {    
   },
 });
 
@@ -126,16 +126,16 @@ class Transition extends React.Component<TransitionProps> {
     const { getVisibilityProgress, getDirection } = this.context;
     if (!getVisibilityProgress || !getDirection) return {};
     const visibilityProgress = getVisibilityProgress(this._getName(), this._route);
-    const myDirection = getDirection(this._getName(), this._route);
-    if(myDirection === 1)
+    const direction = getDirection(this._getName(), this._route);
+    if(direction === 1)
       return { opacity: visibilityProgress.interpolate({
-          inputRange:[0, 0.0001, 0.009, 1],
-          outputRange: [1, 1, 0, 0]
+        inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_IN,
+        outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE_ANIM_IN
         })
       };
     return { opacity: visibilityProgress.interpolate({
-        inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE,
-        outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE
+        inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_OUT,
+        outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE_ANIM_OUT
       })
     };
   }

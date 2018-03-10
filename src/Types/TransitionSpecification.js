@@ -8,5 +8,5 @@ export type TransitionSpecification = {
   reverse: boolean,
   name: string,
   route: string,
-  dimensions: ScaledSize
+  dimensions: ScaledSize,
 }

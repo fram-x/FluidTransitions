@@ -168,8 +168,7 @@ class Screen extends React.Component<any> {
     const toValue = this._toggled ? 0 : 1;
     this._animation = Animated.timing(this._progress, {
       toValue,
-      duration: 1000,
-      easing: Easing.out(Easing.poly(4)),
+      duration: 450,
       useNativeDriver: true,
     });
 
@@ -206,6 +205,7 @@ class Screen extends React.Component<any> {
               this._progress.setValue(this._value);
             }}
           />
+          <View style={{ height: 10 }} />
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
             <Button title="< <" onPress={this._decreaseMore} />
             <Button title="<" onPress={this._decrease} />

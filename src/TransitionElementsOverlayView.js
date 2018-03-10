@@ -88,7 +88,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
   }
 
   getStyle(item: TransitionItem) {
-    return {
+    return {      
       left: item.metrics.x,
       top: item.metrics.y,
       width: item.metrics.width,
