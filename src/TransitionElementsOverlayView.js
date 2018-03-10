@@ -86,7 +86,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
         item.delay && getDirection(item.name, item.route) === -1 ? prevValue + 1: prevValue, 0);
 
       let delayIndexFrom = 0;
-      let delayIndexTo = delayCountTo-1;
+      let delayIndexTo = 0;
 
       this._transitionElements = this.props.transitionElements.map((item, idx) => {
         let element = React.Children.only(item.reactElement.props.children);
@@ -96,7 +96,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
             direction === 1 ? delayIndexFrom : delayIndexTo));
 
         if(item.delay) {
-          direction === 1 ? delayIndexFrom++ : delayIndexTo--;
+          direction === 1 ? delayIndexFrom++ : delayIndexTo++;
         }
         return comp;
       });
@@ -132,20 +132,24 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
         let start = Constants.TRANSITION_PROGRESS_START;
         let end = Constants.TRANSITION_PROGRESS_END;
         const direction = getDirection(item.name, item.route);
-        const distance = 1.0 - (Constants.TRANSITION_PROGRESS_START +
-          (1.0 - Constants.TRANSITION_PROGRESS_END));
+        const distance = (1.0 - (Constants.TRANSITION_PROGRESS_START +
+          (1.0 - Constants.TRANSITION_PROGRESS_END))) * 0.5;
 
         if(item.delay){
           const delayStep = distance / delayCount;
-          start = start + (delayStep * delayIndex);
-         // end = start + delayStep;
+          if(direction === 1) {
+            start = start + (delayStep * delayIndex);
+          } else {
+            end = end - (delayStep * delayIndex);
+          }
+          //end -= distance;
         }
         else {
           // Start/stop first/last half of transition
           if(direction === 1) {
-            end -= distance * 0.5;
+            end -= distance;
           } else {
-            start += distance * 0.5;
+            start += distance;
           }          
         }
 
