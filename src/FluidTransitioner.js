@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, View, Text, InteractionManager, Platform, Easing, Animated } from 'react-native';
-import { addNavigationHelpers } from 'react-navigation';
+import { addNavigationHelpers, Transitioner } from 'react-navigation';
 
-import Transitioner from './BaseTransitioner';
 import TransitionItemsView from './TransitionItemsView';
+import TransitionRouteView from './TransitionRouteView';
 
 const styles = StyleSheet.create({
   container: {
@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
   }
 });
 
-class FluidTransitioner extends React.Component {
+class FluidTransitioner extends React.Component<*> {
   _transitionItemsView: any;
 
   static childContextTypes = {
@@ -49,8 +49,6 @@ class FluidTransitioner extends React.Component {
     return (
       <Transitioner
         configureTransition={this._configureTransition.bind(this)}
-        onTransitionStart={this._onTransitionStart.bind(this)}
-        onTransitionEnd={this._onTransitionEnd.bind(this)}
         render={this._render.bind(this)}
         navigation={this.props.navigation}
       />
@@ -61,77 +59,11 @@ class FluidTransitioner extends React.Component {
     return this.props !== nextProps;
   }
 
-  async componentDidMount() {
-   const runAppearAnimations = async () => {
-      if (!this._transitionItemsView) {
-        return;
-      }
-
-      // Build properties
-      const config = this._configureTransition();
-      const { state } = this.props.navigation;
-      const progress = new Animated.Value(0);
-      const props = {
-        index: state.index,
-        progress,
-        navigation: this.props.navigation,
-        scene: {
-          index: 1,
-          route: state.routes[state.index],
-        },
-      };
-
-      // Start transition
-      const animations = [];
-      await this._transitionItemsView.onTransitionStart(props, null, config, animations);
-      if (animations.length === 0) {
-        this._transitionItemsView.onTransitionEnd(props, null, config)
-        return;
-      }
-      const animationsToRun = [];
-      animations.forEach(ad => animationsToRun.push(ad.animation));
-
-      // Run animation
-      const { timing } = config;
-      delete config.timing;
-      Animated.parallel(animationsToRun).start(async () =>
-        this._transitionItemsView.onTransitionEnd(props, null, config))
-    }
-
-    if(Platform.OS === 'android')
-      InteractionManager.runAfterInteractions(runAppearAnimations);
-    else
-      setTimeout(runAppearAnimations, 200);
-  }
-
-  _onTransitionStart(props, prevProps, animations) {
-
-    //const config = this._configureTransition();
-    //return this._transitionItemsView.onTransitionStart(props, prevProps, config, animations);
-  }
-
-  async _onTransitionEnd(props, prevProps) {
-    const config = this._configureTransition();
-    // Fix issue with nativeDriver and position
-    // https://github.com/react-navigation/react-navigation/issues/3157
-    if (this._configureTransition().useNativeDriver) {
-      props.position.setValue(props.navigation.state.index);
-    }
-
-    await this._transitionItemsView.onTransitionEnd(props, prevProps, config);
-
-    if(this.props.onTransitionEnd)
-      this.props.onTransitionEnd();
-  }
-
   _configureTransition() {
     return {
       timing: Animated.timing,
-      stiffness: 1400,
-      damping: 85,
-      mass: 3,
-      duration: 2350,
-      easing: Easing.elastic(1.2),
+      duration: 3350,
+      easing: Easing.inOut(Easing.poly(4)),
       ...this.props.transitionConfig,
       isInteraction: true,
       useNativeDriver: true,
@@ -139,14 +71,19 @@ class FluidTransitioner extends React.Component {
   }
 
   _render(props, prevProps) {
-    console.log("======");
     const scenes = props.scenes.map(scene => this._renderScene({ ...props, scene }, prevProps));
+    const toRoute = props.scene.route.routeName;
+    const fromRoute = prevProps ? prevProps.scene.route.routeName : null;
+    const index = props.scene.index;
+
     return (
       <TransitionItemsView
         navigation={this.props.navigation}
         ref={ref => this._transitionItemsView = ref}
-        transitionProps={props}
-        prevTransitionProps={prevProps}
+        progress={props.position}
+        fromRoute={fromRoute}
+        toRoute={toRoute}
+        index={index}
       >
         {scenes}
       </TransitionItemsView>
@@ -156,28 +93,17 @@ class FluidTransitioner extends React.Component {
   _renderScene(transitionProps, prevProps) {
     const { position, scene } = transitionProps;
     const { index } = scene;
-    console.log("SCENE " + index);
-
-    let diff = 0;
-    if (prevProps) { diff = (index - position.__getValue())};
-    let opacity = 0.0;
-    if (diff <= 1 && diff >= -1) {
-      opacity = position.interpolate({
-        inputRange: [index - 1, index - 0.0001, index, index + 0.9999, index + 1],
-        outputRange: [0, 1, 1, 1, 0],
-      });
-    }
-
     const navigation = this._getChildNavigation(scene);
     const Scene = this.props.router.getComponentForRouteName(scene.route.routeName);
 
     return (
-      <Animated.View
+      <TransitionRouteView
+        style={styles.scene}
         key={transitionProps.scene.route.key}
-        style={[styles.scene, { opacity}]}
+        route={scene.route.routeName}
       >
           <Scene navigation={navigation}/>
-      </Animated.View>
+      </TransitionRouteView>
     );
   }
 

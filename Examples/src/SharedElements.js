@@ -182,14 +182,23 @@ class Screen extends React.Component<any> {
 
   render() {
     return (
-      <TransitionView style={{ flex: 1 }} progress={this._progress}>
+      <TransitionView
+        style={{ flex: 1 }}
+        index={0}
+        progress={this._progress}
+        fromRoute="screen1"
+        toRoute="screen2"
+      >
         <TransitionRouteView route="screen1" style={{ flex: 1 }}>
           <Screen1 />
         </TransitionRouteView>
+
         <View style={{ height: 1, backgroundColor: '#AAA' }} />
+
         <TransitionRouteView route="screen2" style={{ flex: 1 }}>
           <Screen2 />
         </TransitionRouteView>
+
         <View style={{ justifyContent: 'center',
           padding: 10,
           paddingLeft: 20,

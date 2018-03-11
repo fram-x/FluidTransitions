@@ -17,7 +17,10 @@ type TransitionItemsViewState = {
 
 type TransitionItemsViewProps = {
   children: Array<any>,
-  progress: number | Animated.Value,
+  progress: Animated.Value,
+  fromRoute: string,
+  toRoute: string,
+  index: number
 }
 
 export default class TransitionItemsView extends React.Component<
@@ -25,7 +28,6 @@ export default class TransitionItemsView extends React.Component<
   constructor(props) {
     super(props);
     this._isMounted = false;
-    this._overlayView = null;
     this._viewRef = null;
     this.state = {
       toRoute: null,
@@ -36,12 +38,9 @@ export default class TransitionItemsView extends React.Component<
     };
     this._transitionItems = new TransitionItems();
     this._onLayoutResolvePromise = new Promise(resolve => this._onLayoutResolve = resolve);
-
-    if (props.progress instanceof Animated.Value)
-      this._transitionProgress = props.progress;
+    this._transitionProgress = props.progress;    
   }
 
-  _overlayView: ?TransitionOverlayView;
   _viewRef: ?View;
   _transitionItems: TransitionItems;
   _isMounted: boolean;
@@ -49,9 +48,40 @@ export default class TransitionItemsView extends React.Component<
   _onLayoutResolvePromise: Promise<void>;
   _transitionProgress: Animated.Value;
 
-  componentWillReceiveProps(nextProps) {
-    if(this._transitionProgress != nextProps.progress)
-      this._transitionProgress.setValue(nextProps.progress * 0.01);
+  async componentWillReceiveProps(nextProps) {
+    if(nextProps.toRoute != this.props.toRoute ||
+      nextProps.fromRoute != this.props.fromRoute) {
+
+      await this.updateFromProps(nextProps, this.props);
+    }
+  }
+
+  async updateFromProps(props, prevProps) {
+    if(!this._isMounted) return;
+    const indexHasChanged = props.index != (prevProps ? prevProps.index : -1);
+    if(!indexHasChanged) return;
+
+    const sharedElements = this._transitionItems.getSharedElements(
+      props.fromRoute, props.toRoute);
+
+    const transitionElements = this._transitionItems.getTransitionElements(
+      props.fromRoute, props.toRoute);
+    
+    if(sharedElements.length === 0 && transitionElements === 0)
+      return;
+
+    const direction = props.index > (prevProps ? prevProps.index : -1) ? 1 : -1;
+
+    await this.measureItems(sharedElements, transitionElements);
+
+    this.setState({
+      ...this.state,
+      toRoute: props.toRoute,
+      fromRoute: props.fromRoute,
+      direction,
+      sharedElements,
+      transitionElements,
+    });
   }
 
   render() {
@@ -62,7 +92,6 @@ export default class TransitionItemsView extends React.Component<
         onLayout={this.onLayout.bind(this)}>
         {this.props.children}
         <TransitionOverlayView
-          ref={(ref) => this._overlayView = ref}
           transitionElements={this.state.transitionElements}
           sharedElements={this.state.sharedElements}
           direction={this.state.direction}
@@ -88,14 +117,11 @@ export default class TransitionItemsView extends React.Component<
     await this.measureItem(viewMetrics, item)
   }
 
-  getMetrics(name: string, route: string): Metrics {
-    const item = this._transitionItems.getItemByNameAndRoute(name, route);
-    return item.metrics;
-  }
-
   getDirection(name: string, route: string): number {
-    if (!this.state.fromRoute) { return 0; }
-    return this.state.fromRoute === route ? 1 : -1;
+    if (!this.state.toRoute) { return 0; }
+    return this.state.fromRoute ? 
+      (this.state.fromRoute === route ? 1 : -1) : 
+      (this.state.fromRoute === route ? -1 : 1);
   }
 
   getReverse(name: string, route: string): boolean {
@@ -105,6 +131,7 @@ export default class TransitionItemsView extends React.Component<
   async getViewMetrics(): Metrics {
     let viewMetrics: Metrics;
     const nodeHandle = findNodeHandle(this._viewRef);
+    if(!nodeHandle) return viewMetrics;
 
     const promise = new Promise(resolve => {
       UIManager.measureInWindow(nodeHandle, (x, y, width, height) => {
@@ -141,9 +168,11 @@ export default class TransitionItemsView extends React.Component<
 
     const self = this;
     const nodeHandle = item.getNodeHandle();
+    if(!nodeHandle) return;
+
     return new Promise((resolve, reject) => {
       UIManager.measureInWindow(nodeHandle, (x, y, width, height) => {
-        item.metrics = { x: x - viewMetrics.x, y: y - viewMetrics.y, width, height };        
+        item.metrics = { x: x - viewMetrics.x, y: y - viewMetrics.y, width, height };
         resolve();
       });
     });
@@ -154,30 +183,7 @@ export default class TransitionItemsView extends React.Component<
     InteractionManager.runAfterInteractions(async ()=> {
       // Wait for layouts
       await this._onLayoutResolvePromise;
-
-      // Get routes
-      const routes = this._transitionItems.getRoutes();
-      const sharedElements = this._transitionItems.getSharedElements(
-        routes.fromRoute, routes.toRoute);
-      const transitionElements = this._transitionItems.getTransitionElements(
-        routes.fromRoute, routes.toRoute);
-
-      if(sharedElements.length === 0 && transitionElements === 0)
-        return;
-
-      const direction = 1; // TODO: Fix?
-
-      await this.measureItems(sharedElements, transitionElements);
-
-      this.setState({
-        ...this.state,
-        toRoute: routes.toRoute,
-        fromRoute: routes.fromRoute,
-        direction,
-        progress: this._transitionProgress,
-        sharedElements,
-        transitionElements,
-      });
+      await this.updateFromProps(this.props);
     });
   }
 
@@ -193,7 +199,6 @@ export default class TransitionItemsView extends React.Component<
     getTransitionProgress: PropTypes.func,
     getDirection: PropTypes.func,
     getReverse: PropTypes.func,
-    getMetrics: PropTypes.func
   }
 
   getChildContext() {
@@ -205,7 +210,6 @@ export default class TransitionItemsView extends React.Component<
       getTransitionProgress: () => this._transitionProgress,
       getDirection: this.getDirection.bind(this),
       getReverse: this.getReverse.bind(this),
-      getMetrics: this.getMetrics.bind(this)
     };
   }
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { View } from 'react-native';
+import { Animated } from 'react-native';
 
 type TransitionRouteViewProps = {
   children: Array<any>,
@@ -20,9 +20,9 @@ class TransitionRouteView extends React.Component<TransitionRouteViewProps> {
 
   render() {
     return (
-      <View style={this.props.style}>
+      <Animated.View style={this.props.style}>
         {this.props.children}
-      </View>
+      </Animated.View>
     );
   }
 }

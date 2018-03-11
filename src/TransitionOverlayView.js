@@ -56,6 +56,8 @@ class TransitionOverlayView extends React.Component<TransitionOverlayViewProps> 
     const { getTransitionProgress } = this.context;
     if(!getTransitionProgress) return  {};
     const visibilityProgress = getTransitionProgress();
+    if(!visibilityProgress) return {};
+
     return {
       opacity: visibilityProgress.interpolate({
           inputRange: Constants.OVERLAY_VIEWS_VISIBILITY_INPUT_RANGE,

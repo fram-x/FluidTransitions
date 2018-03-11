@@ -79,10 +79,10 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
       if(!getDirection)
         return [];
 
-      let delayCountFrom = this.props.transitionElements.reduce((prevValue, item) => 
+      let delayCountFrom = this.props.transitionElements.reduce((prevValue, item) =>
         item.delay && getDirection(item.name, item.route) === 1 ? prevValue + 1: prevValue, 0);
 
-      let delayCountTo = this.props.transitionElements.reduce((prevValue, item) => 
+      let delayCountTo = this.props.transitionElements.reduce((prevValue, item) =>
         item.delay && getDirection(item.name, item.route) === -1 ? prevValue + 1: prevValue, 0);
 
       let delayIndexFrom = 0;
@@ -91,8 +91,8 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
       this._transitionElements = this.props.transitionElements.map((item, idx) => {
         let element = React.Children.only(item.reactElement.props.children);
         const direction = getDirection(item.name, item.route);
-        const comp = this.getAnimatedComponent(element, idx, 
-          this.getStyle(item, direction === 1 ? delayCountFrom : delayCountTo, 
+        const comp = this.getAnimatedComponent(element, idx,
+          this.getStyle(item, direction === 1 ? delayCountFrom : delayCountTo,
             direction === 1 ? delayIndexFrom : delayIndexTo));
 
         if(item.delay) {
@@ -120,8 +120,8 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
   }
 
   getTransitionStyle(item: TransitionItem, delayCount: number, delayIndex: number) {
-    const { getTransitionProgress, getMetrics, getDirection, getReverse, } = this.context;
-    if (!getTransitionProgress || !getMetrics || !getDirection || !getReverse )
+    const { getTransitionProgress, getDirection, getReverse, } = this.context;
+    if (!getTransitionProgress || !getDirection || !getReverse )
       return {};
 
     const progress = getTransitionProgress(item.name, item.route);
@@ -136,13 +136,13 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
           (1.0 - Constants.TRANSITION_PROGRESS_END))) * 0.5;
 
         if(item.delay){
+          // Start/stop in delay window
           const delayStep = distance / delayCount;
           if(direction === 1) {
             start = start + (delayStep * delayIndex);
           } else {
             end = end - (delayStep * delayIndex);
           }
-          //end -= distance;
         }
         else {
           // Start/stop first/last half of transition
@@ -150,7 +150,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
             end -= distance;
           } else {
             start += distance;
-          }          
+          }
         }
 
         const transitionSpecification: TransitionSpecification = {
@@ -163,9 +163,8 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
           dimensions: Dimensions.get('window'),
           start,
           end
-        };
-        const transitionStyle = transitionFunction(transitionSpecification);
-        return transitionStyle;
+        }
+        return transitionFunction(transitionSpecification);
       }
     }
     return { };
@@ -236,8 +235,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
   static contextTypes = {
     getTransitionProgress: PropTypes.func,
     getDirection: PropTypes.func,
-    getReverse: PropTypes.func,
-    getMetrics: PropTypes.func
+    getReverse: PropTypes.func,    
   }
 }
 

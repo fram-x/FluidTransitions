@@ -5,7 +5,7 @@ import Transition from './../TransitionView';
 
 import { CircleFunc, CircleInClass } from './../__mocks__/Components';
 
-describe('TransitionView', () => {
+describe('Transition', () => {
   it('Renders a functional component the same as a class component', () => {
     const functionalTree = renderer.create(<Transition><CircleFunc size={20} background="#FF0000" /></Transition>).toJSON();
     const classTree = renderer.create(<Transition><CircleInClass /></Transition>).toJSON();
