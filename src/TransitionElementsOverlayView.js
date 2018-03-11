@@ -164,6 +164,8 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
           start,
           end
         }
+        // console.log(item.name + "/" + item.route);
+        // console.log(transitionSpecification);
         return transitionFunction(transitionSpecification);
       }
     }
