@@ -98,7 +98,7 @@ class FluidTransitioner extends React.Component<*> {
 
     return (
       <TransitionRouteView
-        style={[styles.scene, this.getTransitionStyle(transitionProps.position, index)]}
+        style={[styles.scene, this.getOpacityStyle(transitionProps.position, index)]}
         key={transitionProps.scene.route.key}
         route={scene.route.routeName}
       >
@@ -107,9 +107,9 @@ class FluidTransitioner extends React.Component<*> {
     );
   }
 
-  getTransitionStyle(position: Animated.Value, index: number) {
+  getOpacityStyle(position: Animated.Value, index: number) {
     return { opacity: position.interpolate({
-      inputRange: [index -1, index - 0.9999, index, index + 0.9999, index + 1],
+      inputRange: [index -1, index - 0.5, index, index + 0.5, index + 1],
       outputRange: [0, 1, 1, 1, 0],
     })};
   }
