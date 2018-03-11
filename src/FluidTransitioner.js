@@ -92,19 +92,26 @@ class FluidTransitioner extends React.Component<*> {
 
   _renderScene(transitionProps, prevProps) {
     const { position, scene } = transitionProps;
-    const { index } = scene;
+    const { index } = scene;    
     const navigation = this._getChildNavigation(scene);
-    const Scene = this.props.router.getComponentForRouteName(scene.route.routeName);
+    const Scene = this.props.router.getComponentForRouteName(scene.route.routeName);    
 
     return (
       <TransitionRouteView
-        style={styles.scene}
+        style={[styles.scene, this.getTransitionStyle(transitionProps.position, index)]}
         key={transitionProps.scene.route.key}
         route={scene.route.routeName}
       >
           <Scene navigation={navigation}/>
       </TransitionRouteView>
     );
+  }
+
+  getTransitionStyle(position: Animated.Value, index: number) {
+    return { opacity: position.interpolate({
+      inputRange: [index -1, index - 0.9999, index, index + 0.9999, index + 1],
+      outputRange: [0, 1, 1, 1, 0],
+    })};
   }
 
   _getChildNavigation = (scene) => {

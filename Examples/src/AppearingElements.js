@@ -41,10 +41,10 @@ const styles = StyleSheet.create({
 
 const InitialScreen = (props) => (
   <View style={styles.container}>
-    <Transition appear="horizontal">
+    <Transition appear="scale">
       <Text style={styles.text}>Click toggle to see appearance animations.</Text>
     </Transition>
-    <Transition shared="button" appear="bottom">
+    <Transition shared="button" appear="scale">
       <View>
         <Button title="Toggle" onPress={() => props.navigation.navigate('screen')} />
       </View>
@@ -53,23 +53,23 @@ const InitialScreen = (props) => (
 );
 
 const Screen = (props) => (
-  <View style={styles.container}>
-    <Transition appear="top">
+  <View style={[styles.container, { backgroundColor: '#EF000022' }]}>
+    <Transition appear="scale">
       <View style={styles.textContainer}>
         <Text>Screen</Text>
       </View>
     </Transition>
     <View style={styles.screen}>
-      <Transition appear="left" delay>
+      <Transition appear="scale" delay>
         <View style={styles.circle} />
       </Transition>
-      <Transition appear="left" delay>
+      <Transition appear="scale" delay>
         <View style={styles.circle} />
       </Transition>
-      <Transition appear="right" delay>
+      <Transition appear="scale" delay>
         <View style={styles.circle} />
       </Transition>
-      <Transition appear="right" delay>
+      <Transition appear="scale" delay>
         <View style={styles.circle} />
       </Transition>
     </View>
