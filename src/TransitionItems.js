@@ -3,11 +3,13 @@ import { UIManager } from 'react-native';
 import TransitionItem from './TransitionItem';
 
 export default class TransitionItems {
-  constructor() {
+  constructor(itemAdded: (item: TransitionItem) => void) {
     this._items = [];		
+    this._itemAddedCallback = itemAdded;
   }
 
   _items: Array<TransitionItem>
+  _itemAddedCallback: (item: TransitionItem) => void;
   
   count(): number {
     return this._items.length;
@@ -16,8 +18,9 @@ export default class TransitionItems {
   add(item: TransitionItem): boolean {
     if(this._items.findIndex(e => e.name === item.name && e.route === item.route) >= 0)
       return false;
-
+      
     this._items = [...this._items, item];
+    this._itemAddedCallback(item);
     return true;
   }
 

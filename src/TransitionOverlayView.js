@@ -37,7 +37,7 @@ class TransitionOverlayView extends React.Component<TransitionOverlayViewProps> 
 
   _isMounted: boolean;
 
-  render() {
+  render() {    
     return (
       <Animated.View style={[styles.overlay, this.getVisibilityStyle()]} pointerEvents='none'>
         <TransitionElementsOverlayView

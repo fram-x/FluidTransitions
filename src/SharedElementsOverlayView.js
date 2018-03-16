@@ -32,63 +32,58 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
   context: TransitionContext
   constructor(props: SharedElementsOverlayViewProps, context: TransitionContext) {
     super(props, context);
-    this._isMounted = false;
-    this._sharedElements = [];
+    this._isMounted = false;    
   }
 
-  _isMounted: boolean;
-  _sharedElements: Array<any>;
+  _isMounted: boolean;  
 
   render() {
-    if(!this.props.sharedElements || !this.getMetricsReady()) {
-      this._sharedElements = [];
+    if(!this.props.sharedElements || !this.getMetricsReady()) {      
       return <View style={styles.overlay} pointerEvents='none'/>;
     }
+    
+    const self = this;
+    const sharedElements = this.props.sharedElements.map((pair, idx) => {
+      const { fromItem, toItem } = pair;
+      const transitionStyle = self.getTransitionStyle(fromItem, toItem);
 
-    if(this._sharedElements.length === 0) {
-      const self = this;
-      this._sharedElements = this.props.sharedElements.map((pair, idx) => {
-        const { fromItem, toItem } = pair;
-        const transitionStyle = self.getTransitionStyle(fromItem, toItem);
+      let element = React.Children.only(fromItem.reactElement.props.children);
+      let elementProps = element.props;
+      let animatedComponent;
+      let child;
 
-        let element = React.Children.only(fromItem.reactElement.props.children);
-        let elementProps = element.props;
-        let animatedComponent;
-        let child;
+      // Functional components should be wrapped in a view to be usable with
+      // Animated.createAnimatedComponent
+      const isFunctionalComponent = !element.type.displayName;
+      if(isFunctionalComponent) {
+        // Wrap in sourrounding view
+        element = React.createElement(element.type, element.props);
+        const wrapper = (<View/>);
+        animatedComponent = Animated.createAnimatedComponent(wrapper.type);
+        elementProps = {};
+        child = element;
+      }
+      else {
+        const wrapper = (<View/>);
+        animatedComponent = Animated.createAnimatedComponent(wrapper.type);
+        elementProps = {};
+        child = element;
+      }
 
-        // Functional components should be wrapped in a view to be usable with
-        // Animated.createAnimatedComponent
-        const isFunctionalComponent = !element.type.displayName;
-        if(isFunctionalComponent) {
-          // Wrap in sourrounding view
-          element = React.createElement(element.type, element.props);
-          const wrapper = (<View/>);
-          animatedComponent = Animated.createAnimatedComponent(wrapper.type);
-          elementProps = {};
-          child = element;
-        }
-        else {
-          const wrapper = (<View/>);
-          animatedComponent = Animated.createAnimatedComponent(wrapper.type);
-          elementProps = {};
-          child = element;
-        }
+      const props = {
+        ...element.props,
+            
+        style: [element.props.style, styles.sharedElement, transitionStyle],
+        key: idx,
+      };
 
-        const props = {
-          ...element.props,
-              
-          style: [element.props.style, styles.sharedElement, transitionStyle],
-          key: idx,
-        };
-
-        return React.createElement(animatedComponent, props, child ?
-          child : element.props.children);
-      });
-    };
+      return React.createElement(animatedComponent, props, child ?
+        child : element.props.children);
+    });    
 
     return (
       <View style={styles.overlay} pointerEvents='none'>
-        {this._sharedElements}
+        {sharedElements}
       </View>
     );
   }

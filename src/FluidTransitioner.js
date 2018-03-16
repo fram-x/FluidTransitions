@@ -62,7 +62,7 @@ class FluidTransitioner extends React.Component<*> {
   _configureTransition() {
     return {
       timing: Animated.timing,
-      duration: 3350,
+      duration: 1750,
       easing: Easing.inOut(Easing.poly(4)),
       ...this.props.transitionConfig,
       isInteraction: true,

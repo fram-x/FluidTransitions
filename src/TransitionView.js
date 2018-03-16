@@ -129,6 +129,8 @@ class Transition extends React.Component<TransitionProps> {
     const visibilityProgress = getVisibilityProgress(this._getName(), this._route);
     if(!visibilityProgress) return {};
     
+    // TODO: Check if we are a part of the transition!
+    
     const direction = getDirection(this._getName(), this._route);    
     if(direction === 1)
       return { opacity: visibilityProgress.interpolate({
