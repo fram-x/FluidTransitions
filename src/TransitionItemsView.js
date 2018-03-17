@@ -42,7 +42,7 @@ export default class TransitionItemsView extends React.Component<
 
     this._transitionItems = new TransitionItems(this._itemAdded);
     this._onLayoutResolvePromise = new Promise(resolve => this._onLayoutResolve = resolve);
-    this._transitionProgress = props.progress;
+    this._transitionProgress = props.progress;    
   }
 
   _viewRef: ?View;
@@ -143,14 +143,14 @@ export default class TransitionItemsView extends React.Component<
     await this.measureItem(viewMetrics, item)
   }
 
-  getDirection(name: string, route: string): number {
+  getDirectionForRoute(name: string, route: string): number {
     if (!this.state.toRoute) { return 0; }
     return this.state.fromRoute ?
       (this.state.fromRoute === route ? 1 : -1) :
-      (this.state.fromRoute === route ? -1 : 1);
+      (this.state.fromRoute === route ? -1 : 1);    
   }
 
-  getReverse(name: string, route: string): boolean {
+  getReverseForRoute(name: string, route: string): boolean {
     return route !== this.state.toRoute;
   }  
 
@@ -223,8 +223,9 @@ export default class TransitionItemsView extends React.Component<
     layoutReady: PropTypes.func,
     getVisibilityProgress: PropTypes.func,
     getTransitionProgress: PropTypes.func,
+    getDirectionForRoute: PropTypes.func,
     getDirection: PropTypes.func,
-    getReverse: PropTypes.func,
+    getReverseForRoute: PropTypes.func,
   }
 
   getChildContext() {
@@ -234,8 +235,9 @@ export default class TransitionItemsView extends React.Component<
       layoutReady: this.layoutReady.bind(this),
       getVisibilityProgress: ()=> this._transitionProgress,
       getTransitionProgress: () => this._transitionProgress,
-      getDirection: this.getDirection.bind(this),
-      getReverse: this.getReverse.bind(this),
+      getDirectionForRoute: this.getDirectionForRoute.bind(this),
+      getDirection: () => this.state.direction ? this.state.direction : 0,
+      getReverseForRoute: this.getReverseForRoute.bind(this),
     };
   }
 }

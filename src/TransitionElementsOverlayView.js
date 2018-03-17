@@ -72,22 +72,22 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
       return <View style={styles.overlay} pointerEvents='none'/>;
     }
 
-    const { getDirection } = this.context;
-    if(!getDirection)
+    const { getDirectionForRoute } = this.context;
+    if(!getDirectionForRoute)
       return [];
 
     let delayCountFrom = this.props.transitionElements.reduce((prevValue, item) =>
-      item.delay && getDirection(item.name, item.route) === 1 ? prevValue + 1: prevValue, 0);
+      item.delay && getDirectionForRoute(item.name, item.route) === 1 ? prevValue + 1: prevValue, 0);
 
     let delayCountTo = this.props.transitionElements.reduce((prevValue, item) =>
-      item.delay && getDirection(item.name, item.route) === -1 ? prevValue + 1: prevValue, 0);
+      item.delay && getDirectionForRoute(item.name, item.route) === -1 ? prevValue + 1: prevValue, 0);
 
     let delayIndexFrom = 0;
     let delayIndexTo = 0;
 
     const transitionElements = this.props.transitionElements.map((item, idx) => {
       let element = React.Children.only(item.reactElement.props.children);
-      const direction = getDirection(item.name, item.route);
+      const direction = getDirectionForRoute(item.name, item.route);
       const comp = this.getAnimatedComponent(element, idx,
         this.getStyle(item, direction === 1 ? delayCountFrom : delayCountTo,
           direction === 1 ? delayIndexFrom : delayIndexTo));
@@ -116,8 +116,8 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
   }
 
   getTransitionStyle(item: TransitionItem, delayCount: number, delayIndex: number) {
-    const { getTransitionProgress, getDirection, getReverse, } = this.context;
-    if (!getTransitionProgress || !getDirection || !getReverse )
+    const { getTransitionProgress, getDirectionForRoute, getReverseForRoute, } = this.context;
+    if (!getTransitionProgress || !getDirectionForRoute || !getReverseForRoute )
       return {};
 
     const progress = getTransitionProgress(item.name, item.route);
@@ -127,7 +127,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
         // Calculate start/end to handle delayed transitions
         let start = Constants.TRANSITION_PROGRESS_START;
         let end = Constants.TRANSITION_PROGRESS_END;
-        const direction = getDirection(item.name, item.route);
+        const direction = getDirectionForRoute(item.name, item.route);
         const distance = (1.0 - (Constants.TRANSITION_PROGRESS_START +
           (1.0 - Constants.TRANSITION_PROGRESS_END))) * 0.5;
 
@@ -155,13 +155,12 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
           route: item.route,
           metrics: item.metrics,
           direction: direction,
-          reverse: getReverse(item.name, item.route),
+          reverse: getReverseForRoute(item.name, item.route),
           dimensions: Dimensions.get('window'),
           start,
           end
         }
-        // console.log(item.name + "/" + item.route);
-        // console.log(transitionSpecification);
+        console.log(item.route + " " + transitionSpecification.direction);
         return transitionFunction(transitionSpecification);
       }
     }
@@ -232,8 +231,8 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
 
   static contextTypes = {
     getTransitionProgress: PropTypes.func,
-    getDirection: PropTypes.func,
-    getReverse: PropTypes.func,
+    getDirectionForRoute: PropTypes.func,
+    getReverseForRoute: PropTypes.func,
   }
 }
 

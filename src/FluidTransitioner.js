@@ -31,11 +31,21 @@ const styles = StyleSheet.create({
   }
 });
 
+const emptyFunction = ()=> {};
+
 class FluidTransitioner extends React.Component<*> {
   _transitionItemsView: any;
 
   static childContextTypes = {
     route: PropTypes.string,
+  }
+  
+  _animatedSubscribeForNativeAnimation(animatedValue: Animated.Value){
+    if(!animatedValue) return;
+    if(!this._configureTransition().useNativeDriver) return;
+    if (Object.keys(animatedValue._listeners).length === 0) {
+      animatedValue.addListener(emptyFunction);
+    }
   }
 
   getChildContext() {
@@ -71,6 +81,9 @@ class FluidTransitioner extends React.Component<*> {
   }
 
   _render(props, prevProps) {
+    this._animatedSubscribeForNativeAnimation(props.position);
+    this._animatedSubscribeForNativeAnimation(props.progress);
+
     const scenes = props.scenes.map(scene => this._renderScene({ ...props, scene }, prevProps));
     const toRoute = props.scene.route.routeName;
     const fromRoute = prevProps ? prevProps.scene.route.routeName : null;
@@ -89,13 +102,11 @@ class FluidTransitioner extends React.Component<*> {
       </TransitionItemsView>
     );
   }
-
   _renderScene(transitionProps, prevProps) {
     const { position, scene } = transitionProps;
     const { index } = scene;    
     const navigation = this._getChildNavigation(scene);
     const Scene = this.props.router.getComponentForRouteName(scene.route.routeName);    
-
     return (
       <TransitionRouteView
         style={[styles.scene, this.getOpacityStyle(transitionProps.position, index)]}
@@ -107,7 +118,7 @@ class FluidTransitioner extends React.Component<*> {
     );
   }
 
-  getOpacityStyle(position: Animated.Value, index: number) {
+  getOpacityStyle(position: Animated.Value, index: number) {    
     return { opacity: position.interpolate({
       inputRange: [index -1, index - 0.5, index, index + 0.5, index + 1],
       outputRange: [0, 1, 1, 1, 0],

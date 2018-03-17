@@ -30,7 +30,7 @@ class Transition extends React.Component<TransitionProps> {
     layoutReady: PropTypes.func,
     route: PropTypes.string,
     getVisibilityProgress: PropTypes.func,
-    getDirection: PropTypes.func
+    getDirectionForRoute: PropTypes.func
   }
 
   constructor(props: TransitionProps, context: TransitionContext) {
@@ -123,15 +123,15 @@ class Transition extends React.Component<TransitionProps> {
     return React.createElement(this._animatedComponent, props, child ? child : props.children);
   }
 
-  getVisibilityStyle() {
-    const { getVisibilityProgress, getDirection } = this.context;
-    if (!getVisibilityProgress || !getDirection) return {};
+  getVisibilityStyle() {    
+    const { getVisibilityProgress, getDirectionForRoute } = this.context;
+    if (!getVisibilityProgress || !getDirectionForRoute) return {};
     const visibilityProgress = getVisibilityProgress(this._getName(), this._route);
     if(!visibilityProgress) return {};
     
     // TODO: Check if we are a part of the transition!
     
-    const direction = getDirection(this._getName(), this._route);    
+    const direction = getDirectionForRoute(this._getName(), this._route);
     if(direction === 1)
       return { opacity: visibilityProgress.interpolate({
         inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_IN,
@@ -139,7 +139,7 @@ class Transition extends React.Component<TransitionProps> {
         })
       };
 
-    return { opacity: visibilityProgress.interpolate({
+     return { opacity: visibilityProgress.interpolate({
         inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_OUT,
         outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE_ANIM_OUT
       })
