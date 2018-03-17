@@ -2,15 +2,16 @@ import React from 'react';
 import { View, StyleSheet, UIManager, InteractionManager, Animated, findNodeHandle } from 'react-native';
 import PropTypes from 'prop-types';
 
-import { Metrics, TransitionConfiguration } from './Types';
+import { Metrics, NavigationDirection, RouteDirection } from './Types';
 import TransitionItem from './TransitionItem';
 import TransitionItems from './TransitionItems';
 import TransitionOverlayView from './TransitionOverlayView';
+import { invariant } from './Utils/invariant';
 
 type TransitionItemsViewState = {
   fromRoute: ?string,
   toRoute: ?string,
-  direction: ?number,
+  direction: NavigationDirection,
   sharedElements: ?Array<any>,
   transitionElements: ?Array<TransitionItem>
 }
@@ -35,14 +36,14 @@ export default class TransitionItemsView extends React.Component<
     this.state = {
       toRoute: null,
       fromRoute: null,
-      direction: null,
+      direction: NavigationDirection.Unknown,
       sharedElements: null,
       transitionElements: null,
     };
 
     this._transitionItems = new TransitionItems(this._itemAdded);
     this._onLayoutResolvePromise = new Promise(resolve => this._onLayoutResolve = resolve);
-    this._transitionProgress = props.progress;    
+    this._transitionProgress = props.progress;
   }
 
   _viewRef: ?View;
@@ -77,7 +78,6 @@ export default class TransitionItemsView extends React.Component<
   async componentWillReceiveProps(nextProps) {
     if(nextProps.toRoute != this.props.toRoute ||
       nextProps.fromRoute != this.props.fromRoute) {
-
       await this.updateFromProps(nextProps, this.props);
     }
   }
@@ -96,7 +96,8 @@ export default class TransitionItemsView extends React.Component<
     if(sharedElements.length === 0 && transitionElements === 0)
       return;
 
-    const direction = props.index > (prevProps ? prevProps.index : -1) ? 1 : -1;
+    const direction = props.index > (prevProps ? prevProps.index : -1) ?
+      NavigationDirection.forward : NavigationDirection.back;
 
     await this.measureItems(sharedElements, transitionElements);
 
@@ -133,26 +134,26 @@ export default class TransitionItemsView extends React.Component<
     }
   }
 
-  async layoutReady(name: string, route: string) {
-    const item = this._transitionItems.getItemByNameAndRoute(name, route);
-    if (!item || !item.metrics) {
-      // a stray element that will be removed - lets just bail out
-      return;
-    }
-    const viewMetrics = await this.getViewMetrics();
-    await this.measureItem(viewMetrics, item)
-  }
+  getDirectionForRoute(name: string, route: string): RouteDirection {
+    if(!this.state.fromRoute && !this.state.toRoute) { return RouteDirection.unknown; }
+    if (!this.state.fromRoute) { return RouteDirection.to; } // First entry, always direction 1
+    if(route === this.state.fromRoute)
+      return RouteDirection.from;
+    else if(route === this.state.toRoute)
+      return RouteDirection.to;
 
-  getDirectionForRoute(name: string, route: string): number {
-    if (!this.state.toRoute) { return 0; }
-    return this.state.fromRoute ?
-      (this.state.fromRoute === route ? 1 : -1) :
-      (this.state.fromRoute === route ? -1 : 1);    
+    invariant(true, "Route " + route + " is not part of transition!")
+    return RouteDirection.unknown;
   }
 
   getReverseForRoute(name: string, route: string): boolean {
-    return route !== this.state.toRoute;
-  }  
+    if(this.state.direction === NavigationDirection.unknown) return false;    
+    const routeDirection = this.getDirectionForRoute(name, route);
+    if(this.state.direction === NavigationDirection.forward)
+      return routeDirection === RouteDirection.from;
+    else
+      return routeDirection === RouteDirection.to;
+  }
 
   async getViewMetrics(): Metrics {
     let viewMetrics: Metrics;
@@ -220,7 +221,6 @@ export default class TransitionItemsView extends React.Component<
   static childContextTypes = {
     register: PropTypes.func,
     unregister: PropTypes.func,
-    layoutReady: PropTypes.func,
     getVisibilityProgress: PropTypes.func,
     getTransitionProgress: PropTypes.func,
     getDirectionForRoute: PropTypes.func,
@@ -232,11 +232,10 @@ export default class TransitionItemsView extends React.Component<
     return {
       register: (item) => this._transitionItems.add(item),
       unregister: (name, route) => this._transitionItems.remove(name, route),
-      layoutReady: this.layoutReady.bind(this),
       getVisibilityProgress: ()=> this._transitionProgress,
       getTransitionProgress: () => this._transitionProgress,
       getDirectionForRoute: this.getDirectionForRoute.bind(this),
-      getDirection: () => this.state.direction ? this.state.direction : 0,
+      getDirection: () => this.state.direction ? this.state.direction : NavigationDirection.unknown,
       getReverseForRoute: this.getReverseForRoute.bind(this),
     };
   }

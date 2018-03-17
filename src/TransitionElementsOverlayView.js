@@ -3,7 +3,7 @@ import { View, StyleSheet, Animated, Dimensions, Platform } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
-import { TransitionConfiguration, TransitionContext, TransitionSpecification } from './Types';
+import { TransitionContext, TransitionSpecification } from './Types';
 import {
   getScaleTransition,
   getTopTransition,
@@ -15,6 +15,7 @@ import {
 }
   from './Transitions';
 import * as Constants from './TransitionConstants';
+import { RouteDirection } from './Types';
 
 const styles: StyleSheet.NamedStyles = StyleSheet.create({
   overlay: {
@@ -77,10 +78,10 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
       return [];
 
     let delayCountFrom = this.props.transitionElements.reduce((prevValue, item) =>
-      item.delay && getDirectionForRoute(item.name, item.route) === 1 ? prevValue + 1: prevValue, 0);
+      item.delay && getDirectionForRoute(item.name, item.route) === RouteDirection.from ? prevValue + 1: prevValue, 0);
 
     let delayCountTo = this.props.transitionElements.reduce((prevValue, item) =>
-      item.delay && getDirectionForRoute(item.name, item.route) === -1 ? prevValue + 1: prevValue, 0);
+      item.delay && getDirectionForRoute(item.name, item.route) === RouteDirection.to ? prevValue + 1: prevValue, 0);
 
     let delayIndexFrom = 0;
     let delayIndexTo = 0;
@@ -127,14 +128,15 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
         // Calculate start/end to handle delayed transitions
         let start = Constants.TRANSITION_PROGRESS_START;
         let end = Constants.TRANSITION_PROGRESS_END;
-        const direction = getDirectionForRoute(item.name, item.route);
+
+        const routeDirection = getDirectionForRoute(item.name, item.route);
         const distance = (1.0 - (Constants.TRANSITION_PROGRESS_START +
           (1.0 - Constants.TRANSITION_PROGRESS_END))) * 0.5;
 
         if(item.delay){
           // Start/stop in delay window
           const delayStep = distance / delayCount;
-          if(direction === 1) {
+          if(routeDirection === 1) {
             start = start + (delayStep * delayIndex);
           } else {
             end = end - (delayStep * delayIndex);
@@ -142,25 +144,26 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
         }
         else {
           // Start/stop first/last half of transition
-          if(direction === 1) {
+          if(routeDirection === 1) {
             end -= distance;
           } else {
             start += distance;
           }
         }
 
+        const reverse = getReverseForRoute(item.name, item.route);
         const transitionSpecification: TransitionSpecification = {
           progress,
           name: item.name,
           route: item.route,
           metrics: item.metrics,
-          direction: direction,
-          reverse: getReverseForRoute(item.name, item.route),
+          direction: routeDirection,
+          reverse,
           dimensions: Dimensions.get('window'),
           start,
           end
         }
-        console.log(item.route + " " + transitionSpecification.direction);
+        console.log(item.route + ": " + reverse + "/" + (routeDirection === RouteDirection.from ? 'from' : 'to'));
         return transitionFunction(transitionSpecification);
       }
     }

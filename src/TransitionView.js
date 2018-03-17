@@ -3,15 +3,15 @@ import PropTypes from 'prop-types';
 import { View, Animated, StyleSheet, Platform, StyleSheetValidation, findNodeHandle } from 'react-native';
 
 import TransitionItem from './TransitionItem';
-import { TransitionContext } from './Types';
+import { RouteDirection, TransitionContext } from './Types';
 import * as Constants from './TransitionConstants';
 
 const uniqueBaseId: string = `transitionCompId-${Date.now()}`;
 let uuidCount: number = 0;
 
 const styles = StyleSheet.create({
-  transition: {   
-    // backgroundColor: '#0000EF22', 
+  transition: {
+    // backgroundColor: '#0000EF22',
   },
 });
 
@@ -27,7 +27,6 @@ class Transition extends React.Component<TransitionProps> {
   static contextTypes = {
     register: PropTypes.func,
     unregister: PropTypes.func,
-    layoutReady: PropTypes.func,
     route: PropTypes.string,
     getVisibilityProgress: PropTypes.func,
     getDirectionForRoute: PropTypes.func
@@ -73,12 +72,6 @@ class Transition extends React.Component<TransitionProps> {
     return findNodeHandle(this._viewRef);
   }
 
-  onLayout() {
-    const { layoutReady } = this.context;
-    if (!layoutReady) return;
-    layoutReady(this._getName(), this._route);
-  }
-
   _getName(): string {
     if (this.props.shared) { return this.props.shared; }
     return this._name;
@@ -114,7 +107,6 @@ class Transition extends React.Component<TransitionProps> {
     const props = {
       ...elementProps,
       key: this._getName(),
-      onLayout: this.onLayout.bind(this),
       collapsable: false,
       style,
       ref: (ref) => { this._viewRef = ref; },
@@ -123,27 +115,30 @@ class Transition extends React.Component<TransitionProps> {
     return React.createElement(this._animatedComponent, props, child ? child : props.children);
   }
 
-  getVisibilityStyle() {    
+  getVisibilityStyle() {
     const { getVisibilityProgress, getDirectionForRoute } = this.context;
     if (!getVisibilityProgress || !getDirectionForRoute) return {};
     const visibilityProgress = getVisibilityProgress(this._getName(), this._route);
     if(!visibilityProgress) return {};
-    
-    // TODO: Check if we are a part of the transition!
-    
+
+    // TODO: Check if we are a part of a shared element transition!
+
     const direction = getDirectionForRoute(this._getName(), this._route);
-    if(direction === 1)
+    if(direction === RouteDirection.from) // Means we are transitioning from this element's route
       return { opacity: visibilityProgress.interpolate({
         inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_IN,
         outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE_ANIM_IN
         })
       };
-
+    else if(direction === RouteDirection.to){
      return { opacity: visibilityProgress.interpolate({
         inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_OUT,
         outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE_ANIM_OUT
-      })
-    };
+        })
+      };
+    }
+
+    return { opacity: 0};
   }
 }
 

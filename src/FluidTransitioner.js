@@ -82,8 +82,7 @@ class FluidTransitioner extends React.Component<*> {
 
   _render(props, prevProps) {
     this._animatedSubscribeForNativeAnimation(props.position);
-    this._animatedSubscribeForNativeAnimation(props.progress);
-
+    
     const scenes = props.scenes.map(scene => this._renderScene({ ...props, scene }, prevProps));
     const toRoute = props.scene.route.routeName;
     const fromRoute = prevProps ? prevProps.scene.route.routeName : null;
@@ -123,6 +122,28 @@ class FluidTransitioner extends React.Component<*> {
       inputRange: [index -1, index - 0.5, index, index + 0.5, index + 1],
       outputRange: [0, 1, 1, 1, 0],
     })};
+  }
+
+  _runStartAnimation(){
+    // Initialize start transition
+    const progress = new Animated.Value(0);
+    const position = new Animated.Value(-1);
+    const transitionSpec = this._configureTransition();
+    const { timing } = transitionSpec;
+    delete transitionSpec.timing;
+
+    const animations = [
+      timing(progress, {
+        ...transitionSpec,
+        toValue: 1,
+      }),
+      timing(position, {
+        ...transitionSpec,
+        toValue: 0,
+      }),
+    ];
+
+    Animated.parallel(animations).start(()=> {});
   }
 
   _getChildNavigation = (scene) => {
