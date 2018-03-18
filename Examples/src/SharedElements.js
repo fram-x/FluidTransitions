@@ -125,7 +125,6 @@ class Screen extends React.Component<any> {
   constructor(props) {
     super(props);
     this._value = 0;
-    this._progress = new Animated.Value(this._value);
     this._animate = this._animate.bind(this);
     this._increase = this._increase.bind(this);
     this._decrease = this._decrease.bind(this);
@@ -133,10 +132,15 @@ class Screen extends React.Component<any> {
     this._decreaseMore = this._decreaseMore.bind(this);
     this._toggled = false;
     this._step = 0.0001;
+
+    this.state = {
+      fromRoute: 'screen1',
+      toRoute: 'screen2',
+      index: 0,
+      progress: new Animated.Value(this._value) };
   }
 
   _value: number;
-  _progress: Animated.Value;
   _toggled: boolean;
   _slider: ?Slider;
   _animation: ?Animated.CompositeAnimation;
@@ -149,15 +153,13 @@ class Screen extends React.Component<any> {
   _dec(step) {
     if (this._value >= step) {
       this._value -= step;
-      this._progress.setValue(this._value);
-      console.log(this._value);
+      this.state.progress.setValue(this._value);
     }
   }
   _inc(step) {
     if (this._value <= 1.0 - step) {
       this._value += step;
-      this._progress.setValue(this._value);
-      console.log(this._value);
+      this.state.progress.setValue(this._value);
     }
   }
 
@@ -165,29 +167,37 @@ class Screen extends React.Component<any> {
     if (this._animation) {
       this._animation.stop();
     }
-    const toValue = this._toggled ? 0 : 1;
-    this._animation = Animated.timing(this._progress, {
-      toValue,
-      duration: 1500,
-      easing: Easing.inOut(Easing.poly(4)),
-      useNativeDriver: true,
-    });
 
-    this._animation.start(() => {
-      this._animation = null;
-      this._toggled = !this._toggled;
-      this._value = toValue;
-    });
+    const runAnimationFunc = () => {
+      this.state.progress.setValue(0);
+      this._animation = Animated.timing(this.state.progress, {
+        toValue: 1,
+        duration: 3500,
+        easing: Easing.inOut(Easing.poly(4)),
+        useNativeDriver: true,
+      });
+
+      this._animation.start(() => {
+        this._animation = null;
+        this._toggled = !this._toggled;
+      });
+    };
+
+    if (this._toggled) {
+      this.setState({ ...this.state, fromRoute: 'screen2', toRoute: 'screen1', index: 0 }, runAnimationFunc);
+    } else {
+      this.setState({ ...this.state, fromRoute: 'screen1', toRoute: 'screen2', index: 1 }, runAnimationFunc);
+    }
   }
 
   render() {
     return (
       <TransitionView
         style={{ flex: 1 }}
-        index={0}
-        progress={this._progress}
-        fromRoute="screen1"
-        toRoute="screen2"
+        index={this.state.index}
+        progress={this.state.progress}
+        fromRoute={this.state.fromRoute}
+        toRoute={this.state.toRoute}
       >
         <TransitionRouteView route="screen1" style={{ flex: 1 }}>
           <Screen1 />
@@ -212,7 +222,7 @@ class Screen extends React.Component<any> {
             ref={(ref) => this._slider = ref}
             onValueChange={val => {
               this._value = val * 0.01;
-              this._progress.setValue(this._value);
+              this.state.progress.setValue(this._value);
             }}
           />
           <View style={{ height: 10 }} />

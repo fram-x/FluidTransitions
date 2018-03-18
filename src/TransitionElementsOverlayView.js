@@ -3,7 +3,7 @@ import { View, StyleSheet, Animated, Dimensions, Platform } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
-import { TransitionContext, TransitionSpecification } from './Types';
+import { TransitionContext, NavigationDirection, TransitionSpecification } from './Types';
 import {
   getScaleTransition,
   getTopTransition,
@@ -73,8 +73,8 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
       return <View style={styles.overlay} pointerEvents='none'/>;
     }
 
-    const { getDirectionForRoute } = this.context;
-    if(!getDirectionForRoute)
+    const { getDirectionForRoute, getDirection } = this.context;
+    if(!getDirectionForRoute || !getDirection)
       return [];
 
     let delayCountFrom = this.props.transitionElements.reduce((prevValue, item) =>
@@ -83,18 +83,28 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     let delayCountTo = this.props.transitionElements.reduce((prevValue, item) =>
       item.delay && getDirectionForRoute(item.name, item.route) === RouteDirection.to ? prevValue + 1: prevValue, 0);
 
+    const navDirection = getDirection();
     let delayIndexFrom = 0;
-    let delayIndexTo = 0;
+    let delayIndexTo = Math.max(0, delayCountTo-1);
+    let delayFromFactor = 1;
+    let delayToFactor = -1;
+
+    if(navDirection === NavigationDirection.back){
+      delayIndexFrom = Math.max(0, delayCountFrom-1);
+      delayIndexTo = 0;
+      delayFromFactor = -1;
+      delayToFactor = 1;
+    }
 
     const transitionElements = this.props.transitionElements.map((item, idx) => {
       let element = React.Children.only(item.reactElement.props.children);
-      const direction = getDirectionForRoute(item.name, item.route);
+      const routeDirection = getDirectionForRoute(item.name, item.route);
       const comp = this.getAnimatedComponent(element, idx,
-        this.getStyle(item, direction === 1 ? delayCountFrom : delayCountTo,
-          direction === 1 ? delayIndexFrom : delayIndexTo));
+        this.getStyle(item, routeDirection === RouteDirection.from ? delayCountFrom : delayCountTo,
+          routeDirection === RouteDirection.from ? delayIndexFrom : delayIndexTo));
 
       if(item.delay) {
-        direction === 1 ? delayIndexFrom++ : delayIndexTo++;
+        routeDirection === RouteDirection.from ? delayIndexFrom += delayFromFactor : delayIndexTo += delayToFactor;
       }
       return comp;
     });
@@ -236,6 +246,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     getTransitionProgress: PropTypes.func,
     getDirectionForRoute: PropTypes.func,
     getReverseForRoute: PropTypes.func,
+    getDirection: PropTypes.func
   }
 }
 

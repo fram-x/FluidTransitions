@@ -1,20 +1,27 @@
 import React from 'react';
 import { Platform } from 'react-native';
-import { TransitionSpecification } from './../Types/TransitionSpecification';
+import { RouteDirection, TransitionSpecification } from './../Types';
 
-export const getScaleTransition = (transitionSpecification: TransitionSpecification) => {
-  if (!transitionSpecification) {
+export const getScaleTransition = (transitionInfo: TransitionSpecification) => {
+  if (!transitionInfo) {
     return { opacity: 0 };
   }
   // When scaling we need to handle Android's scaling issues
-  let startPosition = transitionSpecification.reverse ? 1 : 0.005;
-  let endPosition = transitionSpecification.reverse ? 0.005 : 1;
+  let startPosition = transitionInfo.direction === RouteDirection.from ? 1 : 0.005;
+  let endPosition = transitionInfo.direction === RouteDirection.from ? 0.005 : 1;
 
   if(Platform.OS === 'ios'){
-    startPosition = transitionSpecification.reverse ? 1 : 0;
-    endPosition = transitionSpecification.reverse ? 0 : 1;
+    startPosition = transitionInfo.direction === RouteDirection.from ? 1 : 0;
+    endPosition = transitionInfo.direction === RouteDirection.from ? 0 : 1;
   }
-  const { progress, start, end } = transitionSpecification;
+
+  // if(transitionInfo.reverse){
+  //   const tmp = startPosition;
+  //   startPosition = endPosition;
+  //   endPosition = tmp;
+  // }
+
+  const { progress, start, end } = transitionInfo;
   const scaleInterpolation = progress.interpolate({
     inputRange: [0, start, end, 1],
     outputRange: [startPosition, startPosition, endPosition, endPosition],

@@ -148,11 +148,7 @@ export default class TransitionItemsView extends React.Component<
 
   getReverseForRoute(name: string, route: string): boolean {
     if(this.state.direction === NavigationDirection.unknown) return false;    
-    const routeDirection = this.getDirectionForRoute(name, route);
-    if(this.state.direction === NavigationDirection.forward)
-      return routeDirection === RouteDirection.from;
-    else
-      return routeDirection === RouteDirection.to;
+    return this.state.direction === NavigationDirection.back;
   }
 
   async getViewMetrics(): Metrics {
