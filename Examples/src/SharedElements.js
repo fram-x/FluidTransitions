@@ -173,7 +173,7 @@ class Screen extends React.Component<any> {
     const runAnimationFunc = () => {
       this._animation = Animated.timing(this.state.progress, {
         toValue,
-        duration: 3500,
+        duration: 750,
         easing: Easing.inOut(Easing.poly(4)),
         useNativeDriver: true,
       });
