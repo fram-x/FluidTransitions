@@ -186,7 +186,6 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     return null;
   }
 
-  _animatedComponent;
   getAnimatedComponent(renderElement, idx, style) {
 
     let element = renderElement;
@@ -200,15 +199,13 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     if(isFunctionalComponent || element.type.displayName === 'Button') {
       // Wrap in sourrounding view
       element = React.createElement(element.type, element.props);
-      if(!this._animatedComponent){
-        const wrapper = (<View/>);
-        this._animatedComponent = Animated.createAnimatedComponent(wrapper.type);
-      }
+      const wrapper = (<View/>);
+      animatedComponent = Animated.createAnimatedComponent(wrapper.type);
       elementProps = {};
       child = element;
     }
-    else if(!this._animatedComponent) {
-      this._animatedComponent = Animated.createAnimatedComponent(element.type);
+    else {
+      animatedComponent = Animated.createAnimatedComponent(element.type);
     }
 
     const props = {
@@ -218,7 +215,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
       key: idx,
     };
 
-    return React.createElement(this._animatedComponent, props, child ? child : props.children);
+    return React.createElement(animatedComponent, props, child ? child : props.children);
   }
 
   getMetricsReady(): boolean {

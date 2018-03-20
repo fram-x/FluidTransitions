@@ -76,7 +76,7 @@ class FluidTransitioner extends React.Component<*> {
       easing: Easing.inOut(Easing.poly(4)),
       ...this.props.transitionConfig,
       isInteraction: true,
-      useNativeDriver: true,
+      useNativeDriver: false,
     };
   }
 
