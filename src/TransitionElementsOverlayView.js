@@ -3,7 +3,7 @@ import { View, StyleSheet, Animated, Dimensions, Platform } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
-import { TransitionContext, NavigationDirection, TransitionSpecification } from './Types';
+import { TransitionContext, RouteDirection, NavigationDirection, TransitionSpecification } from './Types';
 import {
   getScaleTransition,
   getTopTransition,
@@ -15,7 +15,6 @@ import {
 }
   from './Transitions';
 import * as Constants from './TransitionConstants';
-import { RouteDirection } from './Types';
 
 const styles: StyleSheet.NamedStyles = StyleSheet.create({
   overlay: {
@@ -78,10 +77,12 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
       return [];
 
     let delayCountFrom = this.props.transitionElements.reduce((prevValue, item) =>
-      item.delay && getDirectionForRoute(item.name, item.route) === RouteDirection.from ? prevValue + 1: prevValue, 0);
+      item.delay && getDirectionForRoute(item.name, item.route) === RouteDirection.from ? 
+        prevValue + 1: prevValue, 0);
 
     let delayCountTo = this.props.transitionElements.reduce((prevValue, item) =>
-      item.delay && getDirectionForRoute(item.name, item.route) === RouteDirection.to ? prevValue + 1: prevValue, 0);
+      item.delay && getDirectionForRoute(item.name, item.route) === RouteDirection.to ? 
+        prevValue + 1: prevValue, 0);
 
     const navDirection = getDirection();
     let delayIndexFrom = 0;
@@ -89,22 +90,19 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     let delayFromFactor = 1;
     let delayToFactor = -1;
 
-    if(navDirection === NavigationDirection.back){
-      delayIndexFrom = Math.max(0, delayCountFrom-1);
-      delayIndexTo = 0;
-      delayFromFactor = -1;
-      delayToFactor = 1;
-    }
-
     const transitionElements = this.props.transitionElements.map((item, idx) => {
       let element = React.Children.only(item.reactElement.props.children);
       const routeDirection = getDirectionForRoute(item.name, item.route);
       const comp = this.getAnimatedComponent(element, idx,
-        this.getStyle(item, routeDirection === RouteDirection.from ? delayCountFrom : delayCountTo,
-          routeDirection === RouteDirection.from ? delayIndexFrom : delayIndexTo));
+        this.getStyle(item, routeDirection === RouteDirection.from ? 
+          delayCountFrom : delayCountTo,
+          routeDirection === RouteDirection.from ? 
+          delayIndexFrom : delayIndexTo));
 
       if(item.delay) {
-        routeDirection === RouteDirection.from ? delayIndexFrom += delayFromFactor : delayIndexTo += delayToFactor;
+        routeDirection === RouteDirection.from ? 
+          delayIndexFrom += delayFromFactor : 
+          delayIndexTo += delayToFactor;
       }
       return comp;
     });
@@ -127,8 +125,8 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
   }
 
   getTransitionStyle(item: TransitionItem, delayCount: number, delayIndex: number) {
-    const { getTransitionProgress, getDirectionForRoute, getReverseForRoute, } = this.context;
-    if (!getTransitionProgress || !getDirectionForRoute || !getReverseForRoute )
+    const { getTransitionProgress, getDirectionForRoute, } = this.context;
+    if (!getTransitionProgress || !getDirectionForRoute)
       return {};
 
     const progress = getTransitionProgress(item.name, item.route);
@@ -146,7 +144,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
         if(item.delay){
           // Start/stop in delay window
           const delayStep = distance / delayCount;
-          if(routeDirection === 1) {
+          if(routeDirection === RouteDirection.from) {
             start = start + (delayStep * delayIndex);
           } else {
             end = end - (delayStep * delayIndex);
@@ -154,26 +152,24 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
         }
         else {
           // Start/stop first/last half of transition
-          if(routeDirection === 1) {
+          if(routeDirection === RouteDirection.from) {
             end -= distance;
           } else {
             start += distance;
           }
         }
 
-        const reverse = getReverseForRoute(item.name, item.route);
         const transitionSpecification: TransitionSpecification = {
           progress,
           name: item.name,
           route: item.route,
           metrics: item.metrics,
-          direction: routeDirection,
-          reverse,
+          direction: routeDirection,          
           dimensions: Dimensions.get('window'),
           start,
           end
         }
-        console.log(item.route + ": " + reverse + "/" + (routeDirection === RouteDirection.from ? 'from' : 'to'));
+
         return transitionFunction(transitionSpecification);
       }
     }
@@ -190,6 +186,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     return null;
   }
 
+  _animatedComponent;
   getAnimatedComponent(renderElement, idx, style) {
 
     let element = renderElement;
@@ -203,13 +200,15 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     if(isFunctionalComponent || element.type.displayName === 'Button') {
       // Wrap in sourrounding view
       element = React.createElement(element.type, element.props);
-      const wrapper = (<View/>);
-      animatedComponent = Animated.createAnimatedComponent(wrapper.type);
+      if(!this._animatedComponent){
+        const wrapper = (<View/>);
+        this._animatedComponent = Animated.createAnimatedComponent(wrapper.type);
+      }
       elementProps = {};
       child = element;
     }
-    else {
-      animatedComponent = Animated.createAnimatedComponent(element.type);
+    else if(!this._animatedComponent) {
+      this._animatedComponent = Animated.createAnimatedComponent(element.type);
     }
 
     const props = {
@@ -219,7 +218,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
       key: idx,
     };
 
-    return React.createElement(animatedComponent, props, child ? child : props.children);
+    return React.createElement(this._animatedComponent, props, child ? child : props.children);
   }
 
   getMetricsReady(): boolean {
@@ -244,8 +243,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
 
   static contextTypes = {
     getTransitionProgress: PropTypes.func,
-    getDirectionForRoute: PropTypes.func,
-    getReverseForRoute: PropTypes.func,
+    getDirectionForRoute: PropTypes.func,    
     getDirection: PropTypes.func
   }
 }

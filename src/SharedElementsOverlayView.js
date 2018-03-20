@@ -36,7 +36,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
   }
 
   _isMounted: boolean;  
-
+  _animatedComponent;
   render() {
     if(!this.props.sharedElements || !this.getMetricsReady()) {      
       return <View style={styles.overlay} pointerEvents='none'/>;
@@ -58,14 +58,18 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
       if(isFunctionalComponent) {
         // Wrap in sourrounding view
         element = React.createElement(element.type, element.props);
-        const wrapper = (<View/>);
-        animatedComponent = Animated.createAnimatedComponent(wrapper.type);
+        if(!this._animatedComponent){
+          const wrapper = (<View/>);
+          this._animatedComponent = Animated.createAnimatedComponent(wrapper.type);
+        }
         elementProps = {};
         child = element;
       }
       else {
-        const wrapper = (<View/>);
-        animatedComponent = Animated.createAnimatedComponent(wrapper.type);
+        if(!this._animatedComponent){
+          const wrapper = (<View/>);
+          this._animatedComponent = Animated.createAnimatedComponent(wrapper.type);
+        }
         elementProps = {};
         child = element;
       }
@@ -77,7 +81,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
         key: idx,
       };
 
-      return React.createElement(animatedComponent, props, child ?
+      return React.createElement(this._animatedComponent, props, child ?
         child : element.props.children);
     });    
 

@@ -137,7 +137,8 @@ class Screen extends React.Component<any> {
       fromRoute: 'screen1',
       toRoute: 'screen2',
       index: 0,
-      progress: new Animated.Value(this._value) };
+      progress: new Animated.Value(this._value),
+    };
   }
 
   _value: number;
@@ -168,25 +169,37 @@ class Screen extends React.Component<any> {
       this._animation.stop();
     }
 
+    const toValue = this._toggled ? 0 : 1;
     const runAnimationFunc = () => {
-      this.state.progress.setValue(0);
       this._animation = Animated.timing(this.state.progress, {
-        toValue: 1,
+        toValue,
         duration: 3500,
         easing: Easing.inOut(Easing.poly(4)),
         useNativeDriver: true,
       });
 
-      this._animation.start(() => {
-        this._animation = null;
-        this._toggled = !this._toggled;
-      });
+      this._toggled = !this._toggled;
+      this._animation.start(() => this._animation = null);
     };
 
     if (this._toggled) {
-      this.setState({ ...this.state, fromRoute: 'screen2', toRoute: 'screen1', index: 0 }, runAnimationFunc);
+      this.setState(
+        {
+          ...this.state,
+          fromRoute: 'screen2',
+          toRoute: 'screen1',
+          index: 0 },
+        runAnimationFunc,
+      );
     } else {
-      this.setState({ ...this.state, fromRoute: 'screen1', toRoute: 'screen2', index: 1 }, runAnimationFunc);
+      this.setState(
+        {
+          ...this.state,
+          fromRoute: 'screen1',
+          toRoute: 'screen2',
+          index: 1 },
+        runAnimationFunc,
+      );
     }
   }
 

@@ -4,15 +4,15 @@ export const getRightTransition = (transitionConfiguration: TransitionSpecificat
   if(!transitionConfiguration || transitionConfiguration.metrics === undefined)
     return { };
 
-  const { start, end, reverse, metrics, dimensions } = transitionSpecification;
+  const { start, end, metrics, dimensions } = transitionSpecification;
   const { x, width } = metrics;
   const distanceValue = dimensions.width-(x - 25);
   const progress = transitionConfiguration.progress.interpolate({
     inputRange: [0, start, end, 1],
-    outputRange: reverse ? [0, 0, distanceValue, distanceValue] : [distanceValue, distanceValue, 0, 0],
+    outputRange: [distanceValue, distanceValue, 0, 0],
   });
 
-  return {			
+  return {
     transform: [{
       translateX: progress
     }]

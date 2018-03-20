@@ -87,24 +87,37 @@ export default class TransitionItemsView extends React.Component<
     const indexHasChanged = props.index != (prevProps ? prevProps.index : -1);
     if(!indexHasChanged) return;
 
-    const sharedElements = this._transitionItems.getSharedElements(
-      props.fromRoute, props.toRoute);
+    let { fromRoute, toRoute } = props;
+    const direction = props.index > (prevProps ? prevProps.index : -1) ?
+      NavigationDirection.forward : NavigationDirection.back;
+      
+    if(direction === NavigationDirection.back){
+      const tmp = fromRoute;
+      fromRoute = toRoute;
+      toRoute = tmp;
+    }
 
-    const transitionElements = this._transitionItems.getTransitionElements(
-      props.fromRoute, props.toRoute);
-
+    const sharedElements = this._transitionItems.getSharedElements(fromRoute, toRoute);
+    const transitionElements = this._transitionItems.getTransitionElements(fromRoute, toRoute);
     if(sharedElements.length === 0 && transitionElements === 0)
       return;
 
-    const direction = props.index > (prevProps ? prevProps.index : -1) ?
-      NavigationDirection.forward : NavigationDirection.back;
-
     await this.measureItems(sharedElements, transitionElements);
+
+    console.log("=======");
+    console.log("from:   " + props.fromRoute);
+    console.log("to:     " + props.toRoute);
+    console.log("index:  " + props.index);
+    console.log("navdir: " + (direction === NavigationDirection.forward ? "forward" : 
+      (direction === NavigationDirection.back ? "back" : "none")));
+    console.log("SE:     " + sharedElements.length);
+    console.log("TE:     " + transitionElements.length);
+    console.log("=======");
 
     this.setState({
       ...this.state,
-      toRoute: props.toRoute,
-      fromRoute: props.fromRoute,
+      toRoute: toRoute,
+      fromRoute: fromRoute,
       direction,
       sharedElements,
       transitionElements,
@@ -136,19 +149,14 @@ export default class TransitionItemsView extends React.Component<
 
   getDirectionForRoute(name: string, route: string): RouteDirection {
     if(!this.state.fromRoute && !this.state.toRoute) { return RouteDirection.unknown; }
-    if (!this.state.fromRoute) { return RouteDirection.to; } // First entry, always direction 1
+    if (!this.state.fromRoute) { return RouteDirection.from; } // First screne, always direction from/to???
     if(route === this.state.fromRoute)
       return RouteDirection.from;
     else if(route === this.state.toRoute)
       return RouteDirection.to;
 
-    invariant(true, "Route " + route + " is not part of transition!")
+    //invariant(true, "Route " + route + " is not part of transition!")
     return RouteDirection.unknown;
-  }
-
-  getReverseForRoute(name: string, route: string): boolean {
-    if(this.state.direction === NavigationDirection.unknown) return false;    
-    return this.state.direction === NavigationDirection.back;
   }
 
   async getViewMetrics(): Metrics {
@@ -220,8 +228,7 @@ export default class TransitionItemsView extends React.Component<
     getVisibilityProgress: PropTypes.func,
     getTransitionProgress: PropTypes.func,
     getDirectionForRoute: PropTypes.func,
-    getDirection: PropTypes.func,
-    getReverseForRoute: PropTypes.func,
+    getDirection: PropTypes.func,    
   }
 
   getChildContext() {
@@ -231,8 +238,7 @@ export default class TransitionItemsView extends React.Component<
       getVisibilityProgress: ()=> this._transitionProgress,
       getTransitionProgress: () => this._transitionProgress,
       getDirectionForRoute: this.getDirectionForRoute.bind(this),
-      getDirection: () => this.state.direction ? this.state.direction : NavigationDirection.unknown,
-      getReverseForRoute: this.getReverseForRoute.bind(this),
+      getDirection: () => this.state.direction ? this.state.direction : NavigationDirection.unknown,      
     };
   }
 }
