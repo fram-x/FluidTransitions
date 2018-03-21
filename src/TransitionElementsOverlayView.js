@@ -68,14 +68,13 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
   _transitionElements: Array<TransitionItem>
 
   render() {
-    if(!this.props.transitionElements || !this.getMetricsReady()) {
+    const { getDirectionForRoute, getDirection } = this.context;
+
+    if(!this.props.transitionElements || !this.getMetricsReady() ||
+      !getDirectionForRoute || !getDirection) {
       return <View style={styles.overlay} pointerEvents='none'/>;
     }
-
-    const { getDirectionForRoute, getDirection } = this.context;
-    if(!getDirectionForRoute || !getDirection)
-      return [];
-
+    
     let delayCountFrom = this.props.transitionElements.reduce((prevValue, item) =>
       item.delay && getDirectionForRoute(item.name, item.route) === RouteDirection.from ? 
         prevValue + 1: prevValue, 0);
@@ -164,7 +163,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
           name: item.name,
           route: item.route,
           metrics: item.metrics,
-          direction: routeDirection,          
+          direction: routeDirection,
           dimensions: Dimensions.get('window'),
           start,
           end

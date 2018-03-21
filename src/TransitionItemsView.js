@@ -54,7 +54,6 @@ export default class TransitionItemsView extends React.Component<
   _transitionProgress: Animated.Value;
 
   async _itemAdded(item: TransitionItem) {
-
     if(!this._isMounted || !this._viewRef) return;
 
     const sharedElements = this._transitionItems.getSharedElements(
