@@ -33,11 +33,26 @@ const styles = StyleSheet.create({
 
 const emptyFunction = ()=> {};
 
+type SceneRenderedInfo = {
+  key: string,
+  isMounted: boolean,
+};
+
 class FluidTransitioner extends React.Component<*> {
-  _transitionItemsView: any;
+  constructor(props) {
+    super(props);
+    this._onTransitionStart = this._onTransitionStart.bind(this);
+    this._screenDidMount = this._screenDidMount.bind(this);
+  }
+
+  _transitionItemsView: any;  
+  _scenes: Array<SceneRenderedInfo> = [];
+  _scenesMountedResolve: Function;
+  _scenesMountedPromise: Promise<void>;
 
   static childContextTypes = {
     route: PropTypes.string,
+    onScreenDidMount: PropTypes.func,
   }
   
   _animatedSubscribeForNativeAnimation(animatedValue: Animated.Value){
@@ -52,6 +67,7 @@ class FluidTransitioner extends React.Component<*> {
     return {
       route: this.props.navigation.state.routes[
         this.props.navigation.state.index].routeName,
+      onScreenDidMount: this._screenDidMount
     };
   }
 
@@ -61,8 +77,36 @@ class FluidTransitioner extends React.Component<*> {
         configureTransition={this._configureTransition.bind(this)}
         render={this._render.bind(this)}
         navigation={this.props.navigation}
+        onTransitionStart={this._onTransitionStart}
       />
     );
+  }
+
+  _screenDidMount(key: string) {
+    console.log("screen did mount " + key);
+    console.log(this._scenes);
+
+    if(!this._scenesMountedResolve)
+      return;
+
+    // check if this is a scene we are waiting for
+    const sceneRenderInfo = this._scenes.find(sri => sri.key === key);
+    if(sceneRenderInfo){
+      sceneRenderInfo.isMounted = true;
+    }
+
+    if(!this._scenes.find(sri => !sri.isMounted)){
+      this._scenesMountedResolve();
+      this._scenesMountedResolve = null;
+    }
+  }
+
+  async _onTransitionStart() {
+    console.log("transitionstart");
+    if(this._scenesMountedPromise)
+      await this._scenesMountedPromise;
+
+    console.log("transitionstart done");
   }
 
   shouldComponentUpdate(nextProps) {
@@ -83,7 +127,12 @@ class FluidTransitioner extends React.Component<*> {
   _render(props, prevProps) {
     this._animatedSubscribeForNativeAnimation(props.position);
     
-    const scenes = props.scenes.map(scene => this._renderScene({ ...props, scene }, prevProps));
+    this._updateSceneArray(props.scenes);
+    this._scenesMountedPromise = new Promise(resolve => this._scenesMountedResolve = resolve);
+
+    const scenes = props.scenes.map(scene => 
+      this._renderScene({ ...props, scene }, prevProps));
+
     const toRoute = props.scene.route.routeName;
     const fromRoute = prevProps ? prevProps.scene.route.routeName : null;
     const index = props.scene.index;
@@ -101,6 +150,7 @@ class FluidTransitioner extends React.Component<*> {
       </TransitionItemsView>
     );
   }
+
   _renderScene(transitionProps, prevProps) {
     const { position, scene } = transitionProps;
     const { index } = scene;    
@@ -111,6 +161,7 @@ class FluidTransitioner extends React.Component<*> {
         style={[styles.scene, this.getOpacityStyle(transitionProps.position, index)]}
         key={transitionProps.scene.route.key}
         route={scene.route.routeName}
+        sceneKey={scene.key}
       >
           <Scene navigation={navigation}/>
       </TransitionRouteView>
@@ -122,6 +173,24 @@ class FluidTransitioner extends React.Component<*> {
       inputRange: [index -1, index - 0.5, index, index + 0.5, index + 1],
       outputRange: [0, 1, 1, 1, 0],
     })};
+  }
+
+  _updateSceneArray(scenes: Array<any>) {
+    scenes.forEach(scene => {
+      if(!this._scenes.find(sri => sri.key === scene.key))
+        this._scenes = [...this._scenes, { key: scene.key, isRendered: false}];
+    });
+
+    const toDelete = [];
+    this._scenes.forEach(sri => {
+      if(!scenes.find(scene => scene.key === sri.key))
+        toDelete.push(sri);
+    });
+
+    toDelete.forEach(sri => {
+      const index = this._scenes.indexOf(sri);      
+      this._scenes = [...this._scenes.slice(0, index), ...this._scenes.slice(index + 1)];
+    });
   }
 
   _runStartAnimation(){

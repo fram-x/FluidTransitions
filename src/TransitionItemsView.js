@@ -31,8 +31,6 @@ export default class TransitionItemsView extends React.Component<
     this._isMounted = false;
     this._viewRef = null;
 
-    this._itemAdded = this._itemAdded.bind(this);
-
     this.state = {
       toRoute: null,
       fromRoute: null,
@@ -41,7 +39,7 @@ export default class TransitionItemsView extends React.Component<
       transitionElements: null,
     };
 
-    this._transitionItems = new TransitionItems(this._itemAdded);
+    this._transitionItems = new TransitionItems();
     this._onLayoutResolvePromise = new Promise(resolve => this._onLayoutResolve = resolve);
     this._transitionProgress = props.progress;
   }
@@ -52,27 +50,6 @@ export default class TransitionItemsView extends React.Component<
   _onLayoutResolve: ?Function;
   _onLayoutResolvePromise: Promise<void>;
   _transitionProgress: Animated.Value;
-
-  async _itemAdded(item: TransitionItem) {
-    if(!this._isMounted || !this._viewRef) return;
-
-    const sharedElements = this._transitionItems.getSharedElements(
-      this.props.fromRoute, this.props.toRoute);
-
-    const transitionElements = this._transitionItems.getTransitionElements(
-      this.props.fromRoute, this.props.toRoute);
-
-    if(sharedElements.length === 0 && transitionElements === 0)
-      return;
-
-    await this.measureItems(sharedElements, transitionElements);
-
-    this.setState({
-      ...this.state,
-      sharedElements,
-      transitionElements,
-    });
-  }
 
   async componentWillReceiveProps(nextProps) {
     if(nextProps.toRoute != this.props.toRoute ||
@@ -103,15 +80,15 @@ export default class TransitionItemsView extends React.Component<
 
     await this.measureItems(sharedElements, transitionElements);
 
-    console.log("=======");
-    console.log("from:   " + props.fromRoute);
-    console.log("to:     " + props.toRoute);
-    console.log("index:  " + props.index);
-    console.log("navdir: " + (direction === NavigationDirection.forward ? "forward" : 
-      (direction === NavigationDirection.back ? "back" : "none")));
-    console.log("SE:     " + sharedElements.length);
-    console.log("TE:     " + transitionElements.length);
-    console.log("=======");
+    // console.log("=======");
+    // console.log("from:   " + props.fromRoute);
+    // console.log("to:     " + props.toRoute);
+    // console.log("index:  " + props.index);
+    // console.log("navdir: " + (direction === NavigationDirection.forward ? "forward" : 
+    //   (direction === NavigationDirection.back ? "back" : "none")));
+    // console.log("SE:     " + sharedElements.length);
+    // console.log("TE:     " + transitionElements.length);
+    // console.log("=======");
 
     this.setState({
       ...this.state,

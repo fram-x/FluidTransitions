@@ -5,16 +5,28 @@ import { Animated } from 'react-native';
 type TransitionRouteViewProps = {
   children: Array<any>,
   style: ?any,
-  route: string
+  route: string,
+  sceneKey: ?string,
 }
+
 class TransitionRouteView extends React.Component<TransitionRouteViewProps> {
   static childContextTypes = {
     route: PropTypes.string,
   }
 
+  static contextTypes = {
+    onScreenDidMount: PropTypes.func,
+  }
+
+  componentDidMount() {
+    const { onScreenDidMount } = this.context;
+    if(!onScreenDidMount || !this.props.sceneKey) return;
+    onScreenDidMount(this.props.sceneKey);
+  }
+
   getChildContext() {
     return {
-      route: this.props.route
+      route: this.props.route,
     };
   }
 
