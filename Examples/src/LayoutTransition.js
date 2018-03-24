@@ -113,12 +113,6 @@ const Screen = (props) => (
 const Navigator = FluidNavigator({
   home: { screen: InitialScreen },
   screen: { screen: Screen },
-}, {
-  transitionConfig: {
-    timing: Animated.timing,
-    duration: 350,
-    easing: Easing.poly(4),
-  },
 });
 
 export default () => (

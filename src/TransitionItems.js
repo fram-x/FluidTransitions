@@ -4,7 +4,7 @@ import TransitionItem from './TransitionItem';
 
 export default class TransitionItems {
   constructor() {
-    this._items = [];		
+    this._items = [];		    
   }
 
   _items: Array<TransitionItem>
@@ -16,18 +16,33 @@ export default class TransitionItems {
   add(item: TransitionItem): boolean {
     if(this._items.findIndex(e => e.name === item.name && e.route === item.route) >= 0)
       return false;
-
-    this._items = [...this._items, item];
+      
+    console.log("ADD " + item.name + "/" + item.route);
+    this._items = [...this._items, item];    
     return true;
   }
 
   remove(name: string, route: string): boolean {
     const index = this._items.findIndex(e => e.name === name && e.route === route)
     if (index >= 0) {
-      this._items = [...this._items.slice(0, index), ...this._items.slice(index + 1)];      
+      this._items = [...this._items.slice(0, index), ...this._items.slice(index + 1)];
       return true;
     }		
     return false;
+  }
+
+  getRoutes() {
+    const routes = [];    
+    for(var i = 0; i < this._items.length; i++) {
+        if(!routes.includes(this._items[i].route)) {
+            routes.push(this._items[i].route);
+        }
+    }
+    if(routes.length != 2) {
+      throw new Error("Number of routes should be 2, was " + routes.length);
+    }
+
+    return { fromRoute: routes[0], toRoute: routes[1] };
   }
 
   getItemByNameAndRoute(name: string, route: string): TransitionItem {

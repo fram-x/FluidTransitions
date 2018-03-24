@@ -1,16 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { View, Animated, StyleSheet, Platform, StyleSheetValidation, findNodeHandle } from 'react-native';
+import { View, Animated, UIManager, StyleSheet, Platform, StyleSheetValidation, findNodeHandle } from 'react-native';
 
 import TransitionItem from './TransitionItem';
-import { TransitionContext } from './Types';
+import { RouteDirection, TransitionContext, NavigationDirection } from './Types';
+import * as Constants from './TransitionConstants';
 
 const uniqueBaseId: string = `transitionCompId-${Date.now()}`;
 let uuidCount: number = 0;
 
 const styles = StyleSheet.create({
-  transition: {    
-    // backgroundColor: '#FF000022'
+  transition: {
+    // backgroundColor: '#0000EF22',
   },
 });
 
@@ -26,15 +27,18 @@ class Transition extends React.Component<TransitionProps> {
   static contextTypes = {
     register: PropTypes.func,
     unregister: PropTypes.func,
-    layoutReady: PropTypes.func,
     route: PropTypes.string,
-    getVisibilityProgress: PropTypes.func,
+    getTransitionProgress: PropTypes.func,
+    getDirectionForRoute: PropTypes.func,
+    getDirection: PropTypes.func,
+    getIndex: PropTypes.func,
+    getIsPartOfSharedTransition: PropTypes.func
   }
 
   constructor(props: TransitionProps, context: TransitionContext) {
     super(props, context);
     this._name = `${uniqueBaseId}-${uuidCount++}`;
-    this._animatedComponent = null;    
+    this._animatedComponent = null;
   }
 
   _name: string
@@ -42,7 +46,7 @@ class Transition extends React.Component<TransitionProps> {
   _isMounted: boolean;
   _viewRef: any;
   _animatedComponent: any;
-  
+
   componentWillMount() {
     const { register } = this.context;
     if (register) {
@@ -71,12 +75,6 @@ class Transition extends React.Component<TransitionProps> {
     return findNodeHandle(this._viewRef);
   }
 
-  onLayout() {
-    const { layoutReady } = this.context;
-    if (!layoutReady) return;
-    layoutReady(this._getName(), this._route);
-  }
-
   _getName(): string {
     if (this.props.shared) { return this.props.shared; }
     return this._name;
@@ -90,7 +88,7 @@ class Transition extends React.Component<TransitionProps> {
     if (!element) { return null; }
 
     // Functional components should be wrapped in a view to be usable with
-    // Animated.createAnimatedComponent    
+    // Animated.createAnimatedComponent
     if (element.type.displayName !== 'View' && element.type.displayName !== 'Image') {
       // Wrap in sourrounding view
       element = React.createElement(element.type, element.props);
@@ -112,9 +110,8 @@ class Transition extends React.Component<TransitionProps> {
     const props = {
       ...elementProps,
       key: this._getName(),
-      onLayout: this.onLayout.bind(this),
       collapsable: false,
-      style,
+      style,      
       ref: (ref) => { this._viewRef = ref; },
     };
 
@@ -122,11 +119,42 @@ class Transition extends React.Component<TransitionProps> {
   }
 
   getVisibilityStyle() {
-    const { getVisibilityProgress } = this.context;
-    if (!getVisibilityProgress) return {};
-    const visibilityProgress = getVisibilityProgress(this._getName(), this._route);
-    return { opacity: visibilityProgress };
-  }
+    const { getTransitionProgress, getDirectionForRoute, 
+      getIndex, getDirection, getIsPartOfSharedTransition } = this.context;
+    if (!getTransitionProgress || !getDirectionForRoute ||
+      !getIndex || !getDirection || !getIsPartOfSharedTransition) return {};
+
+    const progress = getTransitionProgress();
+    const index = getIndex();
+    const direction = getDirection();
+    if(!progress || index === undefined) return { opacity: 0};
+
+    const routeDirection = getDirectionForRoute(this._getName(), this._route);
+    if(routeDirection === RouteDirection.unknown) return { opacity: 0};
+
+    const visibilityProgress = progress.interpolate({
+      inputRange: direction === NavigationDirection.forward ? [index-1, index] : [index, index + 1],
+      outputRange: routeDirection === RouteDirection.to ? [0, 1] : [1, 0],
+    });
+
+    // TODO: Check if we are a part of a shared element transition!
+    // if(this.props.shared) {
+    //   if(getIsPartOfSharedTransition(this._getName(), this._route)) {
+    //     return { opacity: visibilityProgress.interpolate({
+    //       inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_OUT,
+    //       outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE_ANIM_OUT
+    //       })
+    //     };
+    //   }
+    //   return {};
+    // }
+    
+    return { opacity: visibilityProgress.interpolate({
+      inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_OUT,
+      outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE_ANIM_OUT
+      })
+    };
+  }  
 }
 
 export default Transition;

@@ -3,11 +3,11 @@ import { View, StyleSheet, Animated } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
-import { TransitionConfiguration, TransitionContext } from './Types';
+import { TransitionConfiguration, TransitionContext, NavigationDirection } from './Types';
 
 const styles: StyleSheet.NamedStyles = StyleSheet.create({
   overlay: {
-    position: 'absolute',    
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
@@ -15,6 +15,7 @@ const styles: StyleSheet.NamedStyles = StyleSheet.create({
   },
   sharedElement: {
     position: 'absolute',
+    // backgroundColor: '#FF000022',
     padding: 0,
     margin: 0,
   },
@@ -31,62 +32,56 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
   context: TransitionContext
   constructor(props: SharedElementsOverlayViewProps, context: TransitionContext) {
     super(props, context);
-    this._isMounted = false;
-    this._sharedElements = [];
+    this._isMounted = false;    
   }
 
-  _isMounted: boolean;
-  _sharedElements: Array<any>;
-
+  _isMounted: boolean;  
+  
   render() {
-    if(!this.props.sharedElements || !this.getMetricsReady()) {
-      this._sharedElements = [];
+    if(!this.props.sharedElements || !this.getMetricsReady()) {    
       return <View style={styles.overlay} pointerEvents='none'/>;
     }
+    const self = this;
+    const sharedElements = this.props.sharedElements.map((pair, idx) => {
+      const { fromItem, toItem } = pair;
+      const transitionStyle = self.getTransitionStyle(fromItem, toItem);
 
-    if(this._sharedElements.length === 0) {
-      const self = this;
-      this._sharedElements = this.props.sharedElements.map((pair, idx) => {
-        const { fromItem, toItem } = pair;
-        const transitionStyle = self.getTransitionStyle(fromItem, toItem);
+      let element = React.Children.only(fromItem.reactElement.props.children);
+      let elementProps = element.props;
+      let animatedComponent;
+      let child;
 
-        let element = React.Children.only(fromItem.reactElement.props.children);
-        let elementProps = element.props;
-        let animatedComponent;
-        let child;
+      // Functional components should be wrapped in a view to be usable with
+      // Animated.createAnimatedComponent
+      const isFunctionalComponent = !element.type.displayName;
+      if(isFunctionalComponent) {
+        // Wrap in sourrounding view
+        element = React.createElement(element.type, element.props);
+        const wrapper = (<View/>);
+        animatedComponent = Animated.createAnimatedComponent(wrapper.type);
+        elementProps = {};
+        child = element;
+      }
+      else {
+        const wrapper = (<View/>);
+        animatedComponent = Animated.createAnimatedComponent(wrapper.type);        
+        elementProps = {};
+        child = element;
+      }
 
-        // Functional components should be wrapped in a view to be usable with
-        // Animated.createAnimatedComponent
-        const isFunctionalComponent = !element.type.displayName;
-        if(isFunctionalComponent) {
-          // Wrap in sourrounding view
-          element = React.createElement(element.type, element.props);
-          const wrapper = (<View/>);
-          animatedComponent = Animated.createAnimatedComponent(wrapper.type);
-          elementProps = {};
-          child = element;
-        }
-        else {
-          const wrapper = (<View/>);
-          animatedComponent = Animated.createAnimatedComponent(wrapper.type);
-          elementProps = {};
-          child = element;
-        }
+      const props = {
+        ...element.props,
+        style: [element.props.style, styles.sharedElement, transitionStyle],
+        key: idx,
+      };
 
-        const props = {
-          ...element.props,
-          style: [element.props.style, styles.sharedElement, transitionStyle],
-          key: idx,
-        };
-
-        return React.createElement(animatedComponent, props, child ? 
-          child : element.props.children);
-      });
-    };
+      return React.createElement(animatedComponent, props, child ?
+        child : element.props.children);
+    });    
 
     return (
       <View style={styles.overlay} pointerEvents='none'>
-        {this._sharedElements}
+        {sharedElements}
       </View>
     );
   }
@@ -104,36 +99,42 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
   }
 
   getTransitionStyle(fromItem: TransitionItem, toItem: TransitionItem) {
-    const { getTransitionProgress } = this.context;
-    if (!getTransitionProgress || !fromItem.metrics || !toItem.metrics) return {
+    const { getTransitionProgress, getIndex, getDirection } = this.context;
+    if (!getTransitionProgress || !getIndex || !getDirection || !fromItem.metrics || !toItem.metrics) return {
       width: fromItem.metrics.width,
       height: fromItem.metrics.height,
       left: fromItem.metrics.x,
       top: fromItem.metrics.y,
     };
 
+    const index = getIndex();
+    const direction = getDirection();
     const progress = getTransitionProgress(fromItem.name, fromItem.route);
+    const interpolatedProgress = progress.interpolate({
+      inputRange: direction === NavigationDirection.forward ? [index-1, index] : [index, index + 1],
+      outputRange: [0, 1],
+    });
 
     const toVsFromScaleX = toItem.scaleRelativeTo(fromItem).x;
     const toVsFromScaleY = toItem.scaleRelativeTo(fromItem).y;
 
-    const scaleX = progress.interpolate({
+    const scaleX = interpolatedProgress.interpolate({
       inputRange: [0, 1],
       outputRange: [1, toVsFromScaleX],
     });
 
-    const scaleY = progress.interpolate({
+    const scaleY = interpolatedProgress.interpolate({
       inputRange: [0, 1],
       outputRange: [1, toVsFromScaleY],
     });
 
-    const translateX = progress.interpolate({
+    const translateX = interpolatedProgress.interpolate({
       inputRange: [0, 1],
       outputRange: [fromItem.metrics.x, toItem.metrics.x +
         fromItem.metrics.width / 2 * (toVsFromScaleX - 1)],
     });
 
-    const translateY = progress.interpolate({
+    const translateY = interpolatedProgress.interpolate({
       inputRange: [0, 1],
       outputRange: [fromItem.metrics.y, toItem.metrics.y +
         fromItem.metrics.height / 2 * (toVsFromScaleY - 1)],
@@ -141,7 +142,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
 
     return {
       width: fromItem.metrics.width,
-      height: fromItem.metrics.height,      
+      height: fromItem.metrics.height,
       transform: [{ translateX }, { translateY }, { scaleX }, { scaleY }]
     };
   }
@@ -156,6 +157,8 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
 
   static contextTypes = {
     getTransitionProgress: PropTypes.func,
+    getDirection: PropTypes.func,
+    getIndex: PropTypes.func,
   }
 }
 

@@ -150,12 +150,6 @@ class ImageGrid extends Component {
 const Navigator = FluidNavigator({
   imageList: { screen: ImageListScreen },
   imageDetails: { screen: ImageDetailsScreen },
-}, {
-  transitionConfig: {
-    timing: Animated.timing,
-    duration: 350,
-    easing: Easing.poly(4),
-  },
 });
 
 export default () => (

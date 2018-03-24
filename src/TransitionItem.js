@@ -1,6 +1,6 @@
 import { Animated } from 'react-native';
 
-import { Metrics } from './Types';
+import { Metrics } from './Types/Metrics';
 
 type Size = {
   x: number,
@@ -34,6 +34,9 @@ export default class TransitionItem {
   visibility: Animated.Value
   progress: Animated.Value
 
+  getNodeHandle() {
+    return this.reactElement.getNodeHandle();
+  }
   scaleRelativeTo(other: TransitionItem): Size {
     const validate = i => {
       if (!i.metrics) {

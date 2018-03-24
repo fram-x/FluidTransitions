@@ -1,11 +1,14 @@
-import { Animated } from 'react-native';
+import { Animated, ScaledSize } from 'react-native';
 import { Metrics } from './Metrics';
+import { RouteDirection } from './Direction';
 
 export type TransitionSpecification = {
   progress: Animated.Value,
-  direction: number,
-  metrics: Metrics,
-  reverse: boolean,
+  direction: RouteDirection,
+  metrics: Metrics,  
   name: string,
   route: string,
+  start: number,
+  end: number,
+  dimensions: ScaledSize,
 }
