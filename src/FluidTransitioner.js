@@ -19,8 +19,9 @@ class FluidTransitioner extends React.Component<*> {
     this._onTransitionStart = this._onTransitionStart.bind(this);
     this._screenDidMount = this._screenDidMount.bind(this);
     this._transitionItemsViewOnLayout = this._transitionItemsViewOnLayout.bind(this);
+    this._configureTransition = this._configureTransition.bind(this);
   }
-    
+
   _scenes: Array<SceneRenderedInfo> = [];
   _scenesMountedResolve: Function;
   _scenesMountedPromise: Promise<void>;
@@ -28,9 +29,10 @@ class FluidTransitioner extends React.Component<*> {
 
   static childContextTypes = {
     route: PropTypes.string,
+    getTransitionConfig: PropTypes.func,
     onScreenDidMount: PropTypes.func,
   }
-  
+
   _animatedSubscribeForNativeAnimation(animatedValue: Animated.Value){
     if(!animatedValue) return;
     if(!this._configureTransition().useNativeDriver) return;
@@ -43,14 +45,15 @@ class FluidTransitioner extends React.Component<*> {
     return {
       route: this.props.navigation.state.routes[
         this.props.navigation.state.index].routeName,
-      onScreenDidMount: this._screenDidMount
+      onScreenDidMount: this._screenDidMount,
+      getTransitionConfig: this._configureTransition
     };
   }
 
   render() {
     return (
       <Transitioner
-        configureTransition={this._configureTransition.bind(this)}
+        configureTransition={this._configureTransition}
         render={this._render.bind(this)}
         navigation={this.props.navigation}
         onTransitionStart={this._onTransitionStart}
@@ -70,12 +73,12 @@ class FluidTransitioner extends React.Component<*> {
     // check if this is a scene we are waiting for
     const sceneRenderInfo = this._scenes.find(sri => sri.key === key);
     if(sceneRenderInfo) sceneRenderInfo.isMounted = true;
-    
+
     this._checkScenesAndLayouts();
   }
 
   _checkScenesAndLayouts() {
-    if(this._layoutsReady && !this._scenes.find(sri => !sri.isMounted)) {      
+    if(this._layoutsReady && !this._scenes.find(sri => !sri.isMounted)) {
       if(this._scenesMountedResolve){
         this._scenesMountedResolve();
         this._scenesMountedResolve = null;
@@ -86,8 +89,6 @@ class FluidTransitioner extends React.Component<*> {
   async _onTransitionStart() {
     if(this._scenesMountedPromise)
       await this._scenesMountedPromise;
-
-    console.log("Transition start");
   }
 
   shouldComponentUpdate(nextProps) {
@@ -106,16 +107,16 @@ class FluidTransitioner extends React.Component<*> {
   }
 
   _render(props, prevProps) {
-    this._animatedSubscribeForNativeAnimation(props.position);    
+    this._animatedSubscribeForNativeAnimation(props.position);
     this._updateSceneArray(props.scenes);
     this._layoutsReady = false;
-    const scenes = props.scenes.map(scene => 
+    const scenes = props.scenes.map(scene =>
       this._renderScene({ ...props, scene }, prevProps));
 
     const toRoute = props.scene.route.routeName;
     const fromRoute = prevProps ? prevProps.scene.route.routeName : null;
     const index = props.scene.index;
-    
+
     return (
       <TransitionItemsView
         navigation={this.props.navigation}
@@ -132,9 +133,9 @@ class FluidTransitioner extends React.Component<*> {
 
   _renderScene(transitionProps, prevProps) {
     const { position, scene } = transitionProps;
-    const { index } = scene;    
+    const { index } = scene;
     const navigation = this._getChildNavigation(scene);
-    const Scene = this.props.router.getComponentForRouteName(scene.route.routeName);    
+    const Scene = this.props.router.getComponentForRouteName(scene.route.routeName);
     return (
       <TransitionRouteView
         style={[styles.scene, this.getOpacityStyle(transitionProps.position, index)]}
@@ -147,7 +148,7 @@ class FluidTransitioner extends React.Component<*> {
     );
   }
 
-  getOpacityStyle(position: Animated.Value, index: number) {    
+  getOpacityStyle(position: Animated.Value, index: number) {
     return { opacity: position.interpolate({
       inputRange: [index -1, index - 0.5, index, index + 0.5, index + 1],
       outputRange: [0, 1, 1, 1, 0],
@@ -172,30 +173,8 @@ class FluidTransitioner extends React.Component<*> {
     });
 
     if(this._scenes.find(sri => !sri.isMounted))
-      this._scenesMountedPromise = new Promise(resolve => 
+      this._scenesMountedPromise = new Promise(resolve =>
         this._scenesMountedResolve = resolve);
-  }
-
-  _runStartAnimation() {
-    // Initialize start transition
-    const progress = new Animated.Value(0);
-    const position = new Animated.Value(-1);
-    const transitionSpec = this._configureTransition();
-    const { timing } = transitionSpec;
-    delete transitionSpec.timing;
-
-    const animations = [
-      timing(progress, {
-        ...transitionSpec,
-        toValue: 1,
-      }),
-      timing(position, {
-        ...transitionSpec,
-        toValue: 0,
-      }),
-    ];
-
-    Animated.parallel(animations).start(()=> {});
   }
 
   _getChildNavigation = (scene) => {
