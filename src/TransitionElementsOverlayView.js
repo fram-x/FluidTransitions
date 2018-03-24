@@ -103,6 +103,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
       !getDirectionForRoute || !getDirection) {
       return <View style={styles.overlay} pointerEvents='none'/>;
     }
+    
     const transitionElements = this.props.transitionElements
       .filter(i => i.route === this.props.fromRoute || i.route === this.props.toRoute);
 
@@ -125,7 +126,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
       const routeDirection = getDirectionForRoute(item.name, item.route);
       const comp = this.getAnimatedComponent(element, idx,
         this.getStyle(item, routeDirection === RouteDirection.from ?
-          delayCountFrom : delayCountTo,
+          delayCountFrom + 1 : delayCountTo + 1,
           routeDirection === RouteDirection.from ?
           delayIndexFrom : delayIndexTo));
 
@@ -164,21 +165,20 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
 
     const index = getIndex();
     const direction = getDirection();
-
+    const routeDirection = getDirectionForRoute(item.name, item.route);
     const progress = getTransitionProgress(item.name, item.route);
     if(progress) {
       
-      const transitionFunction = this.getTransitionFunction(item.appear);
+      const transitionFunction = this.getTransitionFunction(item, routeDirection);
       if (transitionFunction) {
         // Calculate start/end to handle delayed transitions
         let start = Constants.TRANSITION_PROGRESS_START;
         let end = Constants.TRANSITION_PROGRESS_END;
-
-        const routeDirection = getDirectionForRoute(item.name, item.route);
+        
         const distance = (1.0 - (Constants.TRANSITION_PROGRESS_START +
           (1.0 - Constants.TRANSITION_PROGRESS_END))) * 0.5;
 
-        if(item.delay){
+        if(item.delay) {
           // Start/stop in delay window
           const delayStep = distance / delayCount;
           if(routeDirection === RouteDirection.from) {
@@ -219,12 +219,20 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     return { };
   }
 
-  getTransitionFunction(appear) {
-    if (appear) {
-      const transitionType = transitionTypes.find(e => e.name === appear);
-      if (transitionType) {
-        return transitionType.transitionFunction;
-      }
+  getTransitionFunction(item: TransitionItem, routeDirection: RouteDirection) {
+    const getTransition = (transition: string | Function) => {
+      if(transition instanceof Function)
+        return transition;
+      const transitionType = transitionTypes.find(e => e.name === transition);
+      if (transitionType) return transitionType.transitionFunction;
+    }
+
+    if (routeDirection === RouteDirection.to && item.appear) {
+      return getTransition(item.appear);
+    } else if(routeDirection === RouteDirection.from && item.disappear) {
+      return getTransition(item.disappear);
+    } else if(item.appear) {
+      return getTransition(item.appear);
     }
     return null;
   }

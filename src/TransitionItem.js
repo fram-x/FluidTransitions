@@ -10,13 +10,14 @@ type Size = {
 export default class TransitionItem {
   constructor(
     name: string, route: string, reactElement: Object,
-    shared: boolean, appear: string, delay: boolean, metrics: Metrics) {
+    shared: boolean, appear: string, disappear: string, delay: boolean, metrics: Metrics) {
       
     this.name = name;
     this.route = route;
     this.reactElement = reactElement;
     this.shared = shared;
     this.appear = appear;
+    this.disappear = disappear;
     this.delay = delay;
     this.metrics = metrics;
     this.visibility = new Animated.Value(appear ? 0 : 1);
@@ -28,15 +29,17 @@ export default class TransitionItem {
   reactElement: Object
   metrics: Metrics
   shared: boolean
-  appear: string
+  appear: string | Function
+  disappear: string | Function
   delay: boolean
   layoutReady: boolean
   visibility: Animated.Value
-  progress: Animated.Value
+  progress: ?Animated.Value
 
   getNodeHandle() {
     return this.reactElement.getNodeHandle();
   }
+  
   scaleRelativeTo(other: TransitionItem): Size {
     const validate = i => {
       if (!i.metrics) {
