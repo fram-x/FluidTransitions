@@ -190,8 +190,7 @@ export default class TransitionItemsView extends React.Component<
     });
   }
 
-  _inUpdate: boolean = false;
-  _runInitialAnimation: boolean = true;
+  _inUpdate: boolean = false;  
   async componentDidUpdate(){
     if(this._inUpdate) return;
     if(!this.state.fromRoute && !this.state.toRoute) return;
@@ -218,16 +217,15 @@ export default class TransitionItemsView extends React.Component<
 
       this.props.onLayout && this.props.onLayout();
       
-      if(this._runInitialAnimation) {
-        this._runInitialAnimation = false;
-        this._runStartAnimation(() => {});
+      if(this.state.fromRoute === null) {
+        this._runStartAnimation(transitionElements.length);
       }
-    }    
+    }
     
     this._inUpdate = false;
   }
 
-  async _runStartAnimation(callback: Function) {
+  async _runStartAnimation(numberOfTransitions: number) {
     const { getTransitionConfig } = this.context;
     let transitionSpec = getTransitionConfig ? 
       getTransitionConfig() : {
@@ -244,11 +242,12 @@ export default class TransitionItemsView extends React.Component<
     const animations = [
       timing(this._transitionProgress, {
         ...transitionSpec,
+        duration: numberOfTransitions === 0 ? 50 : transitionSpec.duration,
         toValue: 0,
       })
     ];
     
-    Animated.parallel(animations).start(callback);
+    Animated.parallel(animations).start();
   }
 
   componentDidMount() {
