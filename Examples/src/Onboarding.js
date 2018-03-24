@@ -124,6 +124,7 @@ const Screen2 = (props) => (
       <Transition appear="horizontal">
         <Button title="Back" onPress={() => props.navigation.goBack()} />
       </Transition>
+      <View style={{ width: 20 }} />
       <Transition appear="horizontal">
         <Button title="Next" onPress={() => props.navigation.navigate('screen3')} />
       </Transition>

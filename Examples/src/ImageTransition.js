@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Dimensions, Button, TouchableWithoutFeedback, FlatList, Animated, Easing, Image, StyleSheet } from 'react-native';
+import { View, Text, Dimensions, Button, TouchableOpacity, FlatList, Image, StyleSheet } from 'react-native';
 import _ from 'lodash';
 import { FluidNavigator, Transition } from 'react-navigation-fluid-transitions';
 
@@ -41,7 +41,7 @@ class ImageListScreen extends React.Component {
   componentDidMount() {
     const items = [];
     const size = Dimensions.get('window').width;
-    const max = 9;
+    const max = 39;
     const randMax = 100;
     for (let i = 0; i < max; i++) {
       let randomNumber = Math.floor((Math.random() * randMax) + 1);
@@ -133,7 +133,7 @@ class ImageGrid extends Component {
 
     renderCell(image) {
       return (
-        <TouchableWithoutFeedback onPress={() => this.props.imageSelected(image)} key={image.url}>
+        <TouchableOpacity onPress={() => this.props.imageSelected(image)} key={image.url}>
           <View style={styles.cell}>
             <Transition shared={image.url}>
               <Image
@@ -142,7 +142,7 @@ class ImageGrid extends Component {
               />
             </Transition>
           </View>
-        </TouchableWithoutFeedback>
+        </TouchableOpacity>
       );
     }
 }
