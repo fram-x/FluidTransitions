@@ -3,7 +3,7 @@ import { View, StyleSheet, Animated } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
-import { TransitionConfiguration, TransitionContext } from './Types';
+import { TransitionConfiguration, TransitionContext, NavigationDirection } from './Types';
 
 const styles: StyleSheet.NamedStyles = StyleSheet.create({
   overlay: {
@@ -99,36 +99,42 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
   }
 
   getTransitionStyle(fromItem: TransitionItem, toItem: TransitionItem) {
-    const { getTransitionProgress } = this.context;
-    if (!getTransitionProgress || !fromItem.metrics || !toItem.metrics) return {
+    const { getTransitionProgress, getIndex, getDirection } = this.context;
+    if (!getTransitionProgress || !getIndex || !getDirection || !fromItem.metrics || !toItem.metrics) return {
       width: fromItem.metrics.width,
       height: fromItem.metrics.height,
       left: fromItem.metrics.x,
       top: fromItem.metrics.y,
     };
 
+    const index = getIndex();
+    const direction = getDirection();
     const progress = getTransitionProgress(fromItem.name, fromItem.route);
+    const interpolatedProgress = progress.interpolate({
+      inputRange: direction === NavigationDirection.forward ? [index-1, index] : [index, index + 1],
+      outputRange: [0, 1],
+    });
 
     const toVsFromScaleX = toItem.scaleRelativeTo(fromItem).x;
     const toVsFromScaleY = toItem.scaleRelativeTo(fromItem).y;
 
-    const scaleX = progress.interpolate({
+    const scaleX = interpolatedProgress.interpolate({
       inputRange: [0, 1],
       outputRange: [1, toVsFromScaleX],
     });
 
-    const scaleY = progress.interpolate({
+    const scaleY = interpolatedProgress.interpolate({
       inputRange: [0, 1],
       outputRange: [1, toVsFromScaleY],
     });
 
-    const translateX = progress.interpolate({
+    const translateX = interpolatedProgress.interpolate({
       inputRange: [0, 1],
       outputRange: [fromItem.metrics.x, toItem.metrics.x +
         fromItem.metrics.width / 2 * (toVsFromScaleX - 1)],
     });
 
-    const translateY = progress.interpolate({
+    const translateY = interpolatedProgress.interpolate({
       inputRange: [0, 1],
       outputRange: [fromItem.metrics.y, toItem.metrics.y +
         fromItem.metrics.height / 2 * (toVsFromScaleY - 1)],
@@ -151,6 +157,8 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
 
   static contextTypes = {
     getTransitionProgress: PropTypes.func,
+    getDirection: PropTypes.func,
+    getIndex: PropTypes.func,
   }
 }
 
