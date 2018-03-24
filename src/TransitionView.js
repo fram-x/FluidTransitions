@@ -136,7 +136,7 @@ class Transition extends React.PureComponent<TransitionProps> {
       inputRange: direction === NavigationDirection.forward ? [index-1, index] : [index, index + 1],
       outputRange: routeDirection === RouteDirection.to ? [0, 1] : [1, 0],
     });
-
+    
     // TODO: Check if we are a part of a shared element transition!
     // if(this.props.shared) {
     //   if(getIsPartOfSharedTransition(this._getName(), this._route)) {
