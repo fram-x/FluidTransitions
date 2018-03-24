@@ -22,7 +22,7 @@ type TransitionProps = {
   children: Array<any>
 }
 
-class Transition extends React.Component<TransitionProps> {
+class Transition extends React.PureComponent<TransitionProps> {
   context: TransitionContext
   static contextTypes = {
     register: PropTypes.func,

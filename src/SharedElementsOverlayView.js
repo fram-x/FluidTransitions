@@ -35,12 +35,44 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     this._isMounted = false;    
   }
 
-  _isMounted: boolean;  
+  _isMounted: boolean;    
+
+  shouldComponentUpdate(nextProps){
+    if(!nextProps.fromRoute && !nextProps.toRoute)
+      return false;
+
+    // Compare toRoute/fromRoute/direction
+    if(this.props.toRoute !== nextProps.toRoute ||
+      this.props.fromRoute !== nextProps.fromRoute ||
+      this.props.direction !== nextProps.direction)
+      return true;
+
+    // Compare shared elements count
+    if(!this.compareArrays(this.props.sharedElements, nextProps.sharedElements)) 
+      return true;
+
+    return false;
+  }
+
+  compareArrays(a, b){
+    if(!a && !b) return false;
+    if(!a && b || !b && a) return false;
+    if(a.length !== b.length) return false;
+    for(let i=0; i<a.length; i++){
+      if(a[i].fromItem.name !== b[i].fromItem.name ||
+        a[i].fromItem.route !== b[i].fromItem.route ||
+        a[i].toItem.name !== b[i].toItem.name ||
+        a[i].toItem.route !== b[i].toItem.route)
+        return false;
+    }
+    return true;
+  }
   
   render() {
     if(!this.props.sharedElements || !this.getMetricsReady()) {    
       return <View style={styles.overlay} pointerEvents='none'/>;
     }
+    console.log("RENDER SE");
     const self = this;
     const sharedElements = this.props.sharedElements.map((pair, idx) => {
       const { fromItem, toItem } = pair;

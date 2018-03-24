@@ -68,7 +68,37 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
   _isMounted: boolean;
   _transitionElements: Array<TransitionItem>
 
+  shouldComponentUpdate(nextProps) {
+    if(!nextProps.fromRoute && !nextProps.toRoute)
+      return false;
+
+    // Compare toRoute/fromRoute/direction
+    if(this.props.toRoute !== nextProps.toRoute ||
+      this.props.fromRoute !== nextProps.fromRoute ||
+      this.props.direction !== nextProps.direction)
+      return true;
+
+    // Compare elements
+    if(!this.compareArrays(this.props.transitionElements, nextProps.transitionElements)) 
+      return true;
+
+    return false;
+  }
+
+  compareArrays(a, b){
+    if(!a && !b) return false;
+    if(!a && b || !b && a) return false;
+    if(a.length !== b.length) return false;
+    for(let i=0; i<a.length; i++){
+      if(a[i].name !== b[i].name ||
+        a[i].route !== b[i].route)
+        return false;
+    }
+    return true;
+  }
+
   render() {
+    console.log("RENDER TE");
     const { getDirectionForRoute, getDirection } = this.context;
     if(!this.props.transitionElements || !this.getMetricsReady() ||
       !getDirectionForRoute || !getDirection) {

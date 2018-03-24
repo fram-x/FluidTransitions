@@ -4,11 +4,11 @@ import TransitionItem from './TransitionItem';
 
 export default class TransitionItems {
   constructor() {
-    this._items = [];		    
+    this._items = [];
   }
 
   _items: Array<TransitionItem>
-  
+
   count(): number {
     return this._items.length;
   }
@@ -16,9 +16,8 @@ export default class TransitionItems {
   add(item: TransitionItem): boolean {
     if(this._items.findIndex(e => e.name === item.name && e.route === item.route) >= 0)
       return false;
-      
-    console.log("ADD " + item.name + "/" + item.route);
-    this._items = [...this._items, item];    
+
+    this._items = [...this._items, item];
     return true;
   }
 
@@ -27,12 +26,12 @@ export default class TransitionItems {
     if (index >= 0) {
       this._items = [...this._items.slice(0, index), ...this._items.slice(index + 1)];
       return true;
-    }		
+    }
     return false;
   }
 
   getRoutes() {
-    const routes = [];    
+    const routes = [];
     for(var i = 0; i < this._items.length; i++) {
         if(!routes.includes(this._items[i].route)) {
             routes.push(this._items[i].route);
@@ -65,7 +64,7 @@ export default class TransitionItems {
 
     return items;
   }
-  
+
   _getNamePairMap(fromRoute: string, toRoute: string): Map<TransitionItem, TransitionItem> {
     const nameMap = this._items.reduce((map, item) => {
       let pairByName = map.get(item.name);
