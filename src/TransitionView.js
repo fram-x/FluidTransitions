@@ -136,7 +136,7 @@ class Transition extends React.PureComponent<TransitionProps> {
     
     const visibilityProgress = progress.interpolate({ inputRange, outputRange });
 
-    if(this.props.shared && this.props.appear === undefined) {
+    if(this.props.shared || this.props.appear === undefined) {
       if(getIsPartOfSharedTransition(this._getName(), this._route)) {
         return { opacity: visibilityProgress.interpolate({
           inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_OUT,
