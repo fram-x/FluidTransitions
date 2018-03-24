@@ -76,7 +76,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     }
     const transitionElements = this.props.transitionElements
       .filter(i => i.route === this.props.fromRoute || i.route === this.props.toRoute);
-      
+
     let delayCountFrom = transitionElements
       .filter(item => getDirectionForRoute(item.name, item.route) === RouteDirection.from)
       .reduce((prevValue, item) => item.delay ? prevValue + 1: prevValue, 0);
@@ -95,14 +95,14 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
       let element = React.Children.only(item.reactElement.props.children);
       const routeDirection = getDirectionForRoute(item.name, item.route);
       const comp = this.getAnimatedComponent(element, idx,
-        this.getStyle(item, routeDirection === RouteDirection.from ? 
+        this.getStyle(item, routeDirection === RouteDirection.from ?
           delayCountFrom : delayCountTo,
-          routeDirection === RouteDirection.from ? 
+          routeDirection === RouteDirection.from ?
           delayIndexFrom : delayIndexTo));
 
       if(item.delay) {
-        routeDirection === RouteDirection.from ? 
-          delayIndexFrom += delayFromFactor : 
+        routeDirection === RouteDirection.from ?
+          delayIndexFrom += delayFromFactor :
           delayIndexTo += delayToFactor;
       }
       return comp;
@@ -126,12 +126,19 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
   }
 
   getTransitionStyle(item: TransitionItem, delayCount: number, delayIndex: number) {
-    const { getTransitionProgress, getDirectionForRoute, } = this.context;
-    if (!getTransitionProgress || !getDirectionForRoute)
+    const { getTransitionProgress, getDirectionForRoute,
+      getIndex, getDirection } = this.context;
+
+    if (!getTransitionProgress || !getDirectionForRoute ||
+      !getIndex || !getDirection)
       return {};
+
+    const index = getIndex();
+    const direction = getDirection();
 
     const progress = getTransitionProgress(item.name, item.route);
     if(progress) {
+      
       const transitionFunction = this.getTransitionFunction(item.appear);
       if (transitionFunction) {
         // Calculate start/end to handle delayed transitions
@@ -160,8 +167,14 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
           }
         }
 
+        // Create progress interpolation
+        const interpolatedProgress = progress.interpolate({
+          inputRange: direction === NavigationDirection.forward ? [index-1, index] : [index, index + 1],
+          outputRange: [0, 1],
+        });
+
         const transitionSpecification: TransitionSpecification = {
-          progress,
+          progress: interpolatedProgress,
           name: item.name,
           route: item.route,
           metrics: item.metrics,
@@ -241,8 +254,9 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
 
   static contextTypes = {
     getTransitionProgress: PropTypes.func,
-    getDirectionForRoute: PropTypes.func,    
-    getDirection: PropTypes.func
+    getDirectionForRoute: PropTypes.func,
+    getDirection: PropTypes.func,
+    getIndex: PropTypes.func,
   }
 }
 
