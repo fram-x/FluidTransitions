@@ -166,8 +166,6 @@ export default class TransitionItemsView extends React.Component<
   }
 
   async measureItem(viewMetrics: Metrics, item: TransitionItem) {
-    if (item.metrics) { return; }
-
     const self = this;
     const nodeHandle = item.getNodeHandle();
     if(!nodeHandle) return;
