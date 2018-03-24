@@ -98,7 +98,6 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
   }
 
   render() {
-    console.log("RENDER TE");
     const { getDirectionForRoute, getDirection } = this.context;
     if(!this.props.transitionElements || !this.getMetricsReady() ||
       !getDirectionForRoute || !getDirection) {

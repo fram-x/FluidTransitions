@@ -72,7 +72,6 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     if(!this.props.sharedElements || !this.getMetricsReady()) {    
       return <View style={styles.overlay} pointerEvents='none'/>;
     }
-    console.log("RENDER SE");
     const self = this;
     const sharedElements = this.props.sharedElements.map((pair, idx) => {
       const { fromItem, toItem } = pair;
