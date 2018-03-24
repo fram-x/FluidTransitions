@@ -70,16 +70,16 @@ The `Transition` element supports appear and disappear transitions (appear will 
 
 #### The built in transitions are:
 
-| Name        | Description
-| ----------  | ------------- | ----- |
-| scale      	| Scales the element in and out |
-| top      	| Translates the element in/out from the top of the screen |
-| bottom | Translates the element in/out from the bottom of the screen |
-| left | Translates the element in/out from the left of the screen |
-| right | Translates the element in/out from the right of the screen |
-| horizontal | Translates the element in/out from the top/bottom of the screen |
-| vertical | Translates the element in/out from the left/right of the screen |
-| flip | Flips the element in/out |
+| Name        | Description | 
+| ----------  | ------------- | 
+| scale      	| Scales the element in and out | 
+| top      	| Translates the element in/out from the top of the screen | 
+| bottom | Translates the element in/out from the bottom of the screen | 
+| left | Translates the element in/out from the left of the screen | 
+| right | Translates the element in/out from the right of the screen | 
+| horizontal | Translates the element in/out from the top/bottom of the screen | 
+| vertical | Translates the element in/out from the left/right of the screen | 
+| flip | Flips the element in/out | 
 
 #### Custom transitions
 It is easy to provide custom transitions - just add the transition function to your component's appear or disappear property. The following example creates a transition that will scale in from 88 times the original size of the wrapped component:
