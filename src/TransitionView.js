@@ -102,11 +102,9 @@ class Transition extends React.PureComponent<TransitionProps> {
       this._animatedComponent = Animated.createAnimatedComponent(element.type);
     }
 
-    // Visibility
     const visibilityStyle = this.getVisibilityStyle();
-
-    // Build styles
     const style = [elementProps.style, visibilityStyle, styles.transition];
+
     const props = {
       ...elementProps,
       key: this._getName(),
