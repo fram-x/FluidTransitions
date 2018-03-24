@@ -43,6 +43,8 @@ export default class TransitionItemsView extends React.Component<
 
     this._transitionItems = new TransitionItems();
     this._transitionProgress = props.progress;
+
+    this._getIsPartOfSharedTransition = this._getIsPartOfSharedTransition.bind(this);
   }
 
   _viewRef: ?View;
@@ -113,6 +115,19 @@ export default class TransitionItemsView extends React.Component<
 
     //invariant(true, "Route " + route + " is not part of transition!")
     return RouteDirection.unknown;
+  }
+
+  _getIsPartOfSharedTransition(name: string, route: string) {
+    const item = this._transitionItems.getItemByNameAndRoute(name, route);
+    if(!item || !item.shared) return false;
+
+    const sharedElements = this._transitionItems.getSharedElements(this.state.toRoute, this.state.toRoute);    
+    if(sharedElements.find(pair => 
+      (pair.fromItem.name === item.name && pair.fromItem.route === item.route) ||
+      (pair.toItem.name === item.name && pair.toItem.route === item.route))) {
+        return true;
+    }
+    return false;
   }
 
   async getViewMetrics(): Metrics {
@@ -203,6 +218,7 @@ export default class TransitionItemsView extends React.Component<
     getDirectionForRoute: PropTypes.func,
     getDirection: PropTypes.func,
     getIndex: PropTypes.func,
+    getIsPartOfSharedTransition: PropTypes.func
   }
 
   getChildContext() {
@@ -213,6 +229,7 @@ export default class TransitionItemsView extends React.Component<
       getDirectionForRoute: this.getDirectionForRoute.bind(this),
       getIndex: ()=> this.state.index,
       getDirection: () => this.state.direction ? this.state.direction : NavigationDirection.unknown,
+      getIsPartOfSharedTransition: this._getIsPartOfSharedTransition
     };
   }
 }

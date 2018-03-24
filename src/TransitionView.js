@@ -32,6 +32,7 @@ class Transition extends React.Component<TransitionProps> {
     getDirectionForRoute: PropTypes.func,
     getDirection: PropTypes.func,
     getIndex: PropTypes.func,
+    getIsPartOfSharedTransition: PropTypes.func
   }
 
   constructor(props: TransitionProps, context: TransitionContext) {
@@ -118,9 +119,10 @@ class Transition extends React.Component<TransitionProps> {
   }
 
   getVisibilityStyle() {
-    const { getTransitionProgress, getDirectionForRoute, getIndex, getDirection } = this.context;
+    const { getTransitionProgress, getDirectionForRoute, 
+      getIndex, getDirection, getIsPartOfSharedTransition } = this.context;
     if (!getTransitionProgress || !getDirectionForRoute ||
-      !getIndex || !getDirection) return {};
+      !getIndex || !getDirection || !getIsPartOfSharedTransition) return {};
 
     const progress = getTransitionProgress();
     const index = getIndex();
@@ -136,12 +138,22 @@ class Transition extends React.Component<TransitionProps> {
     });
 
     // TODO: Check if we are a part of a shared element transition!
+    // if(this.props.shared) {
+    //   if(getIsPartOfSharedTransition(this._getName(), this._route)) {
+    //     return { opacity: visibilityProgress.interpolate({
+    //       inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_OUT,
+    //       outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE_ANIM_OUT
+    //       })
+    //     };
+    //   }
+    //   return {};
+    // }
     
     return { opacity: visibilityProgress.interpolate({
       inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_OUT,
       outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE_ANIM_OUT
       })
-    };    
+    };
   }  
 }
 
