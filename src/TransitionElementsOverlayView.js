@@ -11,7 +11,8 @@ import {
   getLeftTransition,
   getRightTransition,
   getHorizontalTransition,
-  getVerticalTransition
+  getVerticalTransition,
+  getFlipTransition
 }
   from './Transitions';
 import * as Constants from './TransitionConstants';
@@ -50,6 +51,7 @@ registerTransitionType('left', getLeftTransition);
 registerTransitionType('right', getRightTransition);
 registerTransitionType('horizontal', getHorizontalTransition);
 registerTransitionType('vertical', getVerticalTransition);
+registerTransitionType('flip', getFlipTransition);
 
 type TransitionElementsOverlayViewProps = {
   fromRoute: string,

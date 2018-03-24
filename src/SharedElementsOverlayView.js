@@ -132,11 +132,13 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
   getTransitionStyle(fromItem: TransitionItem, toItem: TransitionItem) {    
     const { getTransitionProgress, getIndex, getDirection } = this.context;
     if (!getTransitionProgress || !getIndex || !getDirection || 
-      !fromItem.metrics || !toItem.metrics) return {
-      width: fromItem.metrics.width,
-      height: fromItem.metrics.height,
-      left: fromItem.metrics.x,
-      top: fromItem.metrics.y,
+      !fromItem.metrics || !toItem.metrics) {
+      return {
+        width: fromItem.metrics.width,
+        height: fromItem.metrics.height,
+        left: fromItem.metrics.x,
+        top: fromItem.metrics.y,
+      }
     };
 
     const index = getIndex();
