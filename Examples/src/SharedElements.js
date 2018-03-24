@@ -136,7 +136,7 @@ class Screen extends React.Component<any> {
     this.state = {
       fromRoute: 'screen1',
       toRoute: 'screen2',
-      index: 0,
+      index: 1,
       progress: new Animated.Value(this._value),
     };
   }

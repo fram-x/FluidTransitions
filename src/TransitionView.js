@@ -28,7 +28,7 @@ class Transition extends React.Component<TransitionProps> {
     register: PropTypes.func,
     unregister: PropTypes.func,
     route: PropTypes.string,
-    getVisibilityProgress: PropTypes.func,
+    getTransitionProgress: PropTypes.func,
     getDirectionForRoute: PropTypes.func
   }
 
@@ -116,9 +116,9 @@ class Transition extends React.Component<TransitionProps> {
   }
 
   getVisibilityStyle() {
-    const { getVisibilityProgress, getDirectionForRoute } = this.context;
-    if (!getVisibilityProgress || !getDirectionForRoute) return {};
-    const visibilityProgress = getVisibilityProgress(this._getName(), this._route);
+    const { getTransitionProgress, getDirectionForRoute } = this.context;
+    if (!getTransitionProgress || !getDirectionForRoute) return {};
+    const visibilityProgress = getTransitionProgress();
     if(!visibilityProgress) return {};
 
     // TODO: Check if we are a part of a shared element transition!

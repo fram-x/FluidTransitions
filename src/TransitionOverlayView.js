@@ -3,7 +3,7 @@ import { View, StyleSheet, Animated } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
-import { TransitionConfiguration, TransitionContext } from './Types';
+import { TransitionConfiguration, NavigationDirection, TransitionContext } from './Types';
 import SharedElementsOverlayView from './SharedElementsOverlayView';
 import TransitionElementsOverlayView from './TransitionElementsOverlayView';
 import * as Constants from './TransitionConstants';
@@ -11,7 +11,7 @@ import * as Constants from './TransitionConstants';
 const styles: StyleSheet.NamedStyles = StyleSheet.create({
   overlay: {
     position: 'absolute',
-    // backgroundColor: '#ECFF0022',
+    backgroundColor: '#ECFF0022',
     top: 0,
     left: 0,
     right: 0,
@@ -24,6 +24,7 @@ type TransitionOverlayViewProps = {
   toRoute: string,
   visibility: Animated.Value,
   direction: number,
+  index: number,
   sharedElements: Array<any>,
   transitionElements: Array<TransitionItem>
 }
@@ -58,12 +59,19 @@ class TransitionOverlayView extends React.Component<TransitionOverlayViewProps> 
 
   getVisibilityStyle(){
     const { getTransitionProgress } = this.context;
-    if(!getTransitionProgress) return  {};
-    const visibilityProgress = getTransitionProgress();
-    if(!visibilityProgress) return {};
+    const { index, direction } = this.props;
 
+    if(!getTransitionProgress) return  {};
+    const progress = getTransitionProgress();
+    if(!progress || index === undefined) return { opacity: 0 };
+        
+    const visibility = progress.interpolate({
+      inputRange: direction === NavigationDirection.forward ? [index -1, index] : [index, index+1],
+      outputRange: direction === NavigationDirection.forward ? [0, 1] : [1, 0],
+    });
+    
     return { 
-      opacity: visibilityProgress.interpolate({
+      opacity: visibility.interpolate({
           inputRange: Constants.OVERLAY_VIEWS_VISIBILITY_INPUT_RANGE,
           outputRange: Constants.OVERLAY_VIEWS_VISIBILITY_OUTPUT_RANGE
         })
@@ -79,7 +87,7 @@ class TransitionOverlayView extends React.Component<TransitionOverlayViewProps> 
   }
 
   static contextTypes = {
-    getTransitionProgress: PropTypes.func,    
+    getTransitionProgress: PropTypes.func,
   }
 }
 

@@ -12,6 +12,7 @@ type TransitionItemsViewState = {
   fromRoute: ?string,
   toRoute: ?string,
   direction: NavigationDirection,
+  index: number,
   sharedElements: ?Array<any>,
   transitionElements: ?Array<TransitionItem>
 }
@@ -21,7 +22,7 @@ type TransitionItemsViewProps = {
   progress: Animated.Value,
   fromRoute: string,
   toRoute: string,
-  index: number,
+  index: ?number,
   onLayout: (evt: any) => void,
 }
 
@@ -41,7 +42,7 @@ export default class TransitionItemsView extends React.Component<
     };
 
     this._transitionItems = new TransitionItems();
-    this._transitionProgress = props.progress;    
+    this._transitionProgress = props.progress;
   }
 
   _viewRef: ?View;
@@ -77,6 +78,7 @@ export default class TransitionItemsView extends React.Component<
       toRoute: toRoute,
       fromRoute: fromRoute,
       direction,
+      index: props.index,
     });
   }
 
@@ -94,6 +96,7 @@ export default class TransitionItemsView extends React.Component<
           direction={this.state.direction}
           fromRoute={this.state.fromRoute}
           toRoute={this.state.toRoute}
+          index={this.state.index}
           sharedElements={this.state.sharedElements}
           transitionElements={this.state.transitionElements}
         />
@@ -198,8 +201,7 @@ export default class TransitionItemsView extends React.Component<
 
   static childContextTypes = {
     register: PropTypes.func,
-    unregister: PropTypes.func,
-    getVisibilityProgress: PropTypes.func,
+    unregister: PropTypes.func,    
     getTransitionProgress: PropTypes.func,
     getDirectionForRoute: PropTypes.func,
     getDirection: PropTypes.func,      
@@ -209,10 +211,9 @@ export default class TransitionItemsView extends React.Component<
     return {
       register: (item) => this._transitionItems.add(item),
       unregister: (name, route) => this._transitionItems.remove(name, route),
-      getVisibilityProgress: ()=> this._transitionProgress,
       getTransitionProgress: () => this._transitionProgress,
       getDirectionForRoute: this.getDirectionForRoute.bind(this),
-      getDirection: () => this.state.direction ? this.state.direction : NavigationDirection.unknown,            
+      getDirection: () => this.state.direction ? this.state.direction : NavigationDirection.unknown,
     };
   }
 }
