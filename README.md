@@ -1,7 +1,7 @@
 # Fluid Transitions for React Navigation
 
 ## Introduction
-This project aims to implement a simple yet powerful set of constructs for building fluid transitions between screens in [React Navigation](https://reactnavigation.org). The library builds on ideas from [@lintonye](https://github.com/lintonye)'s pull request and suggestion found here: [Shared element transition #941](https://github.com/react-navigation/react-navigation/pull/941).
+This project aims to implement a simple yet powerful set of constructs for building fluid transitions between screens in [React Navigation](https://reactnavigation.org).
 
 The library implements a new navigator component that works just like the StackNavigator. In addition it has a new component called <Transition> which can be used to build different types of fluid transitions that will automatically be run when navigating between screens using the regular navigation actions.
 
@@ -55,3 +55,5 @@ const Navigator = FluidNavigator({
 });
 
 ```
+
+> Some of the concepts in the library builds on ideas from [@lintonye](https://github.com/lintonye)'s pull request and suggestion found here: [Shared element transition #941](https://github.com/react-navigation/react-navigation/pull/941).
