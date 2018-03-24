@@ -69,9 +69,7 @@ const InitialScreen = (props) => (
       <Text style={styles.text}>Click toggle to see appearance animations.</Text>
     </Transition>
     <Transition shared="button" appear="scale">
-      <View>
-        <Button title="Toggle" onPress={() => props.navigation.navigate('screen')} />
-      </View>
+      <Button title="Toggle" onPress={() => props.navigation.navigate('screen')} />
     </Transition>
   </View>
 );
