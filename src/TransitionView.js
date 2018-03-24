@@ -16,9 +16,10 @@ const styles = StyleSheet.create({
 });
 
 type TransitionProps = {
-  appear?: boolean,
-  shared?: string,
-  delay?: boolean,
+  appear: ?boolean,
+  disappear: ?boolean,
+  shared: ?string,
+  delay: ?boolean,
   children: Array<any>
 }
 
@@ -54,7 +55,7 @@ class Transition extends React.PureComponent<TransitionProps> {
       register(new TransitionItem(
         this._getName(), this.context.route,
         this, this.props.shared !== undefined, this.props.appear,
-        this.props.delay !== undefined,
+        this.props.disappear, this.props.delay !== undefined,
       ));
     }
   }

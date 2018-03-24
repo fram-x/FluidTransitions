@@ -165,17 +165,16 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
 
     const index = getIndex();
     const direction = getDirection();
-
+    const routeDirection = getDirectionForRoute(item.name, item.route);
     const progress = getTransitionProgress(item.name, item.route);
     if(progress) {
       
-      const transitionFunction = this.getTransitionFunction(item.appear);
+      const transitionFunction = this.getTransitionFunction(item, routeDirection);
       if (transitionFunction) {
         // Calculate start/end to handle delayed transitions
         let start = Constants.TRANSITION_PROGRESS_START;
         let end = Constants.TRANSITION_PROGRESS_END;
-
-        const routeDirection = getDirectionForRoute(item.name, item.route);
+        
         const distance = (1.0 - (Constants.TRANSITION_PROGRESS_START +
           (1.0 - Constants.TRANSITION_PROGRESS_END))) * 0.5;
 
@@ -220,12 +219,20 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     return { };
   }
 
-  getTransitionFunction(appear) {
-    if (appear) {
-      const transitionType = transitionTypes.find(e => e.name === appear);
-      if (transitionType) {
-        return transitionType.transitionFunction;
-      }
+  getTransitionFunction(item: TransitionItem, routeDirection: RouteDirection) {
+    const getTransition = (transition: string | Function) => {
+      if(transition instanceof Function)
+        return transition;
+      const transitionType = transitionTypes.find(e => e.name === transition);
+      if (transitionType) return transitionType.transitionFunction;
+    }
+
+    if (routeDirection === RouteDirection.to && item.appear) {
+      return getTransition(item.appear);
+    } else if(routeDirection === RouteDirection.from && item.disappear) {
+      return getTransition(item.disappear);
+    } else if(item.appear) {
+      return getTransition(item.appear);
     }
     return null;
   }
