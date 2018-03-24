@@ -3,7 +3,7 @@
 ## Introduction
 This project aims to implement a simple yet powerful set of constructs for building fluid transitions between screens in [React Navigation](https://reactnavigation.org).
 
-The library implements a new navigator component that works just like the StackNavigator. In addition it has a new component called <Transition> which can be used to build different types of fluid transitions that will automatically be run when navigating between screens using the regular navigation actions.
+The library implements a new navigator component that works just like the StackNavigator. In addition it has a new component called `Transition` which can be used to build different types of fluid transitions that will automatically be run when navigating between screens using the regular navigation actions.
 
 > The Navigator's API is identical to the StackNavigator and can easily be integrated with redux and existing navigation setups.
 
