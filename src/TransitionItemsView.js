@@ -66,7 +66,9 @@ export default class TransitionItemsView extends React.Component<
     let { fromRoute, toRoute } = props;
     const direction = props.index > (prevProps ? prevProps.index : -1) ?
       NavigationDirection.forward : NavigationDirection.back;
-      
+
+    const index = prevProps ? props.index : 1;
+
     if(direction === NavigationDirection.back){
       const tmp = fromRoute;
       fromRoute = toRoute;
@@ -78,7 +80,7 @@ export default class TransitionItemsView extends React.Component<
       toRoute: toRoute,
       fromRoute: fromRoute,
       direction,
-      index: props.index,
+      index
     });
   }
 
@@ -160,12 +162,12 @@ export default class TransitionItemsView extends React.Component<
 
     return new Promise((resolve, reject) => {
       UIManager.measureInWindow(nodeHandle, (x, y, width, height) => {
-        item.metrics = { x: x - viewMetrics.x, y: y - viewMetrics.y, width, height };        
+        item.metrics = { x: x - viewMetrics.x, y: y - viewMetrics.y, width, height };
         resolve();
       });
     });
   }
-  
+
   _inUpdate: boolean = false;
   async componentDidUpdate(){
     console.log("TIW Update");
@@ -201,10 +203,11 @@ export default class TransitionItemsView extends React.Component<
 
   static childContextTypes = {
     register: PropTypes.func,
-    unregister: PropTypes.func,    
+    unregister: PropTypes.func,
     getTransitionProgress: PropTypes.func,
     getDirectionForRoute: PropTypes.func,
-    getDirection: PropTypes.func,      
+    getDirection: PropTypes.func,
+    getIndex: PropTypes.func,
   }
 
   getChildContext() {
@@ -213,6 +216,7 @@ export default class TransitionItemsView extends React.Component<
       unregister: (name, route) => this._transitionItems.remove(name, route),
       getTransitionProgress: () => this._transitionProgress,
       getDirectionForRoute: this.getDirectionForRoute.bind(this),
+      getIndex: ()=> this.state.index,
       getDirection: () => this.state.direction ? this.state.direction : NavigationDirection.unknown,
     };
   }

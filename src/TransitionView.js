@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { View, Animated, UIManager, StyleSheet, Platform, StyleSheetValidation, findNodeHandle } from 'react-native';
 
 import TransitionItem from './TransitionItem';
-import { RouteDirection, TransitionContext } from './Types';
+import { RouteDirection, TransitionContext, NavigationDirection } from './Types';
 import * as Constants from './TransitionConstants';
 
 const uniqueBaseId: string = `transitionCompId-${Date.now()}`;
@@ -29,7 +29,9 @@ class Transition extends React.Component<TransitionProps> {
     unregister: PropTypes.func,
     route: PropTypes.string,
     getTransitionProgress: PropTypes.func,
-    getDirectionForRoute: PropTypes.func
+    getDirectionForRoute: PropTypes.func,
+    getDirection: PropTypes.func,
+    getIndex: PropTypes.func,
   }
 
   constructor(props: TransitionProps, context: TransitionContext) {
@@ -116,21 +118,30 @@ class Transition extends React.Component<TransitionProps> {
   }
 
   getVisibilityStyle() {
-    const { getTransitionProgress, getDirectionForRoute } = this.context;
-    if (!getTransitionProgress || !getDirectionForRoute) return {};
-    const visibilityProgress = getTransitionProgress();
-    if(!visibilityProgress) return {};
+    const { getTransitionProgress, getDirectionForRoute, getIndex, getDirection } = this.context;
+    if (!getTransitionProgress || !getDirectionForRoute ||
+      !getIndex || !getDirection) return {};
+
+    const progress = getTransitionProgress();
+    const index = getIndex();
+    const direction = getDirection();
+    if(!progress || index === undefined) return { opacity: 0};
+
+    const visibilityProgress = progress.interpolate({
+      inputRange: direction === NavigationDirection.forward ? [index-1, index] : [index, index + 1],
+      outputRange: [0, 1],
+    });
 
     // TODO: Check if we are a part of a shared element transition!
-
-    const direction = getDirectionForRoute(this._getName(), this._route);
-    if(direction === RouteDirection.from) // Means we are transitioning from this element's route
+    
+    const routeDirection = getDirectionForRoute(this._getName(), this._route);
+    if(routeDirection === RouteDirection.from) // Means we are transitioning from this element's route
       return { opacity: visibilityProgress.interpolate({
         inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_IN,
         outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE_ANIM_IN
         })
       };
-    else if(direction === RouteDirection.to){
+    else if(routeDirection === RouteDirection.to){
      return { opacity: visibilityProgress.interpolate({
         inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_OUT,
         outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE_ANIM_OUT
