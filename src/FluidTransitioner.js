@@ -172,9 +172,8 @@ class FluidTransitioner extends React.Component<*> {
       this._scenes = [...this._scenes.slice(0, index), ...this._scenes.slice(index + 1)];
     });
 
-    if(this._scenes.find(sri => !sri.isMounted))
-      this._scenesMountedPromise = new Promise(resolve =>
-        this._scenesMountedResolve = resolve);
+    this._scenesMountedPromise = new Promise(resolve =>
+      this._scenesMountedResolve = resolve);
   }
 
   _getChildNavigation = (scene) => {

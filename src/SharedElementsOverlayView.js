@@ -32,10 +32,10 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
   context: TransitionContext
   constructor(props: SharedElementsOverlayViewProps, context: TransitionContext) {
     super(props, context);
-    this._isMounted = false;    
+    this._isMounted = false;
   }
 
-  _isMounted: boolean;    
+  _isMounted: boolean;
 
   shouldComponentUpdate(nextProps){
     if(!nextProps.fromRoute && !nextProps.toRoute)
@@ -48,7 +48,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
       return true;
 
     // Compare shared elements count
-    if(!this.compareArrays(this.props.sharedElements, nextProps.sharedElements)) 
+    if(!this.compareArrays(this.props.sharedElements, nextProps.sharedElements))
       return true;
 
     return false;
@@ -67,9 +67,9 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     }
     return true;
   }
-  
+
   render() {
-    if(!this.props.sharedElements || !this.getMetricsReady()) {    
+    if(!this.props.sharedElements || !this.getMetricsReady()) {
       return <View style={styles.overlay} pointerEvents='none'/>;
     }
     const self = this;
@@ -95,7 +95,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
       }
       else {
         const wrapper = (<View/>);
-        animatedComponent = Animated.createAnimatedComponent(wrapper.type);        
+        animatedComponent = Animated.createAnimatedComponent(wrapper.type);
         elementProps = {};
         child = element;
       }
@@ -108,7 +108,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
 
       return React.createElement(animatedComponent, props, child ?
         child : element.props.children);
-    });    
+    });
 
     return (
       <View style={styles.overlay} pointerEvents='none'>
@@ -129,9 +129,9 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     return false;
   }
 
-  getTransitionStyle(fromItem: TransitionItem, toItem: TransitionItem) {    
+  getTransitionStyle(fromItem: TransitionItem, toItem: TransitionItem) {
     const { getTransitionProgress, getIndex, getDirection } = this.context;
-    if (!getTransitionProgress || !getIndex || !getDirection || 
+    if (!getTransitionProgress || !getIndex || !getDirection ||
       !fromItem.metrics || !toItem.metrics) {
       return {
         width: fromItem.metrics.width,
