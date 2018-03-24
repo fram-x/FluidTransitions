@@ -13,6 +13,7 @@ Examples are found in the `Examples` folder and is a runnable React Native proje
 To start the example, navigate to the examples folder and run the following commands from the terminal:
 
 `npm i`
+
 `react-native run-ios|run-android`
 
 ### Shared Element Transitions
