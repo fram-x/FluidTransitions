@@ -103,6 +103,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
       !getDirectionForRoute || !getDirection) {
       return <View style={styles.overlay} pointerEvents='none'/>;
     }
+    
     const transitionElements = this.props.transitionElements
       .filter(i => i.route === this.props.fromRoute || i.route === this.props.toRoute);
 
@@ -125,7 +126,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
       const routeDirection = getDirectionForRoute(item.name, item.route);
       const comp = this.getAnimatedComponent(element, idx,
         this.getStyle(item, routeDirection === RouteDirection.from ?
-          delayCountFrom : delayCountTo,
+          delayCountFrom + 1 : delayCountTo + 1,
           routeDirection === RouteDirection.from ?
           delayIndexFrom : delayIndexTo));
 
@@ -178,7 +179,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
         const distance = (1.0 - (Constants.TRANSITION_PROGRESS_START +
           (1.0 - Constants.TRANSITION_PROGRESS_END))) * 0.5;
 
-        if(item.delay){
+        if(item.delay) {
           // Start/stop in delay window
           const delayStep = distance / delayCount;
           if(routeDirection === RouteDirection.from) {
