@@ -85,9 +85,6 @@ export default class TransitionItemsView extends React.Component<
   }
 
   render() {
-    console.log("==========");
-    console.log("TIW Render");
-
     return (
       <View
         style={styles.container}
@@ -170,7 +167,6 @@ export default class TransitionItemsView extends React.Component<
 
   _inUpdate: boolean = false;
   async componentDidUpdate(){
-    console.log("TIW Update");
     if(this._inUpdate) return;
 
     this._inUpdate = true;
@@ -179,7 +175,6 @@ export default class TransitionItemsView extends React.Component<
     await this.measureItems(sharedElements, transitionElements);
     if(!sharedElements.find(p => !p.fromItem.metrics || !p.toItem.metrics) &&
       !transitionElements.find(i => !i.metrics)) {
-      console.log("TIW READY! SE: " + sharedElements.length + ", TE:" + transitionElements.length + " - " + this.state.fromRoute + " -> " + this.state.toRoute);
       this.setState({
         ...this.state,
         sharedElements,
