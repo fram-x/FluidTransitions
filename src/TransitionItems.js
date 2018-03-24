@@ -23,7 +23,7 @@ export default class TransitionItems {
 
   remove(name: string, route: string): boolean {
     const index = this._items.findIndex(e => e.name === name && e.route === route)
-    if (index >= 0) {
+    if (index >= 0) {      
       this._items = [...this._items.slice(0, index), ...this._items.slice(index + 1)];
       return true;
     }
