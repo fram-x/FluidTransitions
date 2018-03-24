@@ -99,6 +99,9 @@ myCustomTransitionFunction = (transitionInfo) => {
 }
 ```
 
+#### Delay
+Each transition can be delayed by setting the delay property. This will cause the transition to be started a little bit later than the previous one to give the impression that elements appear in sequence.
+
 ### Technical
 This libraries uses native animations on both Android and iOS to get full performance. Custom transitions trying to animate properties that are not supported by the native animation driver will not work.
 
