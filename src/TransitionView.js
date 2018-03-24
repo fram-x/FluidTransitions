@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { View, Animated, StyleSheet, Platform, StyleSheetValidation, findNodeHandle } from 'react-native';
+import { View, Animated, UIManager, StyleSheet, Platform, StyleSheetValidation, findNodeHandle } from 'react-native';
 
 import TransitionItem from './TransitionItem';
 import { RouteDirection, TransitionContext } from './Types';
@@ -108,7 +108,7 @@ class Transition extends React.Component<TransitionProps> {
       ...elementProps,
       key: this._getName(),
       collapsable: false,
-      style,
+      style,      
       ref: (ref) => { this._viewRef = ref; },
     };
 
@@ -139,7 +139,7 @@ class Transition extends React.Component<TransitionProps> {
     }
 
     return { opacity: 0};
-  }
+  }  
 }
 
 export default Transition;

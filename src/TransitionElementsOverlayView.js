@@ -54,6 +54,7 @@ registerTransitionType('vertical', getVerticalTransition);
 type TransitionElementsOverlayViewProps = {
   fromRoute: string,
   toRoute: string,
+  direction: number,
   transitionElements: Array<any>
 }
 
@@ -69,19 +70,20 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
 
   render() {
     const { getDirectionForRoute, getDirection } = this.context;
-
     if(!this.props.transitionElements || !this.getMetricsReady() ||
       !getDirectionForRoute || !getDirection) {
       return <View style={styles.overlay} pointerEvents='none'/>;
     }
-    
-    let delayCountFrom = this.props.transitionElements.reduce((prevValue, item) =>
-      item.delay && getDirectionForRoute(item.name, item.route) === RouteDirection.from ? 
-        prevValue + 1: prevValue, 0);
+    const transitionElements = this.props.transitionElements
+      .filter(i => i.route === this.props.fromRoute || i.route === this.props.toRoute);
+      
+    let delayCountFrom = transitionElements
+      .filter(item => getDirectionForRoute(item.name, item.route) === RouteDirection.from)
+      .reduce((prevValue, item) => item.delay ? prevValue + 1: prevValue, 0);
 
-    let delayCountTo = this.props.transitionElements.reduce((prevValue, item) =>
-      item.delay && getDirectionForRoute(item.name, item.route) === RouteDirection.to ? 
-        prevValue + 1: prevValue, 0);
+    let delayCountTo = transitionElements
+      .filter(item => getDirectionForRoute(item.name, item.route) === RouteDirection.to)
+      .reduce((prevValue, item) => item.delay ? prevValue + 1: prevValue, 0);
 
     const navDirection = getDirection();
     let delayIndexFrom = 0;
@@ -89,7 +91,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     let delayFromFactor = 1;
     let delayToFactor = -1;
 
-    const transitionElements = this.props.transitionElements.map((item, idx) => {
+    const transitionViews = transitionElements.map((item, idx) => {
       let element = React.Children.only(item.reactElement.props.children);
       const routeDirection = getDirectionForRoute(item.name, item.route);
       const comp = this.getAnimatedComponent(element, idx,
@@ -108,7 +110,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
 
     return (
       <View style={styles.overlay} pointerEvents='none'>
-        {transitionElements}
+        {transitionViews}
       </View>
     );
   }

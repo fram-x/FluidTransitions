@@ -38,12 +38,9 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
   _isMounted: boolean;  
   
   render() {
-    if(!this.props.sharedElements || !this.getMetricsReady()) {      
+    if(!this.props.sharedElements || !this.getMetricsReady()) {    
       return <View style={styles.overlay} pointerEvents='none'/>;
     }
-    
-    console.log("SE RENDER " + this.props.sharedElements.length);
-
     const self = this;
     const sharedElements = this.props.sharedElements.map((pair, idx) => {
       const { fromItem, toItem } = pair;
@@ -65,7 +62,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
         elementProps = {};
         child = element;
       }
-      else {      
+      else {
         const wrapper = (<View/>);
         animatedComponent = Animated.createAnimatedComponent(wrapper.type);        
         elementProps = {};
@@ -74,7 +71,6 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
 
       const props = {
         ...element.props,
-            
         style: [element.props.style, styles.sharedElement, transitionStyle],
         key: idx,
       };

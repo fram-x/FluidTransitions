@@ -11,7 +11,7 @@ import * as Constants from './TransitionConstants';
 const styles: StyleSheet.NamedStyles = StyleSheet.create({
   overlay: {
     position: 'absolute',
-    // backgroundColor: '#EC000022',
+    // backgroundColor: '#ECFF0022',
     top: 0,
     left: 0,
     right: 0,
@@ -22,10 +22,10 @@ const styles: StyleSheet.NamedStyles = StyleSheet.create({
 type TransitionOverlayViewProps = {
   fromRoute: string,
   toRoute: string,
-  transitionElements: Array<TransitionItem>,
-  sharedElements: Array<any>,
   visibility: Animated.Value,
-  direction: number
+  direction: number,
+  sharedElements: Array<any>,
+  transitionElements: Array<TransitionItem>
 }
 
 class TransitionOverlayView extends React.Component<TransitionOverlayViewProps> {
@@ -37,16 +37,20 @@ class TransitionOverlayView extends React.Component<TransitionOverlayViewProps> 
 
   _isMounted: boolean;
 
-  render() {    
+  render() {
     return (
       <Animated.View style={[styles.overlay, this.getVisibilityStyle()]} pointerEvents='none'>
         <TransitionElementsOverlayView
           transitionElements={this.props.transitionElements}
           direction={this.props.direction}
+          fromRoute={this.props.fromRoute}
+          toRoute={this.props.toRoute}
         />
          <SharedElementsOverlayView
           sharedElements={this.props.sharedElements}
           direction={this.props.direction}
+          fromRoute={this.props.fromRoute}
+          toRoute={this.props.toRoute}
         />
       </Animated.View>
     );
@@ -58,7 +62,7 @@ class TransitionOverlayView extends React.Component<TransitionOverlayViewProps> 
     const visibilityProgress = getTransitionProgress();
     if(!visibilityProgress) return {};
 
-    return {
+    return { 
       opacity: visibilityProgress.interpolate({
           inputRange: Constants.OVERLAY_VIEWS_VISIBILITY_INPUT_RANGE,
           outputRange: Constants.OVERLAY_VIEWS_VISIBILITY_OUTPUT_RANGE
@@ -75,7 +79,7 @@ class TransitionOverlayView extends React.Component<TransitionOverlayViewProps> 
   }
 
   static contextTypes = {
-    getTransitionProgress: PropTypes.func,
+    getTransitionProgress: PropTypes.func,    
   }
 }
 

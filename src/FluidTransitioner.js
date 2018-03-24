@@ -6,31 +6,6 @@ import { addNavigationHelpers, Transitioner } from 'react-navigation';
 import TransitionItemsView from './TransitionItemsView';
 import TransitionRouteView from './TransitionRouteView';
 
-const styles = StyleSheet.create({
-  container: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  scene: {
-    position: 'absolute',
-    backgroundColor: '#FFF',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  sceneContent: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  }
-});
-
 const emptyFunction = ()=> {};
 
 type SceneRenderedInfo = {
@@ -43,12 +18,13 @@ class FluidTransitioner extends React.Component<*> {
     super(props);
     this._onTransitionStart = this._onTransitionStart.bind(this);
     this._screenDidMount = this._screenDidMount.bind(this);
+    this._transitionItemsViewOnLayout = this._transitionItemsViewOnLayout.bind(this);
   }
-
-  _transitionItemsView: any;  
+    
   _scenes: Array<SceneRenderedInfo> = [];
   _scenesMountedResolve: Function;
   _scenesMountedPromise: Promise<void>;
+  _layoutsReady: boolean;
 
   static childContextTypes = {
     route: PropTypes.string,
@@ -82,31 +58,36 @@ class FluidTransitioner extends React.Component<*> {
     );
   }
 
-  _screenDidMount(key: string) {
-    console.log("screen did mount " + key);
-    console.log(this._scenes);
+  _transitionItemsViewOnLayout(evt) {
+    this._layoutsReady = true;
+    this._checkScenesAndLayouts();
+  }
 
+  _screenDidMount(key: string) {
     if(!this._scenesMountedResolve)
       return;
 
     // check if this is a scene we are waiting for
     const sceneRenderInfo = this._scenes.find(sri => sri.key === key);
-    if(sceneRenderInfo){
-      sceneRenderInfo.isMounted = true;
-    }
+    if(sceneRenderInfo) sceneRenderInfo.isMounted = true;
+    
+    this._checkScenesAndLayouts();
+  }
 
-    if(!this._scenes.find(sri => !sri.isMounted)){
-      this._scenesMountedResolve();
-      this._scenesMountedResolve = null;
+  _checkScenesAndLayouts() {
+    if(this._layoutsReady && !this._scenes.find(sri => !sri.isMounted)) {      
+      if(this._scenesMountedResolve){
+        this._scenesMountedResolve();
+        this._scenesMountedResolve = null;
+      }
     }
   }
 
   async _onTransitionStart() {
-    console.log("transitionstart");
     if(this._scenesMountedPromise)
       await this._scenesMountedPromise;
 
-    console.log("transitionstart done");
+    console.log("Transition start");
   }
 
   shouldComponentUpdate(nextProps) {
@@ -116,7 +97,7 @@ class FluidTransitioner extends React.Component<*> {
   _configureTransition() {
     return {
       timing: Animated.timing,
-      duration: 3750,
+      duration: 750,
       easing: Easing.inOut(Easing.poly(4)),
       ...this.props.transitionConfig,
       isInteraction: true,
@@ -125,26 +106,24 @@ class FluidTransitioner extends React.Component<*> {
   }
 
   _render(props, prevProps) {
-    this._animatedSubscribeForNativeAnimation(props.position);
-    
+    this._animatedSubscribeForNativeAnimation(props.position);    
     this._updateSceneArray(props.scenes);
-    this._scenesMountedPromise = new Promise(resolve => this._scenesMountedResolve = resolve);
-
+    this._layoutsReady = false;
     const scenes = props.scenes.map(scene => 
       this._renderScene({ ...props, scene }, prevProps));
 
     const toRoute = props.scene.route.routeName;
     const fromRoute = prevProps ? prevProps.scene.route.routeName : null;
     const index = props.scene.index;
-
+    
     return (
       <TransitionItemsView
         navigation={this.props.navigation}
-        ref={ref => this._transitionItemsView = ref}
         progress={props.position}
         fromRoute={fromRoute}
         toRoute={toRoute}
         index={index}
+        onLayout={this._transitionItemsViewOnLayout}
       >
         {scenes}
       </TransitionItemsView>
@@ -178,7 +157,7 @@ class FluidTransitioner extends React.Component<*> {
   _updateSceneArray(scenes: Array<any>) {
     scenes.forEach(scene => {
       if(!this._scenes.find(sri => sri.key === scene.key))
-        this._scenes = [...this._scenes, { key: scene.key, isRendered: false}];
+        this._scenes = [...this._scenes, { key: scene.key, isMounted: false}];
     });
 
     const toDelete = [];
@@ -188,12 +167,16 @@ class FluidTransitioner extends React.Component<*> {
     });
 
     toDelete.forEach(sri => {
-      const index = this._scenes.indexOf(sri);      
+      const index = this._scenes.indexOf(sri);
       this._scenes = [...this._scenes.slice(0, index), ...this._scenes.slice(index + 1)];
     });
+
+    if(this._scenes.find(sri => !sri.isMounted))
+      this._scenesMountedPromise = new Promise(resolve => 
+        this._scenesMountedResolve = resolve);
   }
 
-  _runStartAnimation(){
+  _runStartAnimation() {
     // Initialize start transition
     const progress = new Animated.Value(0);
     const position = new Animated.Value(-1);
@@ -229,5 +212,30 @@ class FluidTransitioner extends React.Component<*> {
     return navigation;
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  scene: {
+    position: 'absolute',
+    backgroundColor: '#FFF',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  sceneContent: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  }
+});
 
 export default FluidTransitioner;

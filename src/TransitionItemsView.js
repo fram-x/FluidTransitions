@@ -21,7 +21,8 @@ type TransitionItemsViewProps = {
   progress: Animated.Value,
   fromRoute: string,
   toRoute: string,
-  index: number
+  index: number,
+  onLayout: (evt: any) => void,
 }
 
 export default class TransitionItemsView extends React.Component<
@@ -40,25 +41,23 @@ export default class TransitionItemsView extends React.Component<
     };
 
     this._transitionItems = new TransitionItems();
-    this._onLayoutResolvePromise = new Promise(resolve => this._onLayoutResolve = resolve);
-    this._transitionProgress = props.progress;
+    this._transitionProgress = props.progress;    
   }
 
   _viewRef: ?View;
+  _viewMetrics: Metrics;
   _transitionItems: TransitionItems;
   _isMounted: boolean;
-  _onLayoutResolve: ?Function;
-  _onLayoutResolvePromise: Promise<void>;
   _transitionProgress: Animated.Value;
 
-  async componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps) {
     if(nextProps.toRoute != this.props.toRoute ||
       nextProps.fromRoute != this.props.fromRoute) {
-      await this.updateFromProps(nextProps, this.props);
+      this.updateFromProps(nextProps, this.props);
     }
   }
 
-  async updateFromProps(props, prevProps) {
+  updateFromProps(props, prevProps) {
     if(!this._isMounted) return;
     const indexHasChanged = props.index != (prevProps ? prevProps.index : -1);
     if(!indexHasChanged) return;
@@ -73,54 +72,33 @@ export default class TransitionItemsView extends React.Component<
       toRoute = tmp;
     }
 
-    const sharedElements = this._transitionItems.getSharedElements(fromRoute, toRoute);
-    const transitionElements = this._transitionItems.getTransitionElements(fromRoute, toRoute);
-    if(sharedElements.length === 0 && transitionElements === 0)
-      return;
-
-    await this.measureItems(sharedElements, transitionElements);
-
-    // console.log("=======");
-    // console.log("from:   " + props.fromRoute);
-    // console.log("to:     " + props.toRoute);
-    // console.log("index:  " + props.index);
-    // console.log("navdir: " + (direction === NavigationDirection.forward ? "forward" : 
-    //   (direction === NavigationDirection.back ? "back" : "none")));
-    // console.log("SE:     " + sharedElements.length);
-    // console.log("TE:     " + transitionElements.length);
-    // console.log("=======");
-
     this.setState({
       ...this.state,
       toRoute: toRoute,
       fromRoute: fromRoute,
       direction,
-      sharedElements,
-      transitionElements,
     });
   }
 
   render() {
+    console.log("==========");
+    console.log("TIW Render");
+
     return (
       <View
         style={styles.container}
         ref={(ref) => this._viewRef = ref}
-        onLayout={this.onLayout.bind(this)}>
+      >
         {this.props.children}
         <TransitionOverlayView
-          transitionElements={this.state.transitionElements}
-          sharedElements={this.state.sharedElements}
           direction={this.state.direction}
+          fromRoute={this.state.fromRoute}
+          toRoute={this.state.toRoute}
+          sharedElements={this.state.sharedElements}
+          transitionElements={this.state.transitionElements}
         />
       </View>
     );
-  }
-
-  onLayout() {
-    if(this._onLayoutResolve){
-      this._onLayoutResolve();
-      this._onLayoutResolve = null;
-    }
   }
 
   getDirectionForRoute(name: string, route: string): RouteDirection {
@@ -136,8 +114,8 @@ export default class TransitionItemsView extends React.Component<
   }
 
   async getViewMetrics(): Metrics {
-    let viewMetrics: Metrics;
     const nodeHandle = findNodeHandle(this._viewRef);
+    let viewMetrics: Metrics;
     if(!nodeHandle) return viewMetrics;
 
     const promise = new Promise(resolve => {
@@ -179,18 +157,38 @@ export default class TransitionItemsView extends React.Component<
 
     return new Promise((resolve, reject) => {
       UIManager.measureInWindow(nodeHandle, (x, y, width, height) => {
-        item.metrics = { x: x - viewMetrics.x, y: y - viewMetrics.y, width, height };
+        item.metrics = { x: x - viewMetrics.x, y: y - viewMetrics.y, width, height };        
         resolve();
       });
     });
+  }
+  
+  _inUpdate: boolean = false;
+  async componentDidUpdate(){
+    console.log("TIW Update");
+    if(this._inUpdate) return;
+
+    this._inUpdate = true;
+    const sharedElements = this._transitionItems.getSharedElements(this.state.fromRoute, this.state.toRoute);
+    const transitionElements = this._transitionItems.getTransitionElements(this.state.fromRoute, this.state.toRoute);
+    await this.measureItems(sharedElements, transitionElements);
+    if(!sharedElements.find(p => !p.fromItem.metrics || !p.toItem.metrics) &&
+      !transitionElements.find(i => !i.metrics)) {
+      console.log("TIW READY! SE: " + sharedElements.length + ", TE:" + transitionElements.length + " - " + this.state.fromRoute + " -> " + this.state.toRoute);
+      this.setState({
+        ...this.state,
+        sharedElements,
+        transitionElements,
+      });
+      this.props.onLayout && this.props.onLayout();
+    }
+    this._inUpdate = false;
   }
 
   componentDidMount() {
     this._isMounted = true;
     InteractionManager.runAfterInteractions(async ()=> {
-      // Wait for layouts
-      await this._onLayoutResolvePromise;
-      await this.updateFromProps(this.props);
+      this.updateFromProps(this.props);
     });
   }
 
@@ -204,7 +202,7 @@ export default class TransitionItemsView extends React.Component<
     getVisibilityProgress: PropTypes.func,
     getTransitionProgress: PropTypes.func,
     getDirectionForRoute: PropTypes.func,
-    getDirection: PropTypes.func,    
+    getDirection: PropTypes.func,      
   }
 
   getChildContext() {
@@ -214,7 +212,7 @@ export default class TransitionItemsView extends React.Component<
       getVisibilityProgress: ()=> this._transitionProgress,
       getTransitionProgress: () => this._transitionProgress,
       getDirectionForRoute: this.getDirectionForRoute.bind(this),
-      getDirection: () => this.state.direction ? this.state.direction : NavigationDirection.unknown,      
+      getDirection: () => this.state.direction ? this.state.direction : NavigationDirection.unknown,            
     };
   }
 }
