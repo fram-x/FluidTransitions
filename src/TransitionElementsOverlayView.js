@@ -103,9 +103,11 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     const { getDirectionForRoute, getDirection } = this.context;
     if(!this.props.transitionElements || !this.getMetricsReady() ||
       !getDirectionForRoute || !getDirection) {
+      // console.log("RENDER TE empty");
       return <View style={styles.overlay} pointerEvents='none'/>;
     }
     
+    // console.log("RENDER TE " + this.props.transitionElements.length);
     const transitionElements = this.props.transitionElements
       .filter(i => i.route === this.props.fromRoute || i.route === this.props.toRoute);
 

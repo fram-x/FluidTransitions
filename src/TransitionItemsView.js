@@ -1,12 +1,12 @@
 import React from 'react';
-import { 
-  View, 
-  StyleSheet, 
-  UIManager, 
-  Easing, 
-  InteractionManager, 
-  Animated, 
-  findNodeHandle 
+import {
+  View,
+  StyleSheet,
+  UIManager,
+  Easing,
+  InteractionManager,
+  Animated,
+  findNodeHandle
 } from 'react-native';
 import PropTypes from 'prop-types';
 
@@ -87,8 +87,6 @@ export default class TransitionItemsView extends React.Component<
       toRoute = tmp;
     }
 
-    // console.log("TIW " + fromRoute + " -> " + toRoute + ", index:" + index);
-
     this.setState({
       ...this.state,
       toRoute: toRoute,
@@ -133,8 +131,8 @@ export default class TransitionItemsView extends React.Component<
     const item = this._transitionItems.getItemByNameAndRoute(name, route);
     if(!item || !item.shared) return false;
 
-    const sharedElements = this._transitionItems.getSharedElements(this.state.fromRoute, this.state.toRoute);    
-    if(sharedElements.find(pair => 
+    const sharedElements = this._transitionItems.getSharedElements(this.state.fromRoute, this.state.toRoute);
+    if(sharedElements.find(pair =>
       (pair.fromItem.name === item.name && pair.fromItem.route === item.route) ||
       (pair.toItem.name === item.name && pair.toItem.route === item.route))) {
         return true;
@@ -190,7 +188,7 @@ export default class TransitionItemsView extends React.Component<
     });
   }
 
-  _inUpdate: boolean = false;  
+  _inUpdate: boolean = false;
   async componentDidUpdate(){
     if(this._inUpdate) return;
     if(!this.state.fromRoute && !this.state.toRoute) return;
@@ -203,10 +201,10 @@ export default class TransitionItemsView extends React.Component<
       this.state.fromRoute, this.state.toRoute);
 
     await this.measureItems(sharedElements, transitionElements);
-        
+
     if(!sharedElements.find(p => !p.fromItem.metrics || !p.toItem.metrics) &&
       !transitionElements.find(i => !i.metrics)) {
-      
+
       const index = this._runInitialAnimation ? 0 : this.state.index;
       this.setState({
         ...this.state,
@@ -216,18 +214,18 @@ export default class TransitionItemsView extends React.Component<
       });
 
       this.props.onLayout && this.props.onLayout();
-      
+
       if(this.state.fromRoute === null) {
         this._runStartAnimation(transitionElements.length);
       }
     }
-    
+
     this._inUpdate = false;
   }
 
   async _runStartAnimation(numberOfTransitions: number) {
     const { getTransitionConfig } = this.context;
-    let transitionSpec = getTransitionConfig ? 
+    let transitionSpec = getTransitionConfig ?
       getTransitionConfig() : {
         timing: Animated.timing,
         duration: 750,
@@ -235,7 +233,7 @@ export default class TransitionItemsView extends React.Component<
         isInteraction: true,
         useNativeDriver: true,
       };
-    
+
     const { timing } = transitionSpec;
     delete transitionSpec.timing;
 
@@ -246,7 +244,7 @@ export default class TransitionItemsView extends React.Component<
         toValue: 0,
       })
     ];
-    
+
     Animated.parallel(animations).start();
   }
 
