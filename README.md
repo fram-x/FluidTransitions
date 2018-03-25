@@ -1,11 +1,11 @@
 # Fluid Transitions for React Navigation
 
 ## Introduction
-This project aims to implement a simple yet powerful set of constructs for building fluid transitions between screens in [React Navigation](https://reactnavigation.org).
+This project aims to implement a simple yet powerful set of constructs for building fluid transitions between elements when navigating with [React Navigation](https://reactnavigation.org).
 
 <img src="https://github.com/fram-x/FluidTransitions/blob/develop/docs/example.gif" width="240">
 
-The library implements a new navigator component (`FluidNavigator`) that works just like a `StackNavigator`. In addition it has a new component called `Transition` which can be used to build different types of fluid transitions that will automatically be run when navigating between screens using the regular navigation actions.
+The library implements a new navigator component called `FluidNavigator` that works just like a `StackNavigator`. In addition it has a new component called `Transition` which can be used to build different types of transitions that will automatically be run when navigating between screens using the regular navigation actions.
 
 > The Navigator's API is identical to the StackNavigator and can easily be integrated with redux and existing navigation setups.
 
@@ -19,7 +19,9 @@ To start the example, navigate to the examples folder and run the following comm
 `react-native run-ios|run-android`
 
 ### Shared Element Transitions
-This example shows how two elements can be set up to automatically transition between each other when navigating between screens. The example can be found in the file [SharedElements.js](./Examples/src/SharedElements.js).
+This example shows how two elements can be set up to automatically transition between each other when navigating between screens. A more detailed edition of this example can be found in the file [SharedElements.js](./Examples/src/SharedElements.js).
+
+> Note that a shared transition happens between two elements of the same type and content. The library animates position and scale between the two. Using different styles and content in two shared elements will result in strange transitions.
 
 ```javascript
 const Screen1 = (props) => (
