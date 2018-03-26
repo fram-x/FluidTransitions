@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Button, Image, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet } from 'react-native';
 
 import { FluidNavigator, Transition } from 'react-navigation-fluid-transitions';
 
@@ -82,7 +82,10 @@ const Screen1 = (props) => (
       <Transition appear="horizontal">
         <View>
           <Text style={styles.textBold}>Welcome to this demo!</Text>
-          <Text style={styles.text}>It shows you how to build some cool transitions to use in your onboarding screens.</Text>
+          <Text style={styles.text}>
+            It shows you how to build some cool transitions to use
+            in your onboarding screens.
+          </Text>
         </View>
       </Transition>
     </View>
@@ -116,7 +119,9 @@ const Screen2 = (props) => (
       <Transition appear="horizontal">
         <View>
           <Text style={styles.textBold}>This is the second page</Text>
-          <Text style={styles.text}>It uses transitions to add individual transitions in a navigation transition.</Text>
+          <Text style={styles.text}>
+            Here are some more individual transitions!
+          </Text>
         </View>
       </Transition>
     </View>
