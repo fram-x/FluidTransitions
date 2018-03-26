@@ -29,19 +29,11 @@ Examples are included as a runnable React Native project found in the `Examples`
 
 To start the example, navigate to the examples folder and run the following commands from the terminal:
 
-`npm i` 
-
-or 
-
-`yarn`
+`npm i` or `yarn`
 
 To start the project run
 
-`react-native run-ios`
-
-or
-
-`react-native run-android`
+`react-native run-ios` or `react-native run-android`
 
 ### Shared Element Transitions
 This example shows how two elements can be set up to automatically transition between each other when navigating between screens. A more detailed edition of this example can be found in the file [SharedElements.js](./Examples/src/SharedElements.js).
