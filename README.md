@@ -1,6 +1,8 @@
 # Fluid Transitions for React Navigation
 
-<a href="https://www.npmjs.com/package/react-navigation-fluid-transitions"><img src="https://img.shields.io/npm/v/react-navigation-fluid-transitions.svg?style=flat-square"></a>
+<a href="https://www.npmjs.com/package/react-navigation-fluid-transitions">
+  <img src="https://img.shields.io/npm/v/react-navigation-fluid-transitions.svg?style=flat-square">
+</a>
 <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
 
 ## Introduction
@@ -126,7 +128,7 @@ myCustomTransitionFunction = (transitionInfo) => {
 }
 ```
 
-Read more about the parameters and functionality for building transition functions here.
+Read more about the parameters and functionality for building [custom transitions](./Examples/docs/CustomTransitions.md).
 
 #### Delay
 Each transition can be delayed by setting the delay property. This will cause the transition to be started a little bit later than the previous one to give the impression that elements appear in sequence.
