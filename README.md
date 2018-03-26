@@ -128,7 +128,7 @@ myCustomTransitionFunction = (transitionInfo) => {
 }
 ```
 
-Read more about the parameters and functionality for building [custom transitions](./Examples/docs/CustomTransitions.md).
+Read more about the parameters and functionality for building [custom transitions](./docs/CustomTransitions.md).
 
 #### Delay
 Each transition can be delayed by setting the delay property. This will cause the transition to be started a little bit later than the previous one to give the impression that elements appear in sequence.
