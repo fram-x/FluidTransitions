@@ -4200,8 +4200,9 @@ react-native@0.53.3:
     xmldoc "^0.4.0"
     yargs "^9.0.0"
 
-react-navigation-fluid-transitions@./../:
+react-navigation-fluid-transitions@^0.1.0:
   version "0.1.0"
+  resolved "https://registry.yarnpkg.com/react-navigation-fluid-transitions/-/react-navigation-fluid-transitions-0.1.0.tgz#ea1f575a0ec542d2709c470a9e98610d0f544048"
 
 react-navigation@^1.1.1:
   version "1.1.1"
