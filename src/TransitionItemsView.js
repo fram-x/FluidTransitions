@@ -71,21 +71,9 @@ export default class TransitionItemsView extends React.Component<
     }
   }
   
-  shouldCOmponentUpdate(nextProps, nextState) {
-    if(this.props.fromRoute === nextProps.fromRoute && 
-      this.props.toRoute === nextProps.toRoute &&
-      this.props.progress === nextProps.progress &&
-      this.props.index === nextProps.index && 
-      this.props.onLayout === nextProps.onLayout) return false;
-
-    return true;
-  }
-
   updateFromProps(props, prevProps) {
     if(!this._isMounted) return;
-    // const indexHasChanged = props.index != (prevProps ? prevProps.index : Number.MIN_SAFE_INTEGER);
-    // if(!indexHasChanged) return;
-
+  
     let { fromRoute, toRoute } = props;
     const direction = props.index > (prevProps ? prevProps.index : Number.MIN_SAFE_INTEGER ) ?
       NavigationDirection.forward : NavigationDirection.back;
@@ -217,6 +205,9 @@ export default class TransitionItemsView extends React.Component<
     if(!sharedElements.find(p => !p.fromItem.metrics || !p.toItem.metrics) &&
       !transitionElements.find(i => !i.metrics)) {
 
+      // HACK: Setting state in componentDidUpdate is not nice - but
+      // This is the only way we can notify the transitioner that we are
+      // ready to move along with the transition.
       this.setState({
         ...this.state,
         sharedElements,
