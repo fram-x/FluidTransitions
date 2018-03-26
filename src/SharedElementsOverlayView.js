@@ -51,7 +51,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
 
     // Compare shared elements count
     if(!this.compareArrays(this.props.sharedElements, nextProps.sharedElements)){
-      console.log("SE UPDATE elements changed ");
+      // console.log("SE UPDATE elements changed ");
       return true;
     }
 
