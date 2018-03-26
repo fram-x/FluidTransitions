@@ -23,6 +23,7 @@ class FluidTransitioner extends React.Component<*> {
     this._screenDidMount = this._screenDidMount.bind(this);
     this._transitionItemsViewOnLayout = this._transitionItemsViewOnLayout.bind(this);
     this._configureTransition = this._configureTransition.bind(this);
+    this._getSceneTransitionConfiguration = this._getSceneTransitionConfiguration.bind(this);
 
     this._scenesMountedPromise = new Promise(resolve =>
       this._scenesMountedResolve = resolve);
@@ -32,6 +33,7 @@ class FluidTransitioner extends React.Component<*> {
   _scenesMountedResolve: Function;
   _scenesMountedPromise: Promise<void>;
   _layoutsReady: boolean;
+  _screenDetails: Array<any> = [];
 
   static childContextTypes = {
     route: PropTypes.string,
@@ -52,7 +54,7 @@ class FluidTransitioner extends React.Component<*> {
       route: this.props.navigation.state.routes[
         this.props.navigation.state.index].routeName,
       onScreenDidMount: this._screenDidMount,
-      getTransitionConfig: this._configureTransition
+      getTransitionConfig: this._getSceneTransitionConfiguration
     };
   }
 
@@ -108,11 +110,24 @@ class FluidTransitioner extends React.Component<*> {
   }
 
   _configureTransition(props, prevProps) {
+    let sceneTransitionConfig = {};
+    if(props) {
+      let moveForward = true;
+      if(prevProps && prevProps.index > props.index){
+        moveForward = false;
+      }
+      const { scene } = moveForward ? props : prevProps;
+      const screenDetails = this._getScreenDetails(scene);
+      if(screenDetails && screenDetails.options && screenDetails.options.transitionConfig) {
+        sceneTransitionConfig = screenDetails.options.transitionConfig;
+      }
+    }
     return {
       timing: Animated.timing,
       duration: 550,
       easing: Easing.inOut(Easing.poly(4)),
       ...this.props.transitionConfig,
+      ...sceneTransitionConfig,
       isInteraction: true,
       useNativeDriver: true,
     };
@@ -148,6 +163,7 @@ class FluidTransitioner extends React.Component<*> {
     const { index } = scene;
     const navigation = this._getChildNavigation(scene);
     const Scene = this.props.router.getComponentForRouteName(scene.route.routeName);
+    
     return (
       <TransitionRouteView
         style={[styles.scene, this.getOpacityStyle(transitionProps.position, index)]}
@@ -184,6 +200,30 @@ class FluidTransitioner extends React.Component<*> {
       this._scenes = [...this._scenes.slice(0, index), ...this._scenes.slice(index + 1)];
     });
   }
+
+  _getSceneTransitionConfiguration(routeName: string, navigation: any) {
+    const props = { navigation, scene: { route: {routeName} }};
+    return this._configureTransition(props);
+  }
+
+  _getScreenDetails = scene => {
+    const { screenProps, navigation, router } = this.props;
+    let screenDetails = this._screenDetails[scene.key];
+    if (!screenDetails || screenDetails.state !== scene.route) {
+      const screenNavigation = addNavigationHelpers({
+        dispatch: navigation.dispatch,
+        state: scene.route,
+      });
+      screenDetails = {
+        state: scene.route,
+        navigation: screenNavigation,
+        options: router.getScreenOptions(screenNavigation, screenProps),
+      };
+
+      this._screenDetails[scene.key] = screenDetails;
+    }
+    return screenDetails;
+  };
 
   _getChildNavigation = (scene) => {
     if (!this._childNavigationProps) { this._childNavigationProps = {}; }

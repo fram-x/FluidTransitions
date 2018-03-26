@@ -225,8 +225,9 @@ export default class TransitionItemsView extends React.Component<
 
   async _runStartAnimation(numberOfTransitions: number) {
     const { getTransitionConfig } = this.context;
+    const { toRoute, navigation } = this.props;
     let transitionSpec = getTransitionConfig ?
-      getTransitionConfig() : {
+      getTransitionConfig(toRoute, navigation) : {
         timing: Animated.timing,
         duration: 750,
         easing: Easing.inOut(Easing.poly(4)),
@@ -240,7 +241,7 @@ export default class TransitionItemsView extends React.Component<
     const animations = [
       timing(this._transitionProgress, {
         ...transitionSpec,
-        duration: numberOfTransitions === 0 ? 50 : transitionSpec.duration,
+        duration: numberOfTransitions === 0 ? 25 : transitionSpec.duration,
         toValue: 0,
       })
     ];
