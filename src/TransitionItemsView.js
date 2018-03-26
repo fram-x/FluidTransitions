@@ -16,7 +16,7 @@ import TransitionItems from './TransitionItems';
 import TransitionOverlayView from './TransitionOverlayView';
 import { invariant } from './Utils/invariant';
 
-type TransitionItemsViewState = {
+type State = {
   fromRoute: ?string,
   toRoute: ?string,
   direction: NavigationDirection,
@@ -25,17 +25,18 @@ type TransitionItemsViewState = {
   transitionElements: ?Array<TransitionItem>
 }
 
-type TransitionItemsViewProps = {
+type Props = {
   children: Array<any>,
   progress: Animated.Value,
   fromRoute: string,
   toRoute: string,
   index: ?number,
+  navigation: any,
   onLayout: (evt: any) => void,
 }
 
 export default class TransitionItemsView extends React.Component<
-  TransitionItemsViewProps, TransitionItemsViewState>  {
+  Props, State>  {
   constructor(props) {
     super(props);
     this._isMounted = false;
@@ -69,11 +70,21 @@ export default class TransitionItemsView extends React.Component<
       this.updateFromProps(nextProps, this.props);
     }
   }
+  
+  shouldCOmponentUpdate(nextProps, nextState) {
+    if(this.props.fromRoute === nextProps.fromRoute && 
+      this.props.toRoute === nextProps.toRoute &&
+      this.props.progress === nextProps.progress &&
+      this.props.index === nextProps.index && 
+      this.props.onLayout === nextProps.onLayout) return false;
+
+    return true;
+  }
 
   updateFromProps(props, prevProps) {
     if(!this._isMounted) return;
-    const indexHasChanged = props.index != (prevProps ? prevProps.index : Number.MIN_SAFE_INTEGER);
-    if(!indexHasChanged) return;
+    // const indexHasChanged = props.index != (prevProps ? prevProps.index : Number.MIN_SAFE_INTEGER);
+    // if(!indexHasChanged) return;
 
     let { fromRoute, toRoute } = props;
     const direction = props.index > (prevProps ? prevProps.index : Number.MIN_SAFE_INTEGER ) ?
@@ -86,21 +97,13 @@ export default class TransitionItemsView extends React.Component<
       fromRoute = toRoute;
       toRoute = tmp;
     }
-
-    this.setState({
-      ...this.state,
-      toRoute: toRoute,
-      fromRoute: fromRoute,
-      direction,
-      index
-    });
+        
+    this.setState({ ...this.state, toRoute, fromRoute, direction, index });
   }
 
   render() {
     return (
-      <View
-        style={styles.container}
-      >
+      <View style={styles.container}>
         {this.props.children}
         <TransitionOverlayView
           ref={(ref) => this._viewRef = ref}
@@ -188,16 +191,25 @@ export default class TransitionItemsView extends React.Component<
     });
   }
 
-  _inUpdate: boolean = false;
-  async componentDidUpdate(){
+  _inUpdate: boolean = false;  
+  async componentDidUpdate(){    
     if(this._inUpdate) return;
     if(!this.state.fromRoute && !this.state.toRoute) return;
-
+    
     this._inUpdate = true;
-    const sharedElements = this._transitionItems.getSharedElements(
+    let sharedElements = this._transitionItems.getSharedElements(
       this.state.fromRoute, this.state.toRoute);
 
-    const transitionElements = this._transitionItems.getTransitionElements(
+    let transitionElements = this._transitionItems.getTransitionElements(
+      this.state.fromRoute, this.state.toRoute);
+
+    await this.measureItems(sharedElements, transitionElements);
+
+    // HACK - we might get here and the list of elements have changed. Measure again.
+    sharedElements = this._transitionItems.getSharedElements(
+      this.state.fromRoute, this.state.toRoute);
+
+    transitionElements = this._transitionItems.getTransitionElements(
       this.state.fromRoute, this.state.toRoute);
 
     await this.measureItems(sharedElements, transitionElements);
@@ -205,14 +217,12 @@ export default class TransitionItemsView extends React.Component<
     if(!sharedElements.find(p => !p.fromItem.metrics || !p.toItem.metrics) &&
       !transitionElements.find(i => !i.metrics)) {
 
-      const index = this._runInitialAnimation ? 0 : this.state.index;
       this.setState({
         ...this.state,
         sharedElements,
         transitionElements,
-        index,
       });
-
+            
       this.props.onLayout && this.props.onLayout();
 
       if(this.state.fromRoute === null) {

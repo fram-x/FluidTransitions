@@ -18,15 +18,11 @@ class FluidTransitioner extends React.Component<*> {
     super(props);
     
     this._onTransitionStart = this._onTransitionStart.bind(this);
-    this._onTransitionEnd = this._onTransitionEnd.bind(this);
 
     this._screenDidMount = this._screenDidMount.bind(this);
     this._transitionItemsViewOnLayout = this._transitionItemsViewOnLayout.bind(this);
     this._configureTransition = this._configureTransition.bind(this);
     this._getSceneTransitionConfiguration = this._getSceneTransitionConfiguration.bind(this);
-
-    this._scenesMountedPromise = new Promise(resolve =>
-      this._scenesMountedResolve = resolve);
   }
 
   _scenes: Array<SceneRenderedInfo> = [];
@@ -65,7 +61,6 @@ class FluidTransitioner extends React.Component<*> {
         render={this._render.bind(this)}
         navigation={this.props.navigation}
         onTransitionStart={this._onTransitionStart}
-        _onTransitionEnd={this._onTransitionEnd}
       />
     );
   }
@@ -95,14 +90,9 @@ class FluidTransitioner extends React.Component<*> {
     }
   }
 
-  async _onTransitionStart() {
+  async _onTransitionStart() {    
     if(this._scenesMountedPromise)
       await this._scenesMountedPromise;
-  }
-
-  _onTransitionEnd() {
-    this._scenesMountedPromise = new Promise(resolve =>
-      this._scenesMountedResolve = resolve);
   }
 
   shouldComponentUpdate(nextProps) {
@@ -134,9 +124,9 @@ class FluidTransitioner extends React.Component<*> {
   }
 
   _render(props, prevProps) {
-    this._animatedSubscribeForNativeAnimation(props.position);
-    this._updateSceneArray(props.scenes);
     this._layoutsReady = false;
+    this._animatedSubscribeForNativeAnimation(props.position);
+    this._updateSceneArray(props.scenes);    
     const scenes = props.scenes.map(scene =>
       this._renderScene({ ...props, scene }, prevProps));
 
@@ -199,6 +189,9 @@ class FluidTransitioner extends React.Component<*> {
       const index = this._scenes.indexOf(sri);
       this._scenes = [...this._scenes.slice(0, index), ...this._scenes.slice(index + 1)];
     });
+
+    this._scenesMountedPromise = new Promise(resolve =>
+      this._scenesMountedResolve = resolve);
   }
 
   _getSceneTransitionConfiguration(routeName: string, navigation: any) {
