@@ -55,7 +55,7 @@ const InitialScreen = (props) => (
           const { progress, start, end } = transitionInfo;
           const rotateInterpolation = progress.interpolate({
             inputRange: [0, start, end, 1],
-            outputRange: [Math.PI, 2 * Math.PI, 0, 0],
+            outputRange: ['360deg', '360deg', '0deg', '0deg'],
           });
           const opacityInterpolation = progress.interpolate({
             inputRange: [0, start, end, 1],
