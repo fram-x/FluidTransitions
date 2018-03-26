@@ -16,14 +16,14 @@ export default class TransitionItems {
   add(item: TransitionItem): boolean {
     if(this._items.findIndex(e => e.name === item.name && e.route === item.route) >= 0)
       return false;
-
+      console.log("ADD " + item.name + "/" + item.route);
     this._items = [...this._items, item];
     return true;
   }
 
   remove(name: string, route: string): boolean {
     const index = this._items.findIndex(e => e.name === name && e.route === route)
-    if (index >= 0) {      
+    if (index >= 0) {
       this._items = [...this._items.slice(0, index), ...this._items.slice(index + 1)];
       return true;
     }

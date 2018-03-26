@@ -1,5 +1,13 @@
 import React from 'react';
-import { View, StyleSheet, UIManager, InteractionManager, Animated, findNodeHandle } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  UIManager,
+  Easing,
+  InteractionManager,
+  Animated,
+  findNodeHandle
+} from 'react-native';
 import PropTypes from 'prop-types';
 
 import { Metrics, NavigationDirection, RouteDirection } from './Types';
@@ -8,7 +16,7 @@ import TransitionItems from './TransitionItems';
 import TransitionOverlayView from './TransitionOverlayView';
 import { invariant } from './Utils/invariant';
 
-type TransitionItemsViewState = {
+type State = {
   fromRoute: ?string,
   toRoute: ?string,
   direction: NavigationDirection,
@@ -17,17 +25,18 @@ type TransitionItemsViewState = {
   transitionElements: ?Array<TransitionItem>
 }
 
-type TransitionItemsViewProps = {
+type Props = {
   children: Array<any>,
   progress: Animated.Value,
   fromRoute: string,
   toRoute: string,
   index: ?number,
+  navigation: any,
   onLayout: (evt: any) => void,
 }
 
 export default class TransitionItemsView extends React.Component<
-  TransitionItemsViewProps, TransitionItemsViewState>  {
+  Props, State>  {
   constructor(props) {
     super(props);
     this._isMounted = false;
@@ -43,8 +52,10 @@ export default class TransitionItemsView extends React.Component<
 
     this._transitionItems = new TransitionItems();
     this._transitionProgress = props.progress;
+    props.progress.setValue(-1);
+    // props.progress.addListener(console.log);
 
-    this._getIsPartOfSharedTransition = this._getIsPartOfSharedTransition.bind(this);
+    this.getIsPartOfSharedTransition = this.getIsPartOfSharedTransition.bind(this);
   }
 
   _viewRef: ?View;
@@ -59,38 +70,28 @@ export default class TransitionItemsView extends React.Component<
       this.updateFromProps(nextProps, this.props);
     }
   }
-
+  
   updateFromProps(props, prevProps) {
     if(!this._isMounted) return;
-    const indexHasChanged = props.index != (prevProps ? prevProps.index : -1);
-    if(!indexHasChanged) return;
-
+  
     let { fromRoute, toRoute } = props;
-    const direction = props.index > (prevProps ? prevProps.index : -1) ?
+    const direction = props.index > (prevProps ? prevProps.index : Number.MIN_SAFE_INTEGER ) ?
       NavigationDirection.forward : NavigationDirection.back;
 
-    const index = prevProps ? props.index : 1;
+    const index = prevProps ? props.index : 0;
 
     if(direction === NavigationDirection.back){
       const tmp = fromRoute;
       fromRoute = toRoute;
       toRoute = tmp;
     }
-
-    this.setState({
-      ...this.state,
-      toRoute: toRoute,
-      fromRoute: fromRoute,
-      direction,
-      index
-    });
+        
+    this.setState({ ...this.state, toRoute, fromRoute, direction, index });
   }
 
   render() {
     return (
-      <View
-        style={styles.container}        
-      >
+      <View style={styles.container}>
         {this.props.children}
         <TransitionOverlayView
           ref={(ref) => this._viewRef = ref}
@@ -107,7 +108,7 @@ export default class TransitionItemsView extends React.Component<
 
   getDirectionForRoute(name: string, route: string): RouteDirection {
     if(!this.state.fromRoute && !this.state.toRoute) { return RouteDirection.unknown; }
-    if (!this.state.fromRoute) { return RouteDirection.from; } // First screne, always direction from/to???
+    if (!this.state.fromRoute) { return RouteDirection.to; } // First screne, always direction to
     if(route === this.state.fromRoute)
       return RouteDirection.from;
     else if(route === this.state.toRoute)
@@ -117,12 +118,12 @@ export default class TransitionItemsView extends React.Component<
     return RouteDirection.unknown;
   }
 
-  _getIsPartOfSharedTransition(name: string, route: string) {
+  getIsPartOfSharedTransition(name: string, route: string) {
     const item = this._transitionItems.getItemByNameAndRoute(name, route);
     if(!item || !item.shared) return false;
 
-    const sharedElements = this._transitionItems.getSharedElements(this.state.toRoute, this.state.toRoute);    
-    if(sharedElements.find(pair => 
+    const sharedElements = this._transitionItems.getSharedElements(this.state.fromRoute, this.state.toRoute);
+    if(sharedElements.find(pair =>
       (pair.fromItem.name === item.name && pair.fromItem.route === item.route) ||
       (pair.toItem.name === item.name && pair.toItem.route === item.route))) {
         return true;
@@ -178,30 +179,81 @@ export default class TransitionItemsView extends React.Component<
     });
   }
 
-  _inUpdate: boolean = false;
-  async componentDidUpdate(){
+  _inUpdate: boolean = false;  
+  async componentDidUpdate(){    
     if(this._inUpdate) return;
-
+    if(!this.state.fromRoute && !this.state.toRoute) return;
+    
     this._inUpdate = true;
-    const sharedElements = this._transitionItems.getSharedElements(this.state.fromRoute, this.state.toRoute);
-    const transitionElements = this._transitionItems.getTransitionElements(this.state.fromRoute, this.state.toRoute);
+    let sharedElements = this._transitionItems.getSharedElements(
+      this.state.fromRoute, this.state.toRoute);
+
+    let transitionElements = this._transitionItems.getTransitionElements(
+      this.state.fromRoute, this.state.toRoute);
+
     await this.measureItems(sharedElements, transitionElements);
+
+    // HACK - we might get here and the list of elements have changed. Measure again.
+    sharedElements = this._transitionItems.getSharedElements(
+      this.state.fromRoute, this.state.toRoute);
+
+    transitionElements = this._transitionItems.getTransitionElements(
+      this.state.fromRoute, this.state.toRoute);
+
+    await this.measureItems(sharedElements, transitionElements);
+
     if(!sharedElements.find(p => !p.fromItem.metrics || !p.toItem.metrics) &&
       !transitionElements.find(i => !i.metrics)) {
+
+      // HACK: Setting state in componentDidUpdate is not nice - but
+      // This is the only way we can notify the transitioner that we are
+      // ready to move along with the transition.
       this.setState({
         ...this.state,
         sharedElements,
         transitionElements,
       });
+            
       this.props.onLayout && this.props.onLayout();
+
+      if(this.state.fromRoute === null) {
+        this._runStartAnimation(transitionElements.length);
+      }
     }
+
     this._inUpdate = false;
+  }
+
+  async _runStartAnimation(numberOfTransitions: number) {
+    const { getTransitionConfig } = this.context;
+    const { toRoute, navigation } = this.props;
+    let transitionSpec = getTransitionConfig ?
+      getTransitionConfig(toRoute, navigation) : {
+        timing: Animated.timing,
+        duration: 750,
+        easing: Easing.inOut(Easing.poly(4)),
+        isInteraction: true,
+        useNativeDriver: true,
+      };
+
+    const { timing } = transitionSpec;
+    delete transitionSpec.timing;
+
+    const animations = [
+      timing(this._transitionProgress, {
+        ...transitionSpec,
+        duration: numberOfTransitions === 0 ? 25 : transitionSpec.duration,
+        toValue: 0,
+      })
+    ];
+
+    Animated.parallel(animations).start();
   }
 
   componentDidMount() {
     this._isMounted = true;
     InteractionManager.runAfterInteractions(async ()=> {
-      this.updateFromProps(this.props);
+      this.updateFromProps({...this.props, index: -1});
     });
   }
 
@@ -219,6 +271,10 @@ export default class TransitionItemsView extends React.Component<
     getIsPartOfSharedTransition: PropTypes.func
   }
 
+  static contextTypes = {
+    getTransitionConfig: PropTypes.func
+  }
+
   getChildContext() {
     return {
       register: (item) => this._transitionItems.add(item),
@@ -227,7 +283,7 @@ export default class TransitionItemsView extends React.Component<
       getDirectionForRoute: this.getDirectionForRoute.bind(this),
       getIndex: ()=> this.state.index,
       getDirection: () => this.state.direction ? this.state.direction : NavigationDirection.unknown,
-      getIsPartOfSharedTransition: this._getIsPartOfSharedTransition
+      getIsPartOfSharedTransition: this.getIsPartOfSharedTransition
     };
   }
 }

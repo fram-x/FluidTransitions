@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Button, Image, StyleSheet } from 'react-native';
+import { View, Text, Button, Platform, Image, StyleSheet } from 'react-native';
 
 import { FluidNavigator, Transition } from 'react-navigation-fluid-transitions';
 
@@ -41,13 +41,35 @@ const styles = StyleSheet.create({
 
 const InitialScreen = (props) => (
   <View style={styles.container}>
-    <Transition appear="scale">
+    <Transition
+      appear={(transitionInfo) => {
+        const { progress, start, end } = transitionInfo;
+        const scaleInterpolation = progress.interpolate({
+          inputRange: [0, start, end, 1],
+          outputRange: [88, 80, 1, 1],
+        });
+        return { transform: [{ scale: scaleInterpolation }] };
+      }}
+      disappear={
+        (transitionInfo) => {
+          const { progress, start, end } = transitionInfo;
+          const rotateInterpolation = progress.interpolate({
+            inputRange: [0, start, end, 1],
+            outputRange: ['360deg', '360deg', '0deg', '0deg'],
+          });
+          const opacityInterpolation = progress.interpolate({
+            inputRange: [0, start, end, 1],
+            outputRange: [1, 1, 0, 0],
+          });
+          return { transform: [{ rotate: rotateInterpolation }],
+            opacity: opacityInterpolation };
+        }
+      }
+    >
       <Text style={styles.text}>Click toggle to see appearance animations.</Text>
     </Transition>
     <Transition shared="button" appear="scale">
-      <View>
-        <Button title="Toggle" onPress={() => props.navigation.navigate('screen')} />
-      </View>
+      <Button title="Toggle" onPress={() => props.navigation.navigate('screen')} />
     </Transition>
   </View>
 );

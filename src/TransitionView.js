@@ -16,9 +16,10 @@ const styles = StyleSheet.create({
 });
 
 type TransitionProps = {
-  appear?: boolean,
-  shared?: string,
-  delay?: boolean,
+  appear: ?boolean,
+  disappear: ?boolean,
+  shared: ?string,
+  delay: ?boolean,
   children: Array<any>
 }
 
@@ -54,7 +55,7 @@ class Transition extends React.PureComponent<TransitionProps> {
       register(new TransitionItem(
         this._getName(), this.context.route,
         this, this.props.shared !== undefined, this.props.appear,
-        this.props.delay !== undefined,
+        this.props.disappear, this.props.delay !== undefined,
       ));
     }
   }
@@ -102,11 +103,9 @@ class Transition extends React.PureComponent<TransitionProps> {
       this._animatedComponent = Animated.createAnimatedComponent(element.type);
     }
 
-    // Visibility
     const visibilityStyle = this.getVisibilityStyle();
-
-    // Build styles
     const style = [elementProps.style, visibilityStyle, styles.transition];
+
     const props = {
       ...elementProps,
       key: this._getName(),
@@ -121,6 +120,7 @@ class Transition extends React.PureComponent<TransitionProps> {
   getVisibilityStyle() {
     const { getTransitionProgress, getDirectionForRoute, 
       getIndex, getDirection, getIsPartOfSharedTransition } = this.context;
+    
     if (!getTransitionProgress || !getDirectionForRoute ||
       !getIndex || !getDirection || !getIsPartOfSharedTransition) return {};
 
@@ -130,24 +130,25 @@ class Transition extends React.PureComponent<TransitionProps> {
     if(!progress || index === undefined) return { opacity: 0};
 
     const routeDirection = getDirectionForRoute(this._getName(), this._route);
-    if(routeDirection === RouteDirection.unknown) return { opacity: 0};
+    if(routeDirection === RouteDirection.unknown) return { opacity: 0 };
 
-    const visibilityProgress = progress.interpolate({
-      inputRange: direction === NavigationDirection.forward ? [index-1, index] : [index, index + 1],
-      outputRange: routeDirection === RouteDirection.to ? [0, 1] : [1, 0],
-    });
+    const inputRange = direction === NavigationDirection.forward ? [index-1, index] : [index, index + 1];
+    const outputRange = routeDirection === RouteDirection.to ? [0, 1] : [1, 0];
+    
+    const visibilityProgress = progress.interpolate({ inputRange, outputRange });
 
-    // TODO: Check if we are a part of a shared element transition!
-    // if(this.props.shared) {
-    //   if(getIsPartOfSharedTransition(this._getName(), this._route)) {
-    //     return { opacity: visibilityProgress.interpolate({
-    //       inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_OUT,
-    //       outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE_ANIM_OUT
-    //       })
-    //     };
-    //   }
-    //   return {};
-    // }
+    if(this.props.shared && this.props.appear === undefined) {
+      if(getIsPartOfSharedTransition(this._getName(), this._route)) {
+        return { opacity: visibilityProgress.interpolate({
+          inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_OUT,
+          outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE_ANIM_OUT
+          })
+        };
+      }
+      return {};
+    } else if(this.props.appear === undefined) {
+      return {};
+    }
     
     return { opacity: visibilityProgress.interpolate({
       inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_OUT,
