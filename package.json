@@ -1,7 +1,7 @@
 {
   "name": "react-navigation-fluid-transitions",
-  "version": "0.1.0",
-  "description": "An extension to to react-navigation providing transitions and shared element transitions.",
+  "version": "0.1.1",
+  "description": "An extension to react-navigation providing transitions and shared element transitions.",
   "main": "./index.js",
   "scripts": {
     "test": "jest --watchAll"
@@ -57,7 +57,10 @@
   "jest": {
     "preset": "react-native",
     "modulePathIgnorePatterns": [
-      "Examples/node_modules"
+      "Examples/node_modules",
+      "node_modules",
+      ".vscode",
+      "docs"
     ]
   }
 }
