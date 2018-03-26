@@ -38,18 +38,22 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
   _isMounted: boolean;
 
   shouldComponentUpdate(nextProps){
-    if(!nextProps.fromRoute && !nextProps.toRoute)
+    if(!nextProps.fromRoute && !nextProps.toRoute){
       return false;
+    }
 
     // Compare toRoute/fromRoute/direction
     if(this.props.toRoute !== nextProps.toRoute ||
       this.props.fromRoute !== nextProps.fromRoute ||
-      this.props.direction !== nextProps.direction)
-      return true;
+      this.props.direction !== nextProps.direction) {
+      return false;
+    }
 
     // Compare shared elements count
-    if(!this.compareArrays(this.props.sharedElements, nextProps.sharedElements))
+    if(!this.compareArrays(this.props.sharedElements, nextProps.sharedElements)){
+      console.log("SE UPDATE elements changed ");
       return true;
+    }
 
     return false;
   }
@@ -71,9 +75,11 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
   render() {
     if(!this.props.sharedElements || !this.getMetricsReady()) {
       // console.log("RENDER SE empty");
-      return <View style={styles.overlay} pointerEvents='none'/>;
+      return <View key='overlay' style={styles.overlay} pointerEvents='none'/>;
     }
+
     // console.log("RENDER SE " + this.props.sharedElements.length);
+
     const self = this;
     const sharedElements = this.props.sharedElements.map((pair, idx) => {
       const { fromItem, toItem } = pair;
@@ -105,7 +111,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
       const props = {
         ...element.props,
         style: [element.props.style, styles.sharedElement, transitionStyle],
-        key: idx,
+        key: "shared_" + idx,
       };
 
       return React.createElement(animatedComponent, props, child ?
@@ -113,7 +119,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     });
 
     return (
-      <View style={styles.overlay} pointerEvents='none'>
+      <View key='overlay' style={styles.overlay} pointerEvents='none'>
         {sharedElements}
       </View>
     );

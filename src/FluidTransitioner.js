@@ -107,7 +107,7 @@ class FluidTransitioner extends React.Component<*> {
     return this.props !== nextProps;
   }
 
-  _configureTransition() {
+  _configureTransition(props, prevProps) {
     return {
       timing: Animated.timing,
       duration: 550,
