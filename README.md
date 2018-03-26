@@ -1,5 +1,8 @@
 # Fluid Transitions for React Navigation
 
+<a href="https://www.npmjs.com/package/react-navigation-fluid-transitions"><img src="https://img.shields.io/npm/v/react-navigation-fluid-transitions.svg?style=flat-square"></a>
+<a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
+
 ## Introduction
 This project aims to implement a simple yet powerful set of constructs for building fluid transitions between elements when navigating with [React Navigation](https://reactnavigation.org). The library is JavaScript only - no linking required.
 
