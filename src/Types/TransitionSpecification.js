@@ -5,7 +5,7 @@ import { RouteDirection } from './Direction';
 export type TransitionSpecification = {
   progress: Animated.Value,
   direction: RouteDirection,
-  metrics: Metrics,  
+  metrics: Metrics,
   name: string,
   route: string,
   start: number,

@@ -13,6 +13,6 @@ export type TransitionContext = {
   hiddenProgress: Animated.Value,
   getTransitionProgress: () => Animated.Value,
   getIsSharedElement: (string, string) => boolean,
-  getIsTransitionElement: (string, string) => boolean,  
+  getIsTransitionElement: (string, string) => boolean,
   getMetrics: (string, string) => Metrics,
 }
