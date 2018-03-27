@@ -180,42 +180,42 @@ export default class TransitionItemsView extends React.Component<
   }
 
   _inUpdate: boolean = false;
-  async componentDidUpdate() {
+  componentDidUpdate() {
     if (this._inUpdate) return;
     if (!this.state.fromRoute && !this.state.toRoute) return;
 
     this._inUpdate = true;
-    let sharedElements = this._transitionItems.getSharedElements(this.state.fromRoute, this.state.toRoute);
-    let transitionElements = this._transitionItems.getTransitionElements(this.state.fromRoute, this.state.toRoute);
 
-    await this.measureItems(sharedElements, transitionElements);
+    // Wait a little bit to give the layout system some time to reconcile
+    let measureAndUpdateFunc = async () => {
+      let sharedElements = this._transitionItems.getSharedElements(this.state.fromRoute, this.state.toRoute);
+      let transitionElements = this._transitionItems.getTransitionElements(this.state.fromRoute, this.state.toRoute);
 
-    // HACK - we might get here and the list of elements have changed. Measure again.
-    sharedElements = this._transitionItems.getSharedElements(this.state.fromRoute, this.state.toRoute);
+      await this.measureItems(sharedElements, transitionElements);
 
-    transitionElements = this._transitionItems.getTransitionElements(this.state.fromRoute, this.state.toRoute);
+      if (!sharedElements.find(p => !p.fromItem.metrics || !p.toItem.metrics) &&
+        !transitionElements.find(i => !i.metrics)) {
+        // HACK: Setting state in componentDidUpdate is not nice - but
+        // this is the only way we can notify the transitioner that we are
+        // ready to move along with the transition and we're trying to be nice
+        // by waiting a few milliseconds
+        this.setState({
+          ...this.state,
+          sharedElements,
+          transitionElements,
+        });
 
-    await this.measureItems(sharedElements, transitionElements);
+        this.props.onLayout && this.props.onLayout();
 
-    if (!sharedElements.find(p => !p.fromItem.metrics || !p.toItem.metrics) &&
-      !transitionElements.find(i => !i.metrics)) {
-      // HACK: Setting state in componentDidUpdate is not nice - but
-      // This is the only way we can notify the transitioner that we are
-      // ready to move along with the transition.
-      this.setState({
-        ...this.state,
-        sharedElements,
-        transitionElements,
-      });
-
-      this.props.onLayout && this.props.onLayout();
-
-      if (this.state.fromRoute === null) {
-        this._runStartAnimation(transitionElements.length);
+        if (this.state.fromRoute === null) {
+          this._runStartAnimation(transitionElements.length);
+        }
       }
-    }
+      this._inUpdate = false;
+    };
 
-    this._inUpdate = false;
+    measureAndUpdateFunc = measureAndUpdateFunc.bind(this);
+    setTimeout(measureAndUpdateFunc, 10);
   }
 
   async _runStartAnimation(numberOfTransitions: number) {

@@ -19,22 +19,25 @@ class FluidTransitioner extends React.Component<*> {
 
     this._onTransitionStart = this._onTransitionStart.bind(this);
 
-    this._screenDidMount = this._screenDidMount.bind(this);
+    this._onSceneReady = this._onSceneReady.bind(this);
     this._transitionItemsViewOnLayout = this._transitionItemsViewOnLayout.bind(this);
     this._configureTransition = this._configureTransition.bind(this);
     this._getSceneTransitionConfiguration = this._getSceneTransitionConfiguration.bind(this);
+
+    this._scenesReadyPromise = new Promise(resolve =>
+      this._scenesReadyResolveFunc = resolve);
   }
 
   _scenes: Array<SceneRenderedInfo> = [];
-  _scenesMountedResolve: Function;
-  _scenesMountedPromise: Promise<void>;
+  _scenesReadyResolveFunc: ?Function;
+  _scenesReadyPromise: ?Promise<void>;
   _layoutsReady: boolean;
   _screenDetails: Array<any> = [];
 
   static childContextTypes = {
     route: PropTypes.string,
     getTransitionConfig: PropTypes.func,
-    onScreenDidMount: PropTypes.func,
+    onSceneReady: PropTypes.func,
   }
 
   _animatedSubscribeForNativeAnimation(animatedValue: Animated.Value) {
@@ -49,7 +52,7 @@ class FluidTransitioner extends React.Component<*> {
     return {
       route: this.props.navigation.state.routes[
         this.props.navigation.state.index].routeName,
-      onScreenDidMount: this._screenDidMount,
+        onSceneReady: this._onSceneReady,
       getTransitionConfig: this._getSceneTransitionConfiguration,
     };
   }
@@ -70,27 +73,27 @@ class FluidTransitioner extends React.Component<*> {
     this._checkScenesAndLayouts();
   }
 
-  _screenDidMount(key: string) {
-    if (!this._scenesMountedResolve) { return; }
-
+  _onSceneReady(key: string) {
+    if (!this._scenesReadyResolveFunc) { return; }
     // check if this is a scene we are waiting for
     const sceneRenderInfo = this._scenes.find(sri => sri.key === key);
     if (sceneRenderInfo) sceneRenderInfo.isMounted = true;
-
     this._checkScenesAndLayouts();
   }
 
   _checkScenesAndLayouts() {
     if (this._layoutsReady && !this._scenes.find(sri => !sri.isMounted)) {
-      if (this._scenesMountedResolve) {
-        this._scenesMountedResolve();
-        this._scenesMountedResolve = null;
+      if (this._scenesReadyResolveFunc) {
+        this._scenesReadyResolveFunc();
+        
+        this._scenesReadyPromise = new Promise(resolve =>
+          this._scenesReadyResolveFunc = resolve);
       }
     }
   }
 
-  async _onTransitionStart() {
-    if (this._scenesMountedPromise) { await this._scenesMountedPromise; }
+  _onTransitionStart(): Promise<void> | void {
+    if (this._scenesReadyPromise) { return this._scenesReadyPromise; }
   }
 
   shouldComponentUpdate(nextProps) {
@@ -187,9 +190,6 @@ class FluidTransitioner extends React.Component<*> {
       const index = this._scenes.indexOf(sri);
       this._scenes = [...this._scenes.slice(0, index), ...this._scenes.slice(index + 1)];
     });
-
-    this._scenesMountedPromise = new Promise(resolve =>
-      this._scenesMountedResolve = resolve);
   }
 
   _getSceneTransitionConfiguration(routeName: string, navigation: any) {
