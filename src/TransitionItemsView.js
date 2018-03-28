@@ -1,12 +1,12 @@
 import React from 'react';
-import { 
-  View, 
-  StyleSheet, 
-  UIManager, 
-  Easing, 
-  InteractionManager, 
-  Animated, 
-  findNodeHandle 
+import {
+  View,
+  StyleSheet,
+  UIManager,
+  Easing,
+  InteractionManager,
+  Animated,
+  findNodeHandle
 } from 'react-native';
 import PropTypes from 'prop-types';
 
@@ -16,7 +16,7 @@ import TransitionItems from './TransitionItems';
 import TransitionOverlayView from './TransitionOverlayView';
 import { invariant } from './Utils/invariant';
 
-type TransitionItemsViewState = {
+type State = {
   fromRoute: ?string,
   toRoute: ?string,
   direction: NavigationDirection,
@@ -25,17 +25,18 @@ type TransitionItemsViewState = {
   transitionElements: ?Array<TransitionItem>
 }
 
-type TransitionItemsViewProps = {
+type Props = {
   children: Array<any>,
   progress: Animated.Value,
   fromRoute: string,
   toRoute: string,
   index: ?number,
+  navigation: any,
   onLayout: (evt: any) => void,
 }
 
 export default class TransitionItemsView extends React.Component<
-  TransitionItemsViewProps, TransitionItemsViewState>  {
+  Props, State>  {
   constructor(props) {
     super(props);
     this._isMounted = false;
@@ -69,12 +70,10 @@ export default class TransitionItemsView extends React.Component<
       this.updateFromProps(nextProps, this.props);
     }
   }
-
+  
   updateFromProps(props, prevProps) {
     if(!this._isMounted) return;
-    const indexHasChanged = props.index != (prevProps ? prevProps.index : Number.MIN_SAFE_INTEGER);
-    if(!indexHasChanged) return;
-
+  
     let { fromRoute, toRoute } = props;
     const direction = props.index > (prevProps ? prevProps.index : Number.MIN_SAFE_INTEGER ) ?
       NavigationDirection.forward : NavigationDirection.back;
@@ -86,23 +85,13 @@ export default class TransitionItemsView extends React.Component<
       fromRoute = toRoute;
       toRoute = tmp;
     }
-
-    // console.log("TIW " + fromRoute + " -> " + toRoute + ", index:" + index);
-
-    this.setState({
-      ...this.state,
-      toRoute: toRoute,
-      fromRoute: fromRoute,
-      direction,
-      index
-    });
+        
+    this.setState({ ...this.state, toRoute, fromRoute, direction, index });
   }
 
   render() {
     return (
-      <View
-        style={styles.container}
-      >
+      <View style={styles.container}>
         {this.props.children}
         <TransitionOverlayView
           ref={(ref) => this._viewRef = ref}
@@ -133,8 +122,8 @@ export default class TransitionItemsView extends React.Component<
     const item = this._transitionItems.getItemByNameAndRoute(name, route);
     if(!item || !item.shared) return false;
 
-    const sharedElements = this._transitionItems.getSharedElements(this.state.fromRoute, this.state.toRoute);    
-    if(sharedElements.find(pair => 
+    const sharedElements = this._transitionItems.getSharedElements(this.state.fromRoute, this.state.toRoute);
+    if(sharedElements.find(pair =>
       (pair.fromItem.name === item.name && pair.fromItem.route === item.route) ||
       (pair.toItem.name === item.name && pair.toItem.route === item.route))) {
         return true;
@@ -190,65 +179,75 @@ export default class TransitionItemsView extends React.Component<
     });
   }
 
-  _inUpdate: boolean = false;
-  _runInitialAnimation: boolean = true;
-  async componentDidUpdate(){
+  _inUpdate: boolean = false;  
+  async componentDidUpdate(){    
     if(this._inUpdate) return;
     if(!this.state.fromRoute && !this.state.toRoute) return;
-
+    
     this._inUpdate = true;
-    const sharedElements = this._transitionItems.getSharedElements(
+    let sharedElements = this._transitionItems.getSharedElements(
       this.state.fromRoute, this.state.toRoute);
 
-    const transitionElements = this._transitionItems.getTransitionElements(
+    let transitionElements = this._transitionItems.getTransitionElements(
       this.state.fromRoute, this.state.toRoute);
 
     await this.measureItems(sharedElements, transitionElements);
-        
+
+    // HACK - we might get here and the list of elements have changed. Measure again.
+    sharedElements = this._transitionItems.getSharedElements(
+      this.state.fromRoute, this.state.toRoute);
+
+    transitionElements = this._transitionItems.getTransitionElements(
+      this.state.fromRoute, this.state.toRoute);
+
+    await this.measureItems(sharedElements, transitionElements);
+
     if(!sharedElements.find(p => !p.fromItem.metrics || !p.toItem.metrics) &&
       !transitionElements.find(i => !i.metrics)) {
-      
-      const index = this._runInitialAnimation ? 0 : this.state.index;
+
+      // HACK: Setting state in componentDidUpdate is not nice - but
+      // This is the only way we can notify the transitioner that we are
+      // ready to move along with the transition.
       this.setState({
         ...this.state,
         sharedElements,
         transitionElements,
-        index,
       });
-
+            
       this.props.onLayout && this.props.onLayout();
-      
-      if(this._runInitialAnimation) {
-        this._runInitialAnimation = false;
-        this._runStartAnimation(() => {});
+
+      if(this.state.fromRoute === null) {
+        this._runStartAnimation(transitionElements.length);
       }
-    }    
-    
+    }
+
     this._inUpdate = false;
   }
 
-  async _runStartAnimation(callback: Function) {
+  async _runStartAnimation(numberOfTransitions: number) {
     const { getTransitionConfig } = this.context;
-    let transitionSpec = getTransitionConfig ? 
-      getTransitionConfig() : {
+    const { toRoute, navigation } = this.props;
+    let transitionSpec = getTransitionConfig ?
+      getTransitionConfig(toRoute, navigation) : {
         timing: Animated.timing,
         duration: 750,
         easing: Easing.inOut(Easing.poly(4)),
         isInteraction: true,
         useNativeDriver: true,
       };
-    
+
     const { timing } = transitionSpec;
     delete transitionSpec.timing;
 
     const animations = [
       timing(this._transitionProgress, {
         ...transitionSpec,
+        duration: numberOfTransitions === 0 ? 25 : transitionSpec.duration,
         toValue: 0,
       })
     ];
-    
-    Animated.parallel(animations).start(callback);
+
+    Animated.parallel(animations).start();
   }
 
   componentDidMount() {

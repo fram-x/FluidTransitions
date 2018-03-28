@@ -11,7 +11,8 @@ import {
   getLeftTransition,
   getRightTransition,
   getHorizontalTransition,
-  getVerticalTransition
+  getVerticalTransition,
+  getFlipTransition
 }
   from './Transitions';
 import * as Constants from './TransitionConstants';
@@ -50,6 +51,7 @@ registerTransitionType('left', getLeftTransition);
 registerTransitionType('right', getRightTransition);
 registerTransitionType('horizontal', getHorizontalTransition);
 registerTransitionType('vertical', getVerticalTransition);
+registerTransitionType('flip', getFlipTransition);
 
 type TransitionElementsOverlayViewProps = {
   fromRoute: string,
@@ -101,9 +103,11 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     const { getDirectionForRoute, getDirection } = this.context;
     if(!this.props.transitionElements || !this.getMetricsReady() ||
       !getDirectionForRoute || !getDirection) {
+      // console.log("RENDER TE empty");
       return <View style={styles.overlay} pointerEvents='none'/>;
     }
     
+    // console.log("RENDER TE " + this.props.transitionElements.length);
     const transitionElements = this.props.transitionElements
       .filter(i => i.route === this.props.fromRoute || i.route === this.props.toRoute);
 

@@ -36,6 +36,7 @@ const styles = StyleSheet.create({
   },
   buttons: {
     flexDirection: 'row',
+    padding: 40,
   },
 });
 
@@ -54,7 +55,7 @@ const Circle = (props) => (
 
 const Screen1 = (props) => (
   <View style={styles.container}>
-    <Transition appear="scale">
+    <Transition appear="flip">
       <Text>1.Screen</Text>
     </Transition>
     <View style={styles.screen1}>
@@ -76,14 +77,16 @@ const Screen1 = (props) => (
       </Transition>
     </View>
     <Transition appear="horizontal">
-      <Button title="Next" onPress={() => props.navigation.navigate('screen2')} />
+      <View style={styles.buttons}>
+        <Button title="Next" onPress={() => props.navigation.navigate('screen2')} />
+      </View>
     </Transition>
   </View>
 );
 
 const Screen2 = (props) => (
   <View style={styles.container}>
-    <Transition appear="scale">
+    <Transition appear="flip">
       <Text>2.Screen</Text>
     </Transition>
     <View style={styles.screen2}>
@@ -107,6 +110,7 @@ const Screen2 = (props) => (
     <Transition appear="horizontal">
       <View style={styles.buttons}>
         <Button title="Back" onPress={() => props.navigation.goBack()} />
+        <View style={{ width: 20 }} />
         <Button title="Next" onPress={() => props.navigation.navigate('screen3')} />
       </View>
     </Transition>
@@ -115,7 +119,7 @@ const Screen2 = (props) => (
 
 const Screen3 = (props) => (
   <View style={styles.container}>
-    <Transition appear="scale">
+    <Transition appear="flip">
       <Text>3.Screen</Text>
     </Transition>
     <View style={styles.screen3}>
@@ -137,7 +141,9 @@ const Screen3 = (props) => (
       </Transition>
     </View>
     <Transition appear="horizontal">
-      <Button title="Back" onPress={() => props.navigation.goBack()} />
+      <View style={styles.buttons}>
+        <Button title="Back" onPress={() => props.navigation.goBack()} />
+      </View>
     </Transition>
   </View>
 );
