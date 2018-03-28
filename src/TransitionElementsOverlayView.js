@@ -3,6 +3,7 @@ import { View, StyleSheet, Animated, Dimensions } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
+import { createAnimatedWrapper } from './createAnimatedWrapper';
 import { TransitionContext, RouteDirection, NavigationDirection, TransitionSpecification } from './Types';
 import {
   getScaleTransition,
@@ -122,17 +123,17 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     const delayToFactor = -1;
 
     const transitionViews = transitionElements.map((item, idx) => {
+      const routeDirection = getDirectionForRoute(item.name, item.route);  
       const element = React.Children.only(item.reactElement.props.children);
-      const routeDirection = getDirectionForRoute(item.name, item.route);
-      const comp = this.getAnimatedComponent(
-        element, idx,
-        this.getStyle(
-          item, routeDirection === RouteDirection.from ?
-            delayCountFrom + 1 : delayCountTo + 1,
-          routeDirection === RouteDirection.from ?
-            delayIndexFrom : delayIndexTo,
-        ),
-      );
+      const key = "TransitionOverlay-"  + idx.toString();
+      const style = [this.getPositionStyle(
+        item, routeDirection === RouteDirection.from ?
+          delayCountFrom + 1 : delayCountTo + 1,
+        routeDirection === RouteDirection.from ?
+          delayIndexFrom : delayIndexTo,
+      ), styles.transitionElement];
+
+      const comp =  createAnimatedWrapper(element, key, style);
 
       if (item.delay) {
         if (routeDirection === RouteDirection.from) {
@@ -151,13 +152,13 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     );
   }
 
-  getStyle(item: TransitionItem, delayCount: number, delayIndex: number) {
+  getPositionStyle(item: TransitionItem, delayCount: number, delayIndex: number) {
     return {
       left: item.metrics.x,
       top: item.metrics.y,
       width: item.metrics.width,
-      height: item.metrics.height,
-      ...this.getTransitionStyle(item, delayCount, delayIndex),
+      height: item.metrics.height, 
+      ...this.getTransitionStyle(item, delayCount, delayIndex)           
     };
   }
 
@@ -237,36 +238,6 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
       return getTransition(item.appear);
     }
     return null;
-  }
-
-  getAnimatedComponent(renderElement, idx, style) {
-    let element = renderElement;
-    let animatedComponent = null;
-    let elementProps = element.props;
-    let child = null;
-
-    // Functional components should be wrapped in a view to be usable with
-    // Animated.createAnimatedComponent
-    const isFunctionalComponent = !element.type.displayName;
-    if (isFunctionalComponent || element.type.displayName === 'Button') {
-      // Wrap in sourrounding view
-      element = React.createElement(element.type, element.props);
-      const wrapper = (<View />);
-      animatedComponent = Animated.createAnimatedComponent(wrapper.type);
-      elementProps = {};
-      child = element;
-    } else {
-      animatedComponent = Animated.createAnimatedComponent(element.type);
-    }
-
-    const props = {
-      ...element.props,
-      collapsable: false,
-      style: [element.props.style, styles.transitionElement, style],
-      key: idx,
-    };
-
-    return React.createElement(animatedComponent, props, child || props.children);
   }
 
   getMetricsReady(): boolean {
