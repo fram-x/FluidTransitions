@@ -10,6 +10,8 @@ This project aims to implement a simple yet powerful set of constructs for build
 
 <img src="https://github.com/fram-x/FluidTransitions/blob/develop/docs/example.gif" width="240">
 
+[Snack on Expo](https://snack.expo.io/HJM75VtqG)
+
 The library implements a new navigator component called `FluidNavigator` with the same interface and routing configuration as the `StackNavigator`. The library has a component called `Transition` which can be used to build different types of transitions that will automatically be run when navigating between screens using the regular navigation actions.
 
 > The Navigator's API is identical to the StackNavigator except that it does not support a header component. It can easily be integrated with redux and your existing navigation setups.
