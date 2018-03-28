@@ -22,8 +22,7 @@ class TransitionRouteView extends React.Component<TransitionRouteViewProps> {
     onSceneReady: PropTypes.func,
   }
 
-  componentDidMount() {
-    
+  componentDidMount() {    
     const { onSceneReady } = this.context;
     if (!onSceneReady || !this.props.sceneKey) return;
     onSceneReady(this.props.sceneKey);

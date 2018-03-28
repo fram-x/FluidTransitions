@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { View, Animated, StyleSheet, findNodeHandle } from 'react-native';
 
 import TransitionItem from './TransitionItem';
-import { RouteDirection, TransitionContext, NavigationDirection } from './Types';
+import { RouteDirection, NavigationDirection } from './Types';
 import * as Constants from './TransitionConstants';
 
 const uniqueBaseId: string = `transitionCompId-${Date.now()}`;
@@ -23,8 +23,7 @@ type TransitionProps = {
   children: Array<any>
 }
 
-class Transition extends React.PureComponent<TransitionProps> {
-  context: TransitionContext
+class Transition extends React.PureComponent<TransitionProps> {  
   static contextTypes = {
     register: PropTypes.func,
     unregister: PropTypes.func,
@@ -36,7 +35,7 @@ class Transition extends React.PureComponent<TransitionProps> {
     getIsPartOfSharedTransition: PropTypes.func,
   }
 
-  constructor(props: TransitionProps, context: TransitionContext) {
+  constructor(props: TransitionProps, context: any) {
     super(props, context);
     this._name = `${uniqueBaseId}-${uuidCount++}`;
     this._animatedComponent = null;

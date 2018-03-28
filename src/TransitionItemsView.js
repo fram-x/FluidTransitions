@@ -90,10 +90,13 @@ export default class TransitionItemsView extends React.Component<
 
   render() {
     return (
-      <View style={styles.container}>
+      <View 
+        style={styles.container} 
+        ref={(ref) => this._viewRef = ref}
+        collapsable={false} 
+      >
         {this.props.children}
-        <TransitionOverlayView
-          ref={(ref) => this._viewRef = ref}
+        <TransitionOverlayView                  
           direction={this.state.direction}
           fromRoute={this.state.fromRoute}
           toRoute={this.state.toRoute}
