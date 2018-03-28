@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Button, Platform, Image, StyleSheet } from 'react-native';
+import { View, Text, Button, Image, StyleSheet } from 'react-native';
 
 import { FluidNavigator, Transition } from 'react-navigation-fluid-transitions';
 

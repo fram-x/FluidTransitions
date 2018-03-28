@@ -71,7 +71,6 @@ class ImageListScreen extends React.Component {
 class ImageDetailsScreen extends React.Component {
   render() {
     const { params } = this.props.navigation.state;
-    const size = Dimensions.get('window').width;
     const uri = params.url;
     return (
       <View style={styles.container}>

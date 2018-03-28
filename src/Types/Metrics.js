@@ -1,6 +1,6 @@
 export type Metrics = {
   x: number,
-  y: nubmer,
+  y: number,
   width: number,
   height: number
 }

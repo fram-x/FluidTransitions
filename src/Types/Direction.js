@@ -7,5 +7,6 @@ export const RouteDirection = {
 export const NavigationDirection = {
   Unknown: 0,
   forward: 1,
-  back: -1
-}
+  back: -1,
+};
+

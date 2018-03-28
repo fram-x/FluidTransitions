@@ -14,15 +14,15 @@ export default class TransitionItems {
   }
 
   add(item: TransitionItem): boolean {
-    if(this._items.findIndex(e => e.name === item.name && e.route === item.route) >= 0)
+    if (this._items.findIndex(e => e.name === item.name && e.route === item.route) >= 0) {
       return false;
-      console.log("ADD " + item.name + "/" + item.route);
+    }
     this._items = [...this._items, item];
     return true;
   }
 
   remove(name: string, route: string): boolean {
-    const index = this._items.findIndex(e => e.name === name && e.route === route)
+    const index = this._items.findIndex(e => e.name === name && e.route === route);
     if (index >= 0) {
       this._items = [...this._items.slice(0, index), ...this._items.slice(index + 1)];
       return true;
@@ -32,13 +32,13 @@ export default class TransitionItems {
 
   getRoutes() {
     const routes = [];
-    for(var i = 0; i < this._items.length; i++) {
-        if(!routes.includes(this._items[i].route)) {
-            routes.push(this._items[i].route);
-        }
+    for (let i = 0; i < this._items.length; i++) {
+      if (!routes.includes(this._items[i].route)) {
+        routes.push(this._items[i].route);
+      }
     }
-    if(routes.length != 2) {
-      throw new Error("Number of routes should be 2, was " + routes.length);
+    if (routes.length != 2) {
+      throw new Error(`Number of routes should be 2, was ${routes.length}`);
     }
 
     return { fromRoute: routes[0], toRoute: routes[1] };
@@ -57,7 +57,9 @@ export default class TransitionItems {
     const itemPairs = this._getItemPairs(fromRoute, toRoute)
       .filter(pair => pair.toItem !== undefined && pair.fromItem !== undefined);
 
-    let items = this._items.filter(e => e.appear !== undefined && (e.route === fromRoute || e.route === toRoute));
+    let items = this._items.filter(e => e.appear !== undefined &&
+      (e.route === fromRoute || e.route === toRoute));
+
     items = items.filter(e => itemPairs.findIndex(p =>
       (e.name === p.fromItem.name && e.route === p.fromItem.route) ||
       (e.name === p.toItem.name && e.route === p.toItem.route)) === -1);
@@ -75,8 +77,7 @@ export default class TransitionItems {
       if (item.route === fromRoute) pairByName.fromItem = item;
       if (item.route === toRoute) pairByName.toItem = item;
       // delete empty pairs
-      if (!pairByName.fromItem && !pairByName.toItem)
-        map.delete(item.name);
+      if (!pairByName.fromItem && !pairByName.toItem) { map.delete(item.name); }
 
       return map;
     }, new Map());
@@ -84,7 +85,7 @@ export default class TransitionItems {
     return nameMap;
   }
 
-  _getItemPairs(fromRoute: string, toRoute: string): Array<TransitionItem>{
+  _getItemPairs(fromRoute: string, toRoute: string): Array<TransitionItem> {
     const nameMap = this._getNamePairMap(fromRoute, toRoute);
     return Array.from(nameMap.values());
   }

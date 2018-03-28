@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, View, Text, InteractionManager, Platform, Easing, Animated } from 'react-native';
+import { StyleSheet, Easing, Animated } from 'react-native';
 import { addNavigationHelpers, Transitioner } from 'react-navigation';
 
 import TransitionItemsView from './TransitionItemsView';
 import TransitionRouteView from './TransitionRouteView';
 
-const emptyFunction = ()=> {};
+const emptyFunction = () => {};
 
 type SceneRenderedInfo = {
   key: string,
@@ -16,30 +16,33 @@ type SceneRenderedInfo = {
 class FluidTransitioner extends React.Component<*> {
   constructor(props) {
     super(props);
-    
+
     this._onTransitionStart = this._onTransitionStart.bind(this);
 
-    this._screenDidMount = this._screenDidMount.bind(this);
+    this._onSceneReady = this._onSceneReady.bind(this);
     this._transitionItemsViewOnLayout = this._transitionItemsViewOnLayout.bind(this);
     this._configureTransition = this._configureTransition.bind(this);
     this._getSceneTransitionConfiguration = this._getSceneTransitionConfiguration.bind(this);
+
+    this._scenesReadyPromise = new Promise(resolve =>
+      this._scenesReadyResolveFunc = resolve);
   }
 
   _scenes: Array<SceneRenderedInfo> = [];
-  _scenesMountedResolve: Function;
-  _scenesMountedPromise: Promise<void>;
+  _scenesReadyResolveFunc: ?Function;
+  _scenesReadyPromise: ?Promise<void>;
   _layoutsReady: boolean;
   _screenDetails: Array<any> = [];
 
   static childContextTypes = {
     route: PropTypes.string,
     getTransitionConfig: PropTypes.func,
-    onScreenDidMount: PropTypes.func,
+    onSceneReady: PropTypes.func,
   }
 
-  _animatedSubscribeForNativeAnimation(animatedValue: Animated.Value){
-    if(!animatedValue) return;
-    if(!this._configureTransition().useNativeDriver) return;
+  _animatedSubscribeForNativeAnimation(animatedValue: Animated.Value) {
+    if (!animatedValue) return;
+    if (!this._configureTransition().useNativeDriver) return;
     if (Object.keys(animatedValue._listeners).length === 0) {
       animatedValue.addListener(emptyFunction);
     }
@@ -49,8 +52,8 @@ class FluidTransitioner extends React.Component<*> {
     return {
       route: this.props.navigation.state.routes[
         this.props.navigation.state.index].routeName,
-      onScreenDidMount: this._screenDidMount,
-      getTransitionConfig: this._getSceneTransitionConfiguration
+        onSceneReady: this._onSceneReady,
+      getTransitionConfig: this._getSceneTransitionConfiguration,
     };
   }
 
@@ -65,34 +68,32 @@ class FluidTransitioner extends React.Component<*> {
     );
   }
 
-  _transitionItemsViewOnLayout(evt) {
+  _transitionItemsViewOnLayout() {
     this._layoutsReady = true;
     this._checkScenesAndLayouts();
   }
 
-  _screenDidMount(key: string) {
-    if(!this._scenesMountedResolve)
-      return;
-
+  _onSceneReady(key: string) {
+    if (!this._scenesReadyResolveFunc) { return; }
     // check if this is a scene we are waiting for
     const sceneRenderInfo = this._scenes.find(sri => sri.key === key);
-    if(sceneRenderInfo) sceneRenderInfo.isMounted = true;
-
+    if (sceneRenderInfo) sceneRenderInfo.isMounted = true;
     this._checkScenesAndLayouts();
   }
 
   _checkScenesAndLayouts() {
-    if(this._layoutsReady && !this._scenes.find(sri => !sri.isMounted)) {
-      if(this._scenesMountedResolve){
-        this._scenesMountedResolve();
-        this._scenesMountedResolve = null;
+    if (this._layoutsReady && !this._scenes.find(sri => !sri.isMounted)) {
+      if (this._scenesReadyResolveFunc) {
+        this._scenesReadyResolveFunc();
+        
+        this._scenesReadyPromise = new Promise(resolve =>
+          this._scenesReadyResolveFunc = resolve);
       }
     }
   }
 
-  async _onTransitionStart() {    
-    if(this._scenesMountedPromise)
-      await this._scenesMountedPromise;
+  _onTransitionStart(): Promise<void> | void {
+    if (this._scenesReadyPromise) { return this._scenesReadyPromise; }
   }
 
   shouldComponentUpdate(nextProps) {
@@ -101,14 +102,14 @@ class FluidTransitioner extends React.Component<*> {
 
   _configureTransition(props, prevProps) {
     let sceneTransitionConfig = {};
-    if(props) {
+    if (props) {
       let moveForward = true;
-      if(prevProps && prevProps.index > props.index){
+      if (prevProps && prevProps.index > props.index) {
         moveForward = false;
       }
       const { scene } = moveForward ? props : prevProps;
       const screenDetails = this._getScreenDetails(scene);
-      if(screenDetails && screenDetails.options && screenDetails.options.transitionConfig) {
+      if (screenDetails && screenDetails.options && screenDetails.options.transitionConfig) {
         sceneTransitionConfig = screenDetails.options.transitionConfig;
       }
     }
@@ -126,13 +127,13 @@ class FluidTransitioner extends React.Component<*> {
   _render(props, prevProps) {
     this._layoutsReady = false;
     this._animatedSubscribeForNativeAnimation(props.position);
-    this._updateSceneArray(props.scenes);    
+    this._updateSceneArray(props.scenes);
     const scenes = props.scenes.map(scene =>
       this._renderScene({ ...props, scene }, prevProps));
 
     const toRoute = props.scene.route.routeName;
     const fromRoute = prevProps ? prevProps.scene.route.routeName : null;
-    const index = props.scene.index;
+    const { index } = props.scene;
 
     return (
       <TransitionItemsView
@@ -153,7 +154,7 @@ class FluidTransitioner extends React.Component<*> {
     const { index } = scene;
     const navigation = this._getChildNavigation(scene);
     const Scene = this.props.router.getComponentForRouteName(scene.route.routeName);
-    
+
     return (
       <TransitionRouteView
         style={[styles.scene, this.getOpacityStyle(transitionProps.position, index)]}
@@ -161,41 +162,38 @@ class FluidTransitioner extends React.Component<*> {
         route={scene.route.routeName}
         sceneKey={scene.key}
       >
-          <Scene navigation={navigation}/>
+        <Scene navigation={navigation} />
       </TransitionRouteView>
     );
   }
 
   getOpacityStyle(position: Animated.Value, index: number) {
     return { opacity: position.interpolate({
-      inputRange: [index -1, index, index + 1],
+      inputRange: [index - 1, index, index + 1],
       outputRange: [0, 1, 0],
-    })};
+    }) };
   }
 
   _updateSceneArray(scenes: Array<any>) {
     scenes.forEach(scene => {
-      if(!this._scenes.find(sri => sri.key === scene.key))
-        this._scenes = [...this._scenes, { key: scene.key, isMounted: false}];
+      if (!this._scenes.find(sri => sri.key === scene.key)) {
+        this._scenes = [...this._scenes, { key: scene.key, isMounted: false }];
+      }
     });
 
     const toDelete = [];
     this._scenes.forEach(sri => {
-      if(!scenes.find(scene => scene.key === sri.key))
-        toDelete.push(sri);
+      if (!scenes.find(scene => scene.key === sri.key)) { toDelete.push(sri); }
     });
 
     toDelete.forEach(sri => {
       const index = this._scenes.indexOf(sri);
       this._scenes = [...this._scenes.slice(0, index), ...this._scenes.slice(index + 1)];
     });
-
-    this._scenesMountedPromise = new Promise(resolve =>
-      this._scenesMountedResolve = resolve);
   }
 
   _getSceneTransitionConfiguration(routeName: string, navigation: any) {
-    const props = { navigation, scene: { route: {routeName} }};
+    const props = { navigation, scene: { route: { routeName } } };
     return this._configureTransition(props);
   }
 
@@ -255,7 +253,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-  }
+  },
 });
 
 export default FluidTransitioner;

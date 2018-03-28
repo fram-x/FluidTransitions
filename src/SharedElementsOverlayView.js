@@ -3,7 +3,8 @@ import { View, StyleSheet, Animated } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
-import { TransitionConfiguration, TransitionContext, NavigationDirection } from './Types';
+import { createAnimatedWrapper } from './createAnimatedWrapper';
+import { TransitionContext, NavigationDirection } from './Types';
 
 const styles: StyleSheet.NamedStyles = StyleSheet.create({
   overlay: {
@@ -37,20 +38,20 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
 
   _isMounted: boolean;
 
-  shouldComponentUpdate(nextProps){
-    if(!nextProps.fromRoute && !nextProps.toRoute){
+  shouldComponentUpdate(nextProps) {
+    if (!nextProps.fromRoute && !nextProps.toRoute) {
       return false;
     }
 
     // Compare toRoute/fromRoute/direction
-    if(this.props.toRoute !== nextProps.toRoute ||
+    if (this.props.toRoute !== nextProps.toRoute ||
       this.props.fromRoute !== nextProps.fromRoute ||
       this.props.direction !== nextProps.direction) {
       return false;
     }
 
     // Compare shared elements count
-    if(!this.compareArrays(this.props.sharedElements, nextProps.sharedElements)){
+    if (!this.compareArrays(this.props.sharedElements, nextProps.sharedElements)) {
       // console.log("SE UPDATE elements changed ");
       return true;
     }
@@ -58,24 +59,23 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     return false;
   }
 
-  compareArrays(a, b){
-    if(!a && !b) return false;
-    if(!a && b || !b && a) return false;
-    if(a.length !== b.length) return false;
-    for(let i=0; i<a.length; i++){
-      if(a[i].fromItem.name !== b[i].fromItem.name ||
+  compareArrays(a, b) {
+    if (!a && !b) return false;
+    if (!a && b || !b && a) return false;
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+      if (a[i].fromItem.name !== b[i].fromItem.name ||
         a[i].fromItem.route !== b[i].fromItem.route ||
         a[i].toItem.name !== b[i].toItem.name ||
-        a[i].toItem.route !== b[i].toItem.route)
-        return false;
+        a[i].toItem.route !== b[i].toItem.route) { return false; }
     }
     return true;
   }
 
   render() {
-    if(!this.props.sharedElements || !this.getMetricsReady()) {
+    if (!this.props.sharedElements || !this.getMetricsReady()) {
       // console.log("RENDER SE empty");
-      return <View key='overlay' style={styles.overlay} pointerEvents='none'/>;
+      return <View key="overlay" style={styles.overlay} pointerEvents="none" />;
     }
 
     // console.log("RENDER SE " + this.props.sharedElements.length);
@@ -85,52 +85,24 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
       const { fromItem, toItem } = pair;
       const transitionStyle = self.getTransitionStyle(fromItem, toItem);
 
-      let element = React.Children.only(fromItem.reactElement.props.children);
-      let elementProps = element.props;
-      let animatedComponent;
-      let child;
-
-      // Functional components should be wrapped in a view to be usable with
-      // Animated.createAnimatedComponent
-      const isFunctionalComponent = !element.type.displayName;
-      if(isFunctionalComponent) {
-        // Wrap in sourrounding view
-        element = React.createElement(element.type, element.props);
-        const wrapper = (<View/>);
-        animatedComponent = Animated.createAnimatedComponent(wrapper.type);
-        elementProps = {};
-        child = element;
-      }
-      else {
-        const wrapper = (<View/>);
-        animatedComponent = Animated.createAnimatedComponent(wrapper.type);
-        elementProps = {};
-        child = element;
-      }
-
-      const props = {
-        ...element.props,
-        style: [element.props.style, styles.sharedElement, transitionStyle],
-        key: "shared_" + idx,
-      };
-
-      return React.createElement(animatedComponent, props, child ?
-        child : element.props.children);
+      const element = React.Children.only(fromItem.reactElement.props.children);
+      const key = "SharedOverlay-"  + idx.toString();
+      const style = [element.props.style, styles.sharedElement, transitionStyle];
+      return createAnimatedWrapper(element, key, style);
     });
 
     return (
-      <View key='overlay' style={styles.overlay} pointerEvents='none'>
+      <View key="overlay" style={styles.overlay} pointerEvents="none">
         {sharedElements}
       </View>
     );
   }
 
   getMetricsReady(): boolean {
-    if(this.props.sharedElements) {
+    if (this.props.sharedElements) {
       let metricsReady = true;
       this.props.sharedElements.forEach(pair => {
-        if(!pair.toItem.metrics || !pair.fromItem.metrics)
-          metricsReady = false;
+        if (!pair.toItem.metrics || !pair.fromItem.metrics) { metricsReady = false; }
       });
       return metricsReady;
     }
@@ -146,14 +118,14 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
         height: fromItem.metrics.height,
         left: fromItem.metrics.x,
         top: fromItem.metrics.y,
-      }
-    };
+      };
+    }
 
     const index = getIndex();
     const direction = getDirection();
     const progress = getTransitionProgress(fromItem.name, fromItem.route);
     const interpolatedProgress = progress.interpolate({
-      inputRange: direction === NavigationDirection.forward ? [index-1, index] : [index, index + 1],
+      inputRange: direction === NavigationDirection.forward ? [index - 1, index] : [index, index + 1],
       outputRange: [0, 1],
     });
 
@@ -185,7 +157,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     return {
       width: fromItem.metrics.width,
       height: fromItem.metrics.height,
-      transform: [{ translateX }, { translateY }, { scaleX }, { scaleY }]
+      transform: [{ translateX }, { translateY }, { scaleX }, { scaleY }],
     };
   }
 

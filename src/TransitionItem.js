@@ -10,8 +10,8 @@ type Size = {
 export default class TransitionItem {
   constructor(
     name: string, route: string, reactElement: Object,
-    shared: boolean, appear: string, disappear: string, delay: boolean, metrics: Metrics) {
-      
+    shared: boolean, appear: string, disappear: string, delay: boolean, metrics: Metrics,
+  ) {
     this.name = name;
     this.route = route;
     this.reactElement = reactElement;
@@ -39,7 +39,7 @@ export default class TransitionItem {
   getNodeHandle() {
     return this.reactElement.getNodeHandle();
   }
-  
+
   scaleRelativeTo(other: TransitionItem): Size {
     const validate = i => {
       if (!i.metrics) {

@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, StyleSheet, Animated } from 'react-native';
+import { StyleSheet, Animated } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
-import { TransitionConfiguration, NavigationDirection, TransitionContext } from './Types';
+import { NavigationDirection, TransitionContext } from './Types';
 import SharedElementsOverlayView from './SharedElementsOverlayView';
 import TransitionElementsOverlayView from './TransitionElementsOverlayView';
 import * as Constants from './TransitionConstants';
@@ -16,7 +16,7 @@ const styles: StyleSheet.NamedStyles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-  }
+  },
 });
 
 type TransitionOverlayViewProps = {
@@ -40,14 +40,14 @@ class TransitionOverlayView extends React.Component<TransitionOverlayViewProps> 
 
   render() {
     return (
-      <Animated.View style={[styles.overlay, this.getVisibilityStyle()]} pointerEvents='none'>
+      <Animated.View style={[styles.overlay, this.getVisibilityStyle()]} pointerEvents="none">
         <TransitionElementsOverlayView
           transitionElements={this.props.transitionElements}
           direction={this.props.direction}
           fromRoute={this.props.fromRoute}
           toRoute={this.props.toRoute}
         />
-         <SharedElementsOverlayView
+        <SharedElementsOverlayView
           sharedElements={this.props.sharedElements}
           direction={this.props.direction}
           fromRoute={this.props.fromRoute}
@@ -57,25 +57,26 @@ class TransitionOverlayView extends React.Component<TransitionOverlayViewProps> 
     );
   }
 
-  getVisibilityStyle(){
+  getVisibilityStyle() {
     const { getTransitionProgress } = this.context;
     const { index, direction } = this.props;
 
-    if(!getTransitionProgress) return  {};
+    if (!getTransitionProgress) return {};
     const progress = getTransitionProgress();
-    if(!progress || index === undefined) return { opacity: 0 };
-        
+    if (!progress || index === undefined) return { opacity: 0 };
+
     const visibility = progress.interpolate({
-      inputRange: direction === NavigationDirection.forward ? [index -1, index] : [index, index+1],
+      inputRange: direction === NavigationDirection.forward ?
+        [index - 1, index] : [index, index + 1],
       outputRange: direction === NavigationDirection.forward ? [0, 1] : [1, 0],
     });
-    
-    return { 
+
+    return {
       opacity: visibility.interpolate({
-          inputRange: Constants.OVERLAY_VIEWS_VISIBILITY_INPUT_RANGE,
-          outputRange: Constants.OVERLAY_VIEWS_VISIBILITY_OUTPUT_RANGE
-        })
-      };
+        inputRange: Constants.OVERLAY_VIEWS_VISIBILITY_INPUT_RANGE,
+        outputRange: Constants.OVERLAY_VIEWS_VISIBILITY_OUTPUT_RANGE,
+      }),
+    };
   }
 
   componentDidMount() {
