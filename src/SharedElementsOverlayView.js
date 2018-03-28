@@ -3,6 +3,7 @@ import { View, StyleSheet, Animated } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
+import { createAnimatedWrapper } from './createAnimatedWrapper';
 import { TransitionContext, NavigationDirection } from './Types';
 
 const styles: StyleSheet.NamedStyles = StyleSheet.create({
@@ -84,35 +85,10 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
       const { fromItem, toItem } = pair;
       const transitionStyle = self.getTransitionStyle(fromItem, toItem);
 
-      let element = React.Children.only(fromItem.reactElement.props.children);
-      let elementProps = element.props;
-      let animatedComponent;
-      let child;
-
-      // Functional components should be wrapped in a view to be usable with
-      // Animated.createAnimatedComponent
-      const isFunctionalComponent = !element.type.displayName;
-      if (isFunctionalComponent) {
-        // Wrap in sourrounding view
-        element = React.createElement(element.type, element.props);
-        const wrapper = (<View />);
-        animatedComponent = Animated.createAnimatedComponent(wrapper.type);
-        elementProps = {};
-        child = element;
-      } else {
-        const wrapper = (<View />);
-        animatedComponent = Animated.createAnimatedComponent(wrapper.type);
-        elementProps = {};
-        child = element;
-      }
-
-      const props = {
-        ...element.props,
-        style: [element.props.style, styles.sharedElement, transitionStyle],
-        key: `shared_${idx}`,
-      };
-
-      return React.createElement(animatedComponent, props, child || element.props.children);
+      const element = React.Children.only(fromItem.reactElement.props.children);
+      const key = "SharedOverlay-"  + idx.toString();
+      const style = [element.props.style, styles.sharedElement, transitionStyle];
+      return createAnimatedWrapper(element, key, style);
     });
 
     return (

@@ -5,13 +5,14 @@ import { View, Animated, StyleSheet, findNodeHandle } from 'react-native';
 import TransitionItem from './TransitionItem';
 import { RouteDirection, NavigationDirection } from './Types';
 import * as Constants from './TransitionConstants';
+import { createAnimatedWrapper, createAnimated } from './createAnimatedWrapper';
 
 const uniqueBaseId: string = `transitionCompId-${Date.now()}`;
 let uuidCount: number = 0;
 
 const styles = StyleSheet.create({
   transition: {
-    // backgroundColor: '#0000EF22',
+    // backgroundColor: '#0000EF22',    
   },
 });
 
@@ -39,6 +40,7 @@ class Transition extends React.PureComponent<TransitionProps> {
     super(props, context);
     this._name = `${uniqueBaseId}-${uuidCount++}`;
     this._animatedComponent = null;
+    this.setViewRef = this.setViewRef.bind(this);
   }
 
   _name: string
@@ -81,39 +83,23 @@ class Transition extends React.PureComponent<TransitionProps> {
   }
 
   render() {
+    if(!this._animatedComponent)
+      this._animatedComponent = createAnimated();
+      
     // Get child
     let element = React.Children.only(this.props.children);
-    let elementProps = element.props;
-    let child = null;
     if (!element) { return null; }
 
-    // Functional components should be wrapped in a view to be usable with
-    // Animated.createAnimatedComponent
-    if (element.type.displayName !== 'View' && element.type.displayName !== 'Image') {
-      // Wrap in sourrounding view
-      element = React.createElement(element.type, element.props);
-      if (!this._animatedComponent) {
-        const wrapper = (<View />);
-        this._animatedComponent = Animated.createAnimatedComponent(wrapper.type);
-      }
-      elementProps = {};
-      child = element;
-    } else if (!this._animatedComponent) {
-      this._animatedComponent = Animated.createAnimatedComponent(element.type);
-    }
-
     const visibilityStyle = this.getVisibilityStyle();
-    const style = [elementProps.style, visibilityStyle, styles.transition];
+    const style = [visibilityStyle, styles.transition];
+    const key = this._getName() + "-"  + this._route;
 
-    const props = {
-      ...elementProps,
-      key: this._getName(),
-      collapsable: false,
-      style,
-      ref: (ref) => { this._viewRef = ref; },
-    };
+    return createAnimatedWrapper(
+      element, key, style, this.setViewRef, this._animatedComponent);
+  }
 
-    return React.createElement(this._animatedComponent, props, child || props.children);
+  setViewRef(ref: any) {
+    this._viewRef = ref;
   }
 
   getVisibilityStyle() {
@@ -131,7 +117,9 @@ class Transition extends React.PureComponent<TransitionProps> {
     const routeDirection = getDirectionForRoute(this._getName(), this._route);
     if (routeDirection === RouteDirection.unknown) return { opacity: 0 };
 
-    const inputRange = direction === NavigationDirection.forward ? [index - 1, index] : [index, index + 1];
+    const inputRange = direction === NavigationDirection.forward ? 
+      [index - 1, index] : [index, index + 1];
+
     const outputRange = routeDirection === RouteDirection.to ? [0, 1] : [1, 0];
 
     const visibilityProgress = progress.interpolate({ inputRange, outputRange });
