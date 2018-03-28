@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-
 import { Transition, FluidNavigator } from 'react-navigation-fluid-transitions';
 
 const styles = StyleSheet.create({
@@ -36,7 +35,7 @@ const styles = StyleSheet.create({
   },
   buttons: {
     flexDirection: 'row',
-    padding: 40,
+    padding: 20,
   },
 });
 
