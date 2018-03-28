@@ -39,7 +39,7 @@ const getWrapperStyle = (style) => {
   const retVal = {};
   const keys = Object.keys(flattenedStyle);
   keys.forEach(key => {
-    if(includePropsForWrapper.indexOf(key) > -1)
+    if(!isNumber(key) && includePropsForWrapper.indexOf(key) > -1)
       retVal[key] = flattenedStyle[key];
   });
 
@@ -53,11 +53,11 @@ const getElementStyle = (style) => {
   const retVal = {};
   const keys = Object.keys(flattenedStyle);
   keys.forEach(key => {
-    if(excludePropsForElement.indexOf(key) === -1)
-      retVal[key] = flattenedStyle[key];
+    if(!isNumber(key) && excludePropsForElement.indexOf(key) === -1)
+        retVal[key] = flattenedStyle[key];
   });
 
-  return {...retVal };
+  return retVal;
 }
 
 const getStyle = (style) => {
@@ -68,6 +68,8 @@ const getStyle = (style) => {
   }
   return flattenedStyle;
 }
+
+function isNumber(n) { return !isNaN(parseFloat(n)) && !isNaN(n - 0) }
 
 const includePropsForWrapper = [
   "display",
