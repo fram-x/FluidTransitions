@@ -10,7 +10,9 @@ This project aims to implement a simple yet powerful set of constructs for build
 
 The library is JavaScript only - no linking required.
 
-<img src="https://github.com/fram-x/FluidTransitions/raw/develop/docs/example.gif" width="240">
+<img src="https://github.com/fram-x/FluidTransitions/raw/develop/docs/final.gif" width="240">|<img src="https://github.com/fram-x/FluidTransitions/raw/develop/docs/final.gif" width="240">
+
+
 
 [Snack on Expo](https://snack.expo.io/HJM75VtqG)
 
