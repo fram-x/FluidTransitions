@@ -8,7 +8,7 @@
 ## Introduction
 This project aims to implement a simple yet powerful set of constructs for building fluid transitions between elements when navigating with [React Navigation](https://reactnavigation.org). The library is JavaScript only - no linking required.
 
-<img src="https://github.com/fram-x/FluidTransitions/blob/develop/docs/example.gif" width="240">
+<img src="https://github.com/fram-x/FluidTransitions/raw/develop/docs/example.gif" width="240">
 
 [Snack on Expo](https://snack.expo.io/HJM75VtqG)
 
