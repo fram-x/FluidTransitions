@@ -1,12 +1,13 @@
 import { TransitionSpecification } from './../Types/TransitionSpecification';
 
-export const getTopTransition = (transitionConfiguration: TransitionSpecification) => {
-  if(!transitionConfiguration || transitionConfiguration.metrics === undefined)
+export const getTopTransition = (transitionSpecification: TransitionSpecification) => {
+  if(!transitionSpecification || transitionSpecification.metrics === undefined)
     return { };
 
-  const { start, end, y, height } = transitionConfiguration.metrics;
+  const { start, end, metrics, dimensions } = transitionSpecification;
+  const { y, height } = metrics;
   const distanceValue = -(height + y + 25);		
-  const progress = transitionConfiguration.progress.interpolate({
+  const progress = transitionSpecification.progress.interpolate({
     inputRange: [0, start, end, 1],
     outputRange: [distanceValue, distanceValue, 0, 0],
   });
