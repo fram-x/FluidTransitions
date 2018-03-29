@@ -6,7 +6,9 @@
 <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
 
 ## Introduction
-This project aims to implement a simple yet powerful set of constructs for building fluid transitions between elements when navigating with [React Navigation](https://reactnavigation.org). The library is JavaScript only - no linking required.
+This project aims to implement a simple yet powerful set of constructs for building fluid transitions between elements when navigating with [React Navigation](https://reactnavigation.org). 
+
+The library is JavaScript only - no linking required.
 
 <img src="https://github.com/fram-x/FluidTransitions/raw/develop/docs/example.gif" width="240">
 
@@ -128,6 +130,8 @@ Read more about the parameters and functionality for building [custom transition
 Each transition can be delayed by setting the delay property. This will cause the transition to be started a little bit later than the previous one to give the impression that elements appear in sequence.
 
 ### Technical
-This libraries uses native animations on both Android and iOS to get full 60 fps performance. Custom transitions trying to animate properties that are not supported by the native animation driver will not work.
+The library uses native animations on both Android and iOS to get full 60 fps performance. Custom transitions trying to animate properties that are not supported by the native animation driver will not work.
+
+The transitions implemented in the shared element transition is currently scaling and position. Rotation is not working due to a (bug)(https://github.com/facebook/react-native/issues/14161) in React Native Android.
 
 > Some of the concepts in the library builds on ideas from [@lintonye](https://github.com/lintonye)'s pull request and suggestion found here: [Shared element transition #941](https://github.com/react-navigation/react-navigation/pull/941).
