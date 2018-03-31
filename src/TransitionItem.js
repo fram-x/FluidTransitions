@@ -1,5 +1,5 @@
-import { Animated } from 'react-native';
-
+import React from 'react';
+import { StyleSheet } from 'react-native';
 import { Metrics } from './Types/Metrics';
 
 type Size = {
@@ -19,9 +19,7 @@ export default class TransitionItem {
     this.appear = appear;
     this.disappear = disappear;
     this.delay = delay;
-    this.metrics = metrics;
-    this.visibility = new Animated.Value(appear ? 0 : 1);
-    this.progress = null;
+    this.metrics = metrics;    
   }
 
   name: string
@@ -33,11 +31,20 @@ export default class TransitionItem {
   disappear: string | Function
   delay: boolean
   layoutReady: boolean
-  visibility: Animated.Value
-  progress: ?Animated.Value
+  flattenedStyle: ?any
 
   getNodeHandle() {
     return this.reactElement.getNodeHandle();
+  }
+
+  getFlattenedStyle() {
+    if(!this.flattenedStyle) {
+      const child = React.Children.only(this.reactElement.props.children);
+      const style = child.props.style;
+      if(!style) return null;
+      this.flattenedStyle = StyleSheet.flatten(style);
+    }
+    return this.flattenedStyle;
   }
 
   scaleRelativeTo(other: TransitionItem): Size {

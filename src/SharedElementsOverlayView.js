@@ -87,7 +87,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
 
       const element = React.Children.only(fromItem.reactElement.props.children);
       const key = "SharedOverlay-"  + idx.toString();
-      const style = [element.props.style, styles.sharedElement, transitionStyle];
+      const style = [element.props.style, styles.sharedElement, transitionStyle];      
       return createAnimatedWrapper(element, key, style);
     });
 
@@ -129,6 +129,8 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
       outputRange: [0, 1],
     });
 
+    const rotationStyle = this.getRotate(interpolatedProgress, fromItem, toItem);
+
     const toVsFromScaleX = toItem.scaleRelativeTo(fromItem).x;
     const toVsFromScaleY = toItem.scaleRelativeTo(fromItem).y;
 
@@ -154,10 +156,14 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
         fromItem.metrics.height / 2 * (toVsFromScaleY - 1)],
     });
 
+    const transform = [{ translateX }, { translateY }, { scaleX }, { scaleY }];
+    if(rotationStyle)
+      rotationStyle.forEach(r => transform.push(r));
+
     return {
       width: fromItem.metrics.width,
       height: fromItem.metrics.height,
-      transform: [{ translateX }, { translateY }, { scaleX }, { scaleY }],
+      transform
     };
   }
 
@@ -167,6 +173,56 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
 
   componentWillUnmount() {
     this._isMounted = false;
+  }
+
+  getRotate(progress: Animated.Value, fromItem: TransitionItem, toItem: TransitionItem):any {
+    const fromStyle = fromItem.getFlattenedStyle();
+    const toStyle = toItem.getFlattenedStyle();
+
+    if(!fromStyle.transform && !toStyle.transform) return null;
+
+    const rotateFrom = fromStyle.transform ? {
+      rotate: fromStyle.transform.find(i => i.rotate),
+      rotateX: fromStyle.transform.find(i => i.rotateX),
+      rotateY: fromStyle.transform.find(i => i.rotateY),
+    } : {};
+    const rotateTo = toStyle.transform ? {
+      rotate: toStyle.transform.find(i => i.rotate),
+      rotateX: toStyle.transform.find(i => i.rotateX),
+      rotateY: toStyle.transform.find(i => i.rotateY),
+    } : {};
+    
+    if(rotateFrom === {} && rotateTo === {}) return null;
+
+    const retVal = [];
+
+    if(rotateFrom.rotate || rotateTo.rotate) {
+      retVal.push({ rotate: progress.interpolate({
+        inputRange: [0, 1],
+        outputRange: [
+          (rotateFrom.rotate ? rotateFrom.rotate.rotate : '0deg'), 
+          (rotateTo.rotate ? rotateTo.rotate.rotate : '0deg')]
+      })});
+    }
+
+    if(rotateFrom.rotateX || rotateTo.rotateX) {
+      retVal.push({ rotateX: progress.interpolate({
+        inputRange: [0, 1],
+        outputRange: [rotateFrom.rotateX ? rotateFrom.rotateX.rotateX : '0deg', 
+        rotateTo.rotateX ? rotateTo.rotateX.rotateX : '0deg']
+      })})
+    }
+
+    if(rotateFrom.rotateY || rotateTo.rotateY) {
+      retVal.push({ rotateY: progress.interpolate({
+        inputRange: [0, 1],
+        outputRange: [rotateFrom.rotateY ? rotateFrom.rotateY.rotateY : '0deg', 
+        rotateTo.rotateY ? rotateTo.rotateY.rotateY : '0deg']
+      })});
+    }
+    
+    if(retVal.length === 0) return null;
+    return retVal;
   }
 
   static contextTypes = {
