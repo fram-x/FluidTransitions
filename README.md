@@ -17,6 +17,9 @@ The library implements a new navigator component called `FluidNavigator` with th
 
 > The Navigator's API is identical to the StackNavigator except that it does not support a header component. It can easily be integrated with redux and your existing navigation setups.
 
+See Medium article:
+<https://medium.com/@christian.falch/fluid-transitions-with-react-navigation-a049d2f71494>
+
 ## Installation
 
 To install the library into your project, run yarn or npm:
