@@ -179,7 +179,8 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     const fromStyle = fromItem.getFlattenedStyle();
     const toStyle = toItem.getFlattenedStyle();
 
-    if(!fromStyle.transform && !toStyle.transform) return null;
+    if((!fromStyle || !fromStyle.transform) && 
+      (!toStyle || !toStyle.transform)) return null;
 
     const rotateFrom = fromStyle.transform ? {
       rotate: fromStyle.transform.find(i => i.rotate),
