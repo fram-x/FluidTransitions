@@ -92,7 +92,7 @@ class Transition extends React.PureComponent<TransitionProps> {
 
     const visibilityStyle = this.getVisibilityStyle();
     const style = [visibilityStyle, styles.transition];
-    const key = this._getName() + "-"  + this._route;
+    const key = this._getName() + "-"  + this._route;  
 
     return createAnimatedWrapper(
       element, key, style, this.setViewRef, this._animatedComponent);
