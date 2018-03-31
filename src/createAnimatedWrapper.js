@@ -16,7 +16,7 @@ const createAnimatedWrapper = (element, key, styles, setViewRefCallback, wrapper
 
   // Get style for inner view
   const elementStyle = getElementStyle(element.props.style);
-
+  
   // create inner element with element styles
   const child = React.createElement(element.type, {...element.props, style: {
     ...elementStyle,
@@ -114,14 +114,14 @@ const includePropsForWrapper = [
   "aspectRatio",
   "zIndex",
   "direction",
-  "transform",
-  "transformMatrix",
-  "decomposedMatrix",
-  "scaleX",
-  "scaleY",
-  "rotation",
-  "translateX",
-  "translateY",
+  // "transform",
+  // "transformMatrix",
+  // "decomposedMatrix",
+  // "scaleX",
+  // "scaleY",
+  // "rotation",
+  // "translateX",
+  // "translateY",
   "backfaceVisibility",
 ];
 
