@@ -131,6 +131,6 @@ Each transition can be delayed by setting the delay property. This will cause th
 ### Technical
 The library uses native animations on both Android and iOS to get full 60 fps performance. Custom transitions trying to animate properties that are not supported by the native animation driver will not work.
 
-The transitions implemented in the shared element transition is currently scaling and position. Rotation is not working due to a (bug)(https://github.com/facebook/react-native/issues/14161) in React Native Android.
+The transitions implemented in the shared element transition is currently scaling and position. 
 
 > Some of the concepts in the library builds on ideas from [@lintonye](https://github.com/lintonye)'s pull request and suggestion found here: [Shared element transition #941](https://github.com/react-navigation/react-navigation/pull/941).
