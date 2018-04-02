@@ -10,7 +10,7 @@ import {
   getRotationInterpolator,
   getPositionInterpolator,
   getBackgroundInterpolator,
-  getBorderRadiusInterpolator,
+  getBorderInterpolator,
 } from './Interpolators';
 
 type InterpolatorEntry = {
@@ -25,11 +25,12 @@ export function registerInterpolator(name: string, interpolatorFunction: Functio
   interpolators.push({ name, interpolatorFunction });
 }
 
+registerInterpolator('background', getBackgroundInterpolator);
+registerInterpolator('borderRadius', getBorderInterpolator);
 registerInterpolator('position', getPositionInterpolator);
 registerInterpolator('scale', getScaleInterpolator);
 registerInterpolator('rotation', getRotationInterpolator);
-registerInterpolator('background', getBackgroundInterpolator);
-registerInterpolator('borderRadius', getBorderRadiusInterpolator);
+
 
 type SharedElementsOverlayViewProps = {
   fromRoute: string,
