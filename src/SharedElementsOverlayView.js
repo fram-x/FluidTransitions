@@ -1,26 +1,35 @@
 import React from 'react';
-import { View, StyleSheet, Animated } from 'react-native';
+import { View, Dimensions, StyleSheet, Animated } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
 import { createAnimatedWrapper } from './createAnimatedWrapper';
-import { TransitionContext, NavigationDirection } from './Types';
+import { TransitionContext, NavigationDirection, InterpolatorSpecification } from './Types';
+import {
+  getScaleInterpolator,
+  getRotationInterpolator,
+  getPositionInterpolator,
+  getBackgroundInterpolator,
+  getBorderRadiusInterpolator,
+} from './Interpolators';
 
-const styles: StyleSheet.NamedStyles = StyleSheet.create({
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  sharedElement: {
-    position: 'absolute',
-    // backgroundColor: '#FF000022',
-    padding: 0,
-    margin: 0,
-  },
-});
+type InterpolatorEntry = {
+  name: string,
+  interpolatorFunction: Function
+}
+
+const interpolators: Array<InterpolatorEntry> = [];
+
+// This function can be called to register other transition functions
+export function registerInterpolator(name: string, interpolatorFunction: Function): InterpolatorEntry {
+  interpolators.push({ name, interpolatorFunction });
+}
+
+registerInterpolator('position', getPositionInterpolator);
+registerInterpolator('scale', getScaleInterpolator);
+registerInterpolator('rotation', getRotationInterpolator);
+registerInterpolator('background', getBackgroundInterpolator);
+registerInterpolator('borderRadius', getBorderRadiusInterpolator);
 
 type SharedElementsOverlayViewProps = {
   fromRoute: string,
@@ -83,11 +92,11 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     const self = this;
     const sharedElements = this.props.sharedElements.map((pair, idx) => {
       const { fromItem, toItem } = pair;
-      const transitionStyle = self.getTransitionStyle(fromItem, toItem);
+      const transitionStyles = self.getTransitionStyle(fromItem, toItem);
 
       const element = React.Children.only(fromItem.reactElement.props.children);
       const key = "SharedOverlay-"  + idx.toString();
-      const style = [element.props.style, styles.sharedElement, transitionStyle];      
+      const style = [element.props.style, styles.sharedElement, transitionStyles];
       return createAnimatedWrapper(element, key, style);
     });
 
@@ -123,48 +132,67 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
 
     const index = getIndex();
     const direction = getDirection();
-    const progress = getTransitionProgress(fromItem.name, fromItem.route);
-    const interpolatedProgress = progress.interpolate({
-      inputRange: direction === NavigationDirection.forward ? [index - 1, index] : [index, index + 1],
+    const nativeProgress = getTransitionProgress(true);
+    const progress = getTransitionProgress(false);
+
+    const nativeInterpolatedProgress = progress.interpolate({
+      inputRange: direction === NavigationDirection.forward ? 
+        [index - 1, index] : [index, index + 1],
       outputRange: [0, 1],
     });
 
-    const rotationStyle = this.getRotate(interpolatedProgress, fromItem, toItem);
-
-    const toVsFromScaleX = toItem.scaleRelativeTo(fromItem).x;
-    const toVsFromScaleY = toItem.scaleRelativeTo(fromItem).y;
-
-    const scaleX = interpolatedProgress.interpolate({
-      inputRange: [0, 1],
-      outputRange: [1, toVsFromScaleX],
+    const interpolatedProgress = progress.interpolate({
+      inputRange: direction === NavigationDirection.forward ? 
+        [index - 1, index] : [index, index + 1],
+      outputRange: [0, 1],
     });
 
-    const scaleY = interpolatedProgress.interpolate({
-      inputRange: [0, 1],
-      outputRange: [1, toVsFromScaleY],
-    });
+    const interpolatorInfo: InterpolatorSpecification = {
+      from: {
+        metrics: fromItem.metrics,
+        style: fromItem.getFlattenedStyle(),
+      },
+      to: {
+        metrics: toItem.metrics,
+        style: toItem.getFlattenedStyle(),
+      },
+      scaleX: toItem.scaleRelativeTo(fromItem).x,
+      scaleY: toItem.scaleRelativeTo(fromItem).y,
+      nativeInterpolatedProgress,
+      interpolatedProgress,
+      dimensions: Dimensions.get('window'),
+    };
 
-    const translateX = interpolatedProgress.interpolate({
-      inputRange: [0, 1],
-      outputRange: [fromItem.metrics.x, toItem.metrics.x +
-        fromItem.metrics.width / 2 * (toVsFromScaleX - 1)],
+    const styles = [];
+    
+    interpolators.forEach(interpolator => {
+      const style = interpolator.interpolatorFunction(interpolatorInfo);
+      if(style)
+        styles.push(style);
     });
-
-    const translateY = interpolatedProgress.interpolate({
-      inputRange: [0, 1],
-      outputRange: [fromItem.metrics.y, toItem.metrics.y +
-        fromItem.metrics.height / 2 * (toVsFromScaleY - 1)],
-    });
-
-    const transform = [{ translateX }, { translateY }, { scaleX }, { scaleY }];
-    if(rotationStyle)
-      rotationStyle.forEach(r => transform.push(r));
 
     return {
       width: fromItem.metrics.width,
       height: fromItem.metrics.height,
-      transform
+      ...this.mergeStyles(styles)
     };
+  }
+
+  mergeStyles(styles: Array<any>): StyleSheet.NamedStyles {
+    const retVal = { transform: [] };
+    styles.forEach(s => {      
+      Object.keys(s).forEach(key => {
+        if(s[key] && s[key] instanceof Array){
+          const a = s[key];
+          if(!retVal[key]) retVal[key] = [];
+          a.forEach(i => retVal[key].push(i));
+        } else {
+          retVal[key] = s[key];
+        }
+      })
+    })
+
+    return retVal;
   }
 
   componentDidMount() {
@@ -175,62 +203,28 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     this._isMounted = false;
   }
 
-  getRotate(progress: Animated.Value, fromItem: TransitionItem, toItem: TransitionItem):any {
-    const fromStyle = fromItem.getFlattenedStyle();
-    const toStyle = toItem.getFlattenedStyle();
-
-    if((!fromStyle || !fromStyle.transform) && 
-      (!toStyle || !toStyle.transform)) return null;
-
-    const rotateFrom = fromStyle.transform ? {
-      rotate: fromStyle.transform.find(i => i.rotate),
-      rotateX: fromStyle.transform.find(i => i.rotateX),
-      rotateY: fromStyle.transform.find(i => i.rotateY),
-    } : {};
-    const rotateTo = toStyle.transform ? {
-      rotate: toStyle.transform.find(i => i.rotate),
-      rotateX: toStyle.transform.find(i => i.rotateX),
-      rotateY: toStyle.transform.find(i => i.rotateY),
-    } : {};
-    
-    if(rotateFrom === {} && rotateTo === {}) return null;
-
-    const retVal = [];
-
-    if(rotateFrom.rotate || rotateTo.rotate) {
-      retVal.push({ rotate: progress.interpolate({
-        inputRange: [0, 1],
-        outputRange: [
-          (rotateFrom.rotate ? rotateFrom.rotate.rotate : '0deg'), 
-          (rotateTo.rotate ? rotateTo.rotate.rotate : '0deg')]
-      })});
-    }
-
-    if(rotateFrom.rotateX || rotateTo.rotateX) {
-      retVal.push({ rotateX: progress.interpolate({
-        inputRange: [0, 1],
-        outputRange: [rotateFrom.rotateX ? rotateFrom.rotateX.rotateX : '0deg', 
-        rotateTo.rotateX ? rotateTo.rotateX.rotateX : '0deg']
-      })})
-    }
-
-    if(rotateFrom.rotateY || rotateTo.rotateY) {
-      retVal.push({ rotateY: progress.interpolate({
-        inputRange: [0, 1],
-        outputRange: [rotateFrom.rotateY ? rotateFrom.rotateY.rotateY : '0deg', 
-        rotateTo.rotateY ? rotateTo.rotateY.rotateY : '0deg']
-      })});
-    }
-    
-    if(retVal.length === 0) return null;
-    return retVal;
-  }
-
   static contextTypes = {
     getTransitionProgress: PropTypes.func,
     getDirection: PropTypes.func,
     getIndex: PropTypes.func,
   }
 }
+
+const styles = StyleSheet.create({
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  sharedElement: {
+    position: 'absolute',
+    // backgroundColor: '#FF000022',
+    padding: 0,
+    margin: 0,
+  },
+});
+
 
 export default SharedElementsOverlayView;

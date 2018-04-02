@@ -172,7 +172,8 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     const index = getIndex();
     const direction = getDirection();
     const routeDirection = getDirectionForRoute(item.name, item.route);
-    const progress = getTransitionProgress(item.name, item.route);
+    const progress = getTransitionProgress();
+    
     if (progress) {
       const transitionFunction = this.getTransitionFunction(item, routeDirection);
       if (transitionFunction) {

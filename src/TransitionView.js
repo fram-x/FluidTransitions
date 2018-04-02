@@ -77,6 +77,10 @@ class Transition extends React.PureComponent<TransitionProps> {
     return findNodeHandle(this._viewRef);
   }
 
+  getViewRef(): any {
+    return this._viewRef;
+  }
+
   _getName(): string {
     if (this.props.shared) { return this.props.shared; }
     return this._name;
