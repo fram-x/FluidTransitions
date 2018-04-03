@@ -16,11 +16,11 @@ export const getStyleInterpolator = (
   const fromValue = fromStyle[key] ? fromStyle[key] : defaultValue;
   const toValue = toStyle[key] ? toStyle[key] : defaultValue;
   
-  const interpolator = (useNative ? spec.nativeInterpolatedProgress : spec.interpolatedProgress)
+  const interpolator = (useNative ? spec.nativeInterpolation : spec.interpolation)
     .interpolate({
-    inputRange: [0, 1],
-    outputRange: [fromValue, toValue],
-  });
+      inputRange: [0, 1],
+      outputRange: [fromValue, toValue],
+    });
   
   return interpolator;
 }

@@ -14,6 +14,6 @@ export type InterpolatorSpecification = {
   scaleX: number,
   scaleY: number,
   dimensions: ScaledSize,
-  nativeInterpolatedProgress: AnimatedInterpolation,
-  interpolatedProgress: AnimatedInterpolation,
+  interpolation: AnimatedInterpolation,
+  nativeInterpolation: AnimatedInterpolation,
 }

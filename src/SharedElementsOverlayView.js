@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Dimensions, StyleSheet, Animated } from 'react-native';
+import { View, Dimensions, AnimatedInterpolation, StyleSheet, Animated } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
@@ -47,6 +47,8 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
   }
 
   _isMounted: boolean;
+  _nativeInterpolation: AnimatedInterpolation;
+  _interpolation: AnimatedInterpolation;
 
   shouldComponentUpdate(nextProps) {
     if (!nextProps.fromRoute && !nextProps.toRoute) {
@@ -62,7 +64,6 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
 
     // Compare shared elements count
     if (!this.compareArrays(this.props.sharedElements, nextProps.sharedElements)) {
-      // console.log("SE UPDATE elements changed ");
       return true;
     }
 
@@ -90,6 +91,8 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
 
     // console.log("RENDER SE " + this.props.sharedElements.length);
 
+    this.setupInterpolations();
+
     const self = this;
     const sharedElements = this.props.sharedElements.map((pair, idx) => {
       const { fromItem, toItem } = pair;
@@ -108,6 +111,26 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     );
   }
 
+  setupInterpolations() {
+    const { getTransitionProgress, getIndex, getDirection } = this.context;
+    if(!getTransitionProgress || !getIndex || !getDirection ) return null;
+
+    const index = getIndex();
+    const direction = getDirection();    
+    const inputRange = direction === NavigationDirection.forward ? 
+      [index - 1, index] : [index, index + 1];
+
+    // TODO: Seems like it is illegal to combine both native and non-native for
+    // same element
+    this._interpolation = getTransitionProgress(false).interpolate({
+      inputRange, outputRange: [0, 1],
+    });
+    
+    this._nativeInterpolation = getTransitionProgress(false).interpolate({
+      inputRange, outputRange: [0, 1],
+    });
+  }
+
   getMetricsReady(): boolean {
     if (this.props.sharedElements) {
       let metricsReady = true;
@@ -118,36 +141,9 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     }
     return false;
   }
-
+  
   getTransitionStyle(fromItem: TransitionItem, toItem: TransitionItem) {
-    const { getTransitionProgress, getIndex, getDirection } = this.context;
-    if (!getTransitionProgress || !getIndex || !getDirection ||
-      !fromItem.metrics || !toItem.metrics) {
-      return {
-        width: fromItem.metrics.width,
-        height: fromItem.metrics.height,
-        left: fromItem.metrics.x,
-        top: fromItem.metrics.y,
-      };
-    }
-
-    const index = getIndex();
-    const direction = getDirection();
-    const nativeProgress = getTransitionProgress(true);
-    const progress = getTransitionProgress(false);
-
-    const nativeInterpolatedProgress = progress.interpolate({
-      inputRange: direction === NavigationDirection.forward ? 
-        [index - 1, index] : [index, index + 1],
-      outputRange: [0, 1],
-    });
-
-    const interpolatedProgress = progress.interpolate({
-      inputRange: direction === NavigationDirection.forward ? 
-        [index - 1, index] : [index, index + 1],
-      outputRange: [0, 1],
-    });
-
+    
     const interpolatorInfo: InterpolatorSpecification = {
       from: {
         metrics: fromItem.metrics,
@@ -159,8 +155,8 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
       },
       scaleX: toItem.scaleRelativeTo(fromItem).x,
       scaleY: toItem.scaleRelativeTo(fromItem).y,
-      nativeInterpolatedProgress,
-      interpolatedProgress,
+      interpolation: this._interpolation,
+      nativeInterpolation: this._nativeInterpolation,
       dimensions: Dimensions.get('window'),
     };
 

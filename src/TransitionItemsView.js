@@ -55,6 +55,7 @@ export default class TransitionItemsView extends React.Component<
     // props.progress.addListener(console.log);
 
     this.getIsPartOfSharedTransition = this.getIsPartOfSharedTransition.bind(this);
+    this.getTransitionProgress = this.getTransitionProgress.bind(this);
   }
 
   _viewRef: ?View;
@@ -123,16 +124,16 @@ export default class TransitionItemsView extends React.Component<
   }
 
   getTransitionProgress = (useNative = true) => {
-    if(!useNative) {
-        if(!this._nonNativeTransitionProgress) {
-          this._nonNativeTransitionProgress = new Animated.Value(0);
-          this._transitionProgress.addListener(Animated.event([{
-            value: this._nonNativeTransitionProgress }],
-            { useNativeDriver: false }));
-        }        
-        return this._nonNativeTransitionProgress;
+    if(useNative) return this._transitionProgress;
+    
+    if(!this._nonNativeTransitionProgress) {
+      this._nonNativeTransitionProgress = new Animated.Value(-1);
+      this._nonNativeTransitionProgress.dada = 'non native';
+      this._transitionProgress.addListener(Animated.event([{
+        value: this._nonNativeTransitionProgress }],
+        { useNativeDriver: false }));
     }
-    return this._transitionProgress;
+    return this._nonNativeTransitionProgress;    
   }
 
   getIsPartOfSharedTransition(name: string, route: string) {

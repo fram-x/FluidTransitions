@@ -26,7 +26,7 @@ export const getRotationInterpolator = (spec: InterpolatorSpecification): StyleS
   const retVal = [];
 
   if(rotateFrom.rotate || rotateTo.rotate) {
-    retVal.push({ rotate: spec.nativeInterpolatedProgress.interpolate({
+    retVal.push({ rotate: spec.nativeInterpolation.interpolate({
       inputRange: [0, 1],
       outputRange: [
         (rotateFrom.rotate ? rotateFrom.rotate.rotate : '0deg'), 
@@ -35,7 +35,7 @@ export const getRotationInterpolator = (spec: InterpolatorSpecification): StyleS
   }
 
   if(rotateFrom.rotateX || rotateTo.rotateX) {
-    retVal.push({ rotateX: spec.nativeInterpolatedProgress.interpolate({
+    retVal.push({ rotateX: spec.nativeInterpolation.interpolate({
       inputRange: [0, 1],
       outputRange: [rotateFrom.rotateX ? rotateFrom.rotateX.rotateX : '0deg', 
       rotateTo.rotateX ? rotateTo.rotateX.rotateX : '0deg']
@@ -43,7 +43,7 @@ export const getRotationInterpolator = (spec: InterpolatorSpecification): StyleS
   }
 
   if(rotateFrom.rotateY || rotateTo.rotateY) {
-    retVal.push({ rotateY: spec.nativeInterpolatedProgress.interpolate({
+    retVal.push({ rotateY: spec.nativeInterpolation.interpolate({
       inputRange: [0, 1],
       outputRange: [rotateFrom.rotateY ? rotateFrom.rotateY.rotateY : '0deg', 
       rotateTo.rotateY ? rotateTo.rotateY.rotateY : '0deg']
