@@ -21,7 +21,8 @@ type TransitionProps = {
   disappear: ?boolean,
   shared: ?string,
   delay: ?boolean,
-  children: Array<any>
+  children: Array<any>,
+  modifiers: ?string
 }
 
 class Transition extends React.PureComponent<TransitionProps> {  
@@ -57,6 +58,7 @@ class Transition extends React.PureComponent<TransitionProps> {
         this._getName(), this.context.route,
         this, this.props.shared !== undefined, this.props.appear,
         this.props.disappear, this.props.delay !== undefined,
+        this.props.modifiers
       ));
     }
   }

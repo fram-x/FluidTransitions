@@ -158,6 +158,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
       interpolation: this._interpolation,
       nativeInterpolation: this._nativeInterpolation,
       dimensions: Dimensions.get('window'),
+      modifiers: fromItem.modifiers ? fromItem.modifiers : ""
     };
 
     const styles = [];
