@@ -39,15 +39,15 @@ const styles = StyleSheet.create({
   },
   circle1: {
     backgroundColor: '#FF0000',
-    width: 25,
-    height: 25,
-    borderRadius: 12.5,
+    width: 50,
+    height: 50,
+    borderRadius: 4,
   },
   circle2: {
     backgroundColor: '#0000FF',
     width: 50,
     height: 50,
-    borderRadius: 15,
+    borderRadius: 25,
   },
   circle3: {
     backgroundColor: '#00FF00',
