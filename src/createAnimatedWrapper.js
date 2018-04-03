@@ -12,7 +12,7 @@ const createAnimatedWrapper = (element, key, styles, setViewRefCallback, wrapper
   const animatedComponent = wrapper ? wrapper : createAnimated();
   
   // Get style for outer view
-  const wrapperElementStyle = getWrapperStyle(element.props.style);
+  const wrapperElementStyle = getWrapperStyle(element.props.style, styles);
 
   // Get style for inner view
   const elementStyle = getElementStyle(element.props.style);
@@ -32,7 +32,7 @@ const createAnimatedWrapper = (element, key, styles, setViewRefCallback, wrapper
   return React.createElement(animatedComponent, props, child);
 }
 
-const getWrapperStyle = (style) => {
+const getWrapperStyle = (style, styles) => {
   const flattenedStyle = getStyle(style);
   if(!flattenedStyle) return style;
 
@@ -40,9 +40,8 @@ const getWrapperStyle = (style) => {
   const keys = Object.keys(flattenedStyle);
   keys.forEach(key => {
     if(!isNumber(key) && includePropsForWrapper.indexOf(key) > -1)
-      retVal[key] = flattenedStyle[key];
+      retVal[key] = flattenedStyle[key]    
   });
-
   return retVal;
 }
 
@@ -123,6 +122,24 @@ const includePropsForWrapper = [
   // "translateX",
   // "translateY",
   "backfaceVisibility",
+  "backgroundColor",
+  "borderColor",
+  "borderTopColor",
+  "borderRightColor",
+  "borderBottomColor",
+  "borderLeftColor",
+  "borderStartColor",
+  "borderEndColor",
+  "borderRadius",
+  "borderTopLeftRadius",
+  "borderTopRightRadius",
+  "borderTopStartRadius",
+  "borderTopEndRadius",
+  "borderBottomLeftRadius",
+  "borderBottomRightRadius",
+  "borderBottomStartRadius",
+  "borderBottomEndRadius",
+  "borderStyle",
 ];
 
 const excludePropsForElement = [
@@ -192,24 +209,24 @@ const excludePropsForElement = [
   // "translateX",
   // "translateY",
   "backfaceVisibility",
-  // "backgroundColor",
-  // "borderColor",
-  // "borderTopColor",
-  // "borderRightColor",
-  // "borderBottomColor",
-  // "borderLeftColor",
-  // "borderStartColor",
-  // "borderEndColor",
-  // "borderRadius",
-  // "borderTopLeftRadius",
-  // "borderTopRightRadius",
-  // "borderTopStartRadius",
-  // "borderTopEndRadius",
-  // "borderBottomLeftRadius",
-  // "borderBottomRightRadius",
-  // "borderBottomStartRadius",
-  // "borderBottomEndRadius",
-  // "borderStyle",
+  "backgroundColor",
+  "borderColor",
+  "borderTopColor",
+  "borderRightColor",
+  "borderBottomColor",
+  "borderLeftColor",
+  "borderStartColor",
+  "borderEndColor",
+  "borderRadius",
+  "borderTopLeftRadius",
+  "borderTopRightRadius",
+  "borderTopStartRadius",
+  "borderTopEndRadius",
+  "borderBottomLeftRadius",
+  "borderBottomRightRadius",
+  "borderBottomStartRadius",
+  "borderBottomEndRadius",
+  "borderStyle",
   "opacity",
   "elevation"
 ];

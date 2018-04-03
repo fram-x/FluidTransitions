@@ -37,6 +37,10 @@ export default class TransitionItem {
     return this.reactElement.getNodeHandle();
   }
 
+  getViewRef() {
+    return this.reactElement.getViewRef();
+  }
+
   getFlattenedStyle() {
     if(!this.flattenedStyle) {
       const child = React.Children.only(this.reactElement.props.children);

@@ -37,6 +37,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 20,
   },
+  circle1: {
+    backgroundColor: '#FF0000',
+    width: 50,
+    height: 50,
+    borderRadius: 4,
+  },
+  circle2: {
+    backgroundColor: '#0000FF',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+  circle3: {
+    backgroundColor: '#00FF00',
+    width: 140,
+    height: 140,
+    borderRadius: 4,
+  },
 });
 
 const Circle = (props) => (
@@ -59,7 +77,7 @@ const Screen1 = (props) => (
     </Transition>
     <View style={styles.screen1}>
       <Transition shared="circle">
-        <Circle background="#FF0000" size={10} />
+        <View style={styles.circle1} />
       </Transition>
     </View>
     <View style={{ flexDirection: 'row' }}>
@@ -90,7 +108,7 @@ const Screen2 = (props) => (
     </Transition>
     <View style={styles.screen2}>
       <Transition shared="circle">
-        <Circle background="#FF0000" size={50} />
+        <View style={styles.circle2} />
       </Transition>
     </View>
     <View style={{ flexDirection: 'row' }}>
@@ -123,7 +141,7 @@ const Screen3 = (props) => (
     </Transition>
     <View style={styles.screen3}>
       <Transition shared="circle">
-        <Circle background="#FF0000" size={140} />
+        <View style={styles.circle3} />
       </Transition>
     </View>
     <View style={{ flexDirection: 'row' }}>

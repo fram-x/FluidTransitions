@@ -55,6 +55,7 @@ export default class TransitionItemsView extends React.Component<
     // props.progress.addListener(console.log);
 
     this.getIsPartOfSharedTransition = this.getIsPartOfSharedTransition.bind(this);
+    this.getTransitionProgress = this.getTransitionProgress.bind(this);
   }
 
   _viewRef: ?View;
@@ -62,6 +63,7 @@ export default class TransitionItemsView extends React.Component<
   _transitionItems: TransitionItems;
   _isMounted: boolean;
   _transitionProgress: Animated.Value;
+  _nonNativeTransitionProgress: Animated.Value;
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.toRoute !== this.props.toRoute ||
@@ -119,6 +121,19 @@ export default class TransitionItemsView extends React.Component<
 
     // invariant(true, "Route " + route + " is not part of transition!")
     return RouteDirection.unknown;
+  }
+
+  getTransitionProgress = (useNative = true) => {
+    if(useNative) return this._transitionProgress;
+    
+    if(!this._nonNativeTransitionProgress) {
+      this._nonNativeTransitionProgress = new Animated.Value(-1);
+      this._nonNativeTransitionProgress.dada = 'non native';
+      this._transitionProgress.addListener(Animated.event([{
+        value: this._nonNativeTransitionProgress }],
+        { useNativeDriver: false }));
+    }
+    return this._nonNativeTransitionProgress;    
   }
 
   getIsPartOfSharedTransition(name: string, route: string) {
@@ -276,7 +291,7 @@ export default class TransitionItemsView extends React.Component<
     return {
       register: (item) => this._transitionItems.add(item),
       unregister: (name, route) => this._transitionItems.remove(name, route),
-      getTransitionProgress: () => this._transitionProgress,
+      getTransitionProgress: this.getTransitionProgress,
       getDirectionForRoute: this.getDirectionForRoute.bind(this),
       getIndex: () => this.state.index,
       getDirection: () => (this.state.direction ?
