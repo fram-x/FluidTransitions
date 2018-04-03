@@ -48,5 +48,5 @@ The `disappear` property of the `Transition` element is used (if not set the app
 ### Delay
 The `delay` property of the `Transition` element is used to specify that the element should be delayed when in transition. When one or more elements are delayed, their transition will start sequentially to give the impression that the different elements appear at a different time. The delay property is a true/false property.
 
-### Modifiers
+### Modifiers (comming in next version)
 When performing shared element transitions the default transition is to translate and scale the transitioned element from source to target. For some elements like shapes that changes a better looking result can be obtained by transitioning using translation with size (no scaling). This can be accomplished by setting the `modifiers` property to `layout` for the `Transition` element to be transitioned.
