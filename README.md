@@ -95,7 +95,7 @@ The `Transition` element supports appear and disappear transitions (appear will 
 </Transition>
 ```
 
-#### Transitions
+#### Transition Types
 
 | Name        | Description | 
 | ----------  | ------------- | 
@@ -128,12 +128,10 @@ myCustomTransitionFunction = (transitionInfo) => {
 
 Read more about the parameters and functionality for building [custom transitions](./docs/CustomTransition.md).
 
-#### Delay
-Each transition can be delayed by setting the delay property. This will cause the transition to be started a little bit later than the previous one to give the impression that elements appear in sequence.
+### API
 
-### Technical
-The library uses native animations on both Android and iOS to get full 60 fps performance. Custom transitions trying to animate properties that are not supported by the native animation driver will not work.
+[FluidNavigator](./docs/FluidNavigator.md)
+[Transition](./docs/Transition.md)
 
-The transitions implemented in the shared element transition is currently scaling and position. 
-
-> Some of the concepts in the library builds on ideas from [@lintonye](https://github.com/lintonye)'s pull request and suggestion found here: [Shared element transition #941](https://github.com/react-navigation/react-navigation/pull/941).
+### Credit
+Some of the concepts in the library builds on ideas from [@lintonye](https://github.com/lintonye)'s pull request and suggestion found here: [Shared element transition #941](https://github.com/react-navigation/react-navigation/pull/941).
