@@ -130,7 +130,8 @@ Read more about the parameters and functionality for building [custom transition
 
 ### API
 
-[FluidNavigator](./docs/FluidNavigator.md)
+[FluidNavigator](./docs/FluidNavigator.md)  
+
 [Transition](./docs/Transition.md)
 
 ### Credit
