@@ -16,4 +16,5 @@ export type InterpolatorSpecification = {
   dimensions: ScaledSize,
   interpolation: AnimatedInterpolation,
   nativeInterpolation: AnimatedInterpolation,
+  modifiers: string,
 }

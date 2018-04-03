@@ -10,7 +10,8 @@ type Size = {
 export default class TransitionItem {
   constructor(
     name: string, route: string, reactElement: Object,
-    shared: boolean, appear: string, disappear: string, delay: boolean, metrics: Metrics,
+    shared: boolean, appear: string, disappear: string, 
+    delay: boolean, modifiers: string
   ) {
     this.name = name;
     this.route = route;
@@ -19,7 +20,7 @@ export default class TransitionItem {
     this.appear = appear;
     this.disappear = disappear;
     this.delay = delay;
-    this.metrics = metrics;    
+    this.modifiers = modifiers;
   }
 
   name: string
@@ -30,6 +31,7 @@ export default class TransitionItem {
   appear: string | Function
   disappear: string | Function
   delay: boolean
+  modifiers: string
   layoutReady: boolean
   flattenedStyle: ?any
 
