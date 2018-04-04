@@ -14,8 +14,18 @@ export const getPositionInterpolator = (spec: InterpolatorSpecification): StyleS
       inputRange: [0, 1],
       outputRange: [spec.from.metrics.y, spec.to.metrics.y],
     });
+
+    const width = spec.interpolation.interpolate({
+      inputRange: [0, 1],
+      outputRange: [spec.from.metrics.width, spec.to.metrics.width]
+    });
+
+    const height = spec.interpolation.interpolate({
+      inputRange: [0, 1],
+      outputRange: [spec.from.metrics.height, spec.to.metrics.height]
+    });
   
-    return { transform: [{ translateX }, { translateY }]};
+    return { width, height, transform: [{ translateX }, { translateY }]};
   }
   const translateX = spec.nativeInterpolation.interpolate({
     inputRange: [0, 1],
