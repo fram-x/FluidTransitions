@@ -3,7 +3,7 @@ import { View, Dimensions, AnimatedInterpolation, StyleSheet, Animated } from 'r
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
-import { createAnimatedWrapper } from './createAnimatedWrapper';
+import { createAnimatedWrapper, createAnimated, mergeStyles } from './Utils';
 import { TransitionContext, NavigationDirection, InterpolatorSpecification } from './Types';
 import {
   getScaleInterpolator,
@@ -97,10 +97,9 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     const sharedElements = this.props.sharedElements.map((pair, idx) => {
       const { fromItem, toItem } = pair;
       const transitionStyles = self.getTransitionStyle(fromItem, toItem);
-
       const element = React.Children.only(fromItem.reactElement.props.children);
       const key = "SharedOverlay-"  + idx.toString();
-      const style = [element.props.style, styles.sharedElement, transitionStyles];
+      const style = [element.props.style, transitionStyles, styles.sharedElement];
       return createAnimatedWrapper(element, key, style);
     });
 
@@ -148,13 +147,15 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
       from: {
         metrics: fromItem.metrics,
         style: fromItem.getFlattenedStyle(),
+        rotation: fromItem.rotation,
       },
       to: {
         metrics: toItem.metrics,
         style: toItem.getFlattenedStyle(),
+        rotation: toItem.rotation,
       },
       scaleX: toItem.scaleRelativeTo(fromItem).x,
-      scaleY: toItem.scaleRelativeTo(fromItem).y,
+      scaleY: toItem.scaleRelativeTo(fromItem).y,     
       interpolation: this._interpolation,
       nativeInterpolation: this._nativeInterpolation,
       dimensions: Dimensions.get('window'),
@@ -172,27 +173,10 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     return {
       width: fromItem.metrics.width,
       height: fromItem.metrics.height,
-      ...this.mergeStyles(styles)
+      ...mergeStyles(styles)
     };
   }
-
-  mergeStyles(styles: Array<any>): StyleSheet.NamedStyles {
-    const retVal = { transform: [] };
-    styles.forEach(s => {      
-      Object.keys(s).forEach(key => {
-        if(s[key] && s[key] instanceof Array){
-          const a = s[key];
-          if(!retVal[key]) retVal[key] = [];
-          a.forEach(i => retVal[key].push(i));
-        } else {
-          retVal[key] = s[key];
-        }
-      })
-    })
-
-    return retVal;
-  }
-
+  
   componentDidMount() {
     this._isMounted = true;
   }
@@ -218,7 +202,11 @@ const styles = StyleSheet.create({
   },
   sharedElement: {
     position: 'absolute',
-    // backgroundColor: '#FF000022',
+    // backgroundColor: '#00FF0022',
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0,
     padding: 0,
     margin: 0,
   },

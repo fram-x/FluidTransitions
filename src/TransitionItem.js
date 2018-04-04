@@ -33,7 +33,7 @@ export default class TransitionItem {
   delay: boolean
   modifiers: string
   layoutReady: boolean
-  flattenedStyle: ?any
+  flattenedStyle: ?any  
 
   getNodeHandle() {
     return this.reactElement.getNodeHandle();

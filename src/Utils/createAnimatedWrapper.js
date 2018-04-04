@@ -3,7 +3,7 @@ import  { View, Animated, StyleSheet } from 'react-native';
 
 import { mergeStyles } from './mergeStyles';
 
-const createAnimated = (element) => {
+const createAnimated = () => {
   // Create wrapped view
   const wrapper = (<View />);
   return Animated.createAnimatedComponent(wrapper.type);
@@ -32,19 +32,6 @@ const createAnimatedWrapper = (element, key, styles, setViewRefCallback, wrapper
   };
   
   return React.createElement(animatedComponent, props, child);
-}
-
-const getTransformStyle = (styles) => {
-  const transforms = [];
-
-  styles.forEach(s => {
-    const flattenedStyle = getStyle(s);
-    if(flattenedStyle && flattenedStyle.transform) {
-      flattenedStyle.transform.forEach(t => transforms.push(t));
-    }
-  });
-  
-  return { transform: transforms };
 }
 
 const getWrapperStyle = (style, styles) => {
@@ -196,7 +183,7 @@ const excludePropsForElement = [
   // "borderRightWidth",
   // "borderBottomWidth",
   // "borderLeftWidth",
-  // "position",
+  "position",
   // "flexDirection",
   // "flexWrap",
   // "justifyContent",

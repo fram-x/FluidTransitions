@@ -3,8 +3,13 @@ import { View, StyleSheet, Animated, Dimensions } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
-import { createAnimatedWrapper } from './createAnimatedWrapper';
-import { TransitionContext, RouteDirection, NavigationDirection, TransitionSpecification } from './Types';
+import { createAnimatedWrapper, createAnimated, mergeStyles, getRotationFromStyle } from './Utils';
+import { 
+  TransitionContext, 
+  RouteDirection, 
+  NavigationDirection, 
+  TransitionSpecification 
+} from './Types';
 import {
   getScaleTransition,
   getTopTransition,
@@ -16,6 +21,7 @@ import {
   getFlipTransition,
 }
   from './Transitions';
+
 import * as Constants from './TransitionConstants';
 
 const styles: StyleSheet.NamedStyles = StyleSheet.create({
@@ -126,13 +132,23 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
       const routeDirection = getDirectionForRoute(item.name, item.route);  
       const element = React.Children.only(item.reactElement.props.children);
       const key = "TransitionOverlay-"  + idx.toString();
-      const style = [this.getPositionStyle(
+      const transitionStyle = this.getPositionStyle(
         item, routeDirection === RouteDirection.from ?
           delayCountFrom + 1 : delayCountTo + 1,
         routeDirection === RouteDirection.from ?
           delayIndexFrom : delayIndexTo,
-      ), styles.transitionElement];
+      );
+      const rotationInfo = getRotationFromStyle(element.props.style);
+      if(rotationInfo.rotate) {
+        const transform = transitionStyle.transform ? transitionStyle.transform : [];
+        transform.push({ rotate: new Animated.Value(0).interpolate({
+          inputRange: [0, 1],
+          outputRange: [rotationInfo.rotate.rotate, '0deg']
+        })});
+        transitionStyle.transform = transform;
+      }
 
+      const style = [transitionStyle, styles.transitionElement];
       const comp =  createAnimatedWrapper(element, key, style);
 
       if (item.delay) {
@@ -158,7 +174,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
       top: item.metrics.y,
       width: item.metrics.width,
       height: item.metrics.height, 
-      ...this.getTransitionStyle(item, delayCount, delayIndex)           
+      ...this.getTransitionStyle(item, delayCount, delayIndex)
     };
   }
 

@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 function isNumber(n) { return !isNaN(parseFloat(n)) && !isNaN(n - 0) }
 
 const getRotationFromStyle = (style) => {
-  if(!style) return null;
+  if(!style) return {};
   let flattenedStyle = style;
   if(isNumber(style)){
     flattenedStyle = StyleSheet.flatten(style);
@@ -14,7 +14,7 @@ const getRotationFromStyle = (style) => {
     rotateY: flattenedStyle.transform.find(i => i.rotateY),
   } : {};
 
-  if(rotationInfo === {}) return null;
+  if(rotationInfo === {}) return {};
 
   return rotationInfo;
 }
