@@ -13,6 +13,7 @@ import AppearingElements from './src/AppearingElements';
 import ImageTransition from './src/ImageTransition';
 import LayoutTransition from './src/LayoutTransition';
 import Onboarding from './src/Onboarding';
+import ShoeShop from './src/ShoeShop';
 
 const ExampleNavigator = StackNavigator({
   home: { screen: HomeScreen, navigationOptions: { title: 'Fluid Transitions' } },
@@ -21,6 +22,7 @@ const ExampleNavigator = StackNavigator({
   image: { screen: ImageTransition },
   layout: { screen: LayoutTransition },
   onboarding: { screen: Onboarding },
+  shoes: { screen: ShoeShop },
 });
 
 class MyApp extends React.Component<any> {
