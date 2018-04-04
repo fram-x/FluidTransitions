@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { InterpolatorSpecification } from './../Types/InterpolatorSpecification';
+import { getRotationFromStyle } from './../Utils';
 
 export const getRotationInterpolator = (spec: InterpolatorSpecification): StyleSheet.NamedStyles => {
   
@@ -9,17 +10,8 @@ export const getRotationInterpolator = (spec: InterpolatorSpecification): StyleS
   if((!fromStyle || !fromStyle.transform) && 
     (!toStyle || !toStyle.transform)) return null;
 
-  const rotateFrom = fromStyle.transform ? {
-    rotate: fromStyle.transform.find(i => i.rotate),
-    rotateX: fromStyle.transform.find(i => i.rotateX),
-    rotateY: fromStyle.transform.find(i => i.rotateY),
-  } : {};
-
-  const rotateTo = toStyle.transform ? {
-    rotate: toStyle.transform.find(i => i.rotate),
-    rotateX: toStyle.transform.find(i => i.rotateX),
-    rotateY: toStyle.transform.find(i => i.rotateY),
-  } : {};
+  const rotateFrom = getRotationFromStyle(fromStyle);
+  const rotateTo = getRotationFromStyle(toStyle);
   
   if(rotateFrom === {} && rotateTo === {}) return null;
 
