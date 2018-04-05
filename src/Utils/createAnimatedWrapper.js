@@ -230,8 +230,8 @@ const excludePropsForElement = [
   'borderBottomStartRadius',
   'borderBottomEndRadius',
   'borderStyle',
-  'opacity',
+  // 'opacity',
   'elevation',
 ];
 
-export { createAnimatedWrapper, createAnimated };
+export { createAnimatedWrapper, createAnimated, getWrapperStyle, getElementStyle };

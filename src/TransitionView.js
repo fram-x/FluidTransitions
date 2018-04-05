@@ -106,10 +106,10 @@ class Transition extends React.Component<TransitionProps> {
   }
 
   getRotationStyle(element) {
-    // const rotationInfo = getRotationFromStyle(element.props.style);
-    // if (rotationInfo.rotate) {
-    //   return { transform: [{ rotate: rotationInfo.rotate.rotate }] };
-    // }
+    const rotationInfo = getRotationFromStyle(element.props.style);
+    if (rotationInfo.rotate) {
+      return { transform: [{ rotate: rotationInfo.rotate.rotate }] };
+    }
 
     return {};
   }
