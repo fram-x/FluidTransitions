@@ -12,6 +12,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: Dimensions.get('window').width - 180,
     top: Dimensions.get('window').height * 0.5 - 100,
+    transform: [{ rotate: '20deg' }],
   },
   shoe2: {
     width: 200,
@@ -46,12 +47,12 @@ const styles = StyleSheet.create({
 const Screen1 = (props) => (
   <View style={styles.container}>
     <TouchableOpacity style={styles.top1} onPress={() => props.navigation.navigate('screen2')}>
-      <Transition appear="left" shared="paper" modifiers="layout">
+      <Transition appear="left" shared="paper">
         <View style={styles.paper1} />
       </Transition>
-      {/* <Transition appear="right" shared="image"> */}
-      <Image style={styles.shoe1} source={require('./assets/air-jordan-1.png')} />
-      {/* </Transition> */}
+      <Transition appear="right" shared="image">
+        <Image style={styles.shoe1} source={require('./assets/air-jordan-1.png')} />
+      </Transition>
     </TouchableOpacity>
   </View>
 );
