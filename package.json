@@ -57,8 +57,7 @@
   "jest": {
     "preset": "react-native",
     "modulePathIgnorePatterns": [
-      "Examples/node_modules",
-      "node_modules",
+      "<rootDir>/Examples/",
       ".vscode",
       "docs"
     ]
