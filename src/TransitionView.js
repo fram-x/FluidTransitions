@@ -159,7 +159,12 @@ class Transition extends React.Component<TransitionProps> {
         };
       }
       return {};
-    } else if (this.props.appear === undefined) {
+    } else if (this.props.appear !== undefined || this.props.disappear !== undefined) {
+      return { opacity: visibilityProgress.interpolate({
+        inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_OUT,
+        outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE_ANIM_OUT,
+      }) };
+    } else {
       return {};
     }
 

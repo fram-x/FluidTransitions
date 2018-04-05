@@ -133,7 +133,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     const transitionViews = transitionElements.map((item, idx) => {
       const routeDirection = getDirectionForRoute(item.name, item.route);  
       const element = React.Children.only(item.reactElement.props.children);
-      const key = "TransitionOverlay-"  + idx.toString();
+      const key = "ti-"  + idx.toString();
       const transitionStyle = this.getPositionStyle(
         item, routeDirection === RouteDirection.from ?
           delayCountFrom + 1 : delayCountTo + 1,

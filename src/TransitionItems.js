@@ -57,7 +57,7 @@ export default class TransitionItems {
     const itemPairs = this._getItemPairs(fromRoute, toRoute)
       .filter(pair => pair.toItem !== undefined && pair.fromItem !== undefined);
 
-    let items = this._items.filter(e => e.appear !== undefined &&
+    let items = this._items.filter(e => (e.appear !== undefined || e.disappear !== undefined) &&
       (e.route === fromRoute || e.route === toRoute));
 
     items = items.filter(e => itemPairs.findIndex(p =>
