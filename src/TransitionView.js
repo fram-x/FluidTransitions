@@ -1,18 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { View, Animated, StyleSheet, findNodeHandle } from 'react-native';
+import { StyleSheet, findNodeHandle } from 'react-native';
 
 import TransitionItem from './TransitionItem';
 import { RouteDirection, NavigationDirection } from './Types';
 import * as Constants from './TransitionConstants';
-import { createAnimatedWrapper, createAnimated, mergeStyles, getRotationFromStyle } from './Utils';
+import { createAnimatedWrapper, createAnimated, getRotationFromStyle } from './Utils';
 
 const uniqueBaseId: string = `transitionCompId-${Date.now()}`;
 let uuidCount: number = 0;
 
 const styles = StyleSheet.create({
   transition: {
-    // backgroundColor: '#0000EF22',    
+    // backgroundColor: '#0000EF22',
+    // borderColor: '#FF0000',
+    // borderWidth: 1,
   },
 });
 
@@ -22,10 +24,10 @@ type TransitionProps = {
   shared: ?string,
   delay: ?boolean,
   children: Array<any>,
-  modifiers: ?string,  
+  modifiers: ?string,
 }
 
-class Transition extends React.Component<TransitionProps> {  
+class Transition extends React.Component<TransitionProps> {
   static contextTypes = {
     register: PropTypes.func,
     unregister: PropTypes.func,
@@ -58,7 +60,7 @@ class Transition extends React.Component<TransitionProps> {
         this._getName(), this.context.route,
         this, this.props.shared !== undefined, this.props.appear,
         this.props.disappear, this.props.delay !== undefined,
-        this.props.modifiers, this.props.rotation
+        this.props.modifiers, this.props.rotation,
       ));
     }
   }
@@ -89,30 +91,29 @@ class Transition extends React.Component<TransitionProps> {
   }
 
   render() {
-    if(!this._animatedComponent)
-      this._animatedComponent = createAnimated();
+    if (!this._animatedComponent) { this._animatedComponent = createAnimated(); }
 
-    let element = React.Children.only(this.props.children);
+    const element = React.Children.only(this.props.children);
     if (!element) { return null; }
 
     const visibilityStyle = this.getVisibilityStyle();
     const rotationStyle = this.getRotationStyle(element);
-    
-    let style = [visibilityStyle, rotationStyle, styles.transition];
-    const key = this._getName() + "-"  + this._route;  
 
-    return createAnimatedWrapper(
-      element, key, style, this.setViewRef, this._animatedComponent);
+    const style = [visibilityStyle, rotationStyle, styles.transition];
+    const key = `${this._getName()}-${this._route}`;
+
+    return createAnimatedWrapper(element, key, style, this.setViewRef, this._animatedComponent);
   }
 
   getRotationStyle(element) {
     // const rotationInfo = getRotationFromStyle(element.props.style);
-    //   if(rotationInfo.rotate) {
-    //     return { transform: [{ rotate: rotationInfo.rotate.rotate }]}
-    //   }
+    // if (rotationInfo.rotate) {
+    //   return { transform: [{ rotate: rotationInfo.rotate.rotate }] };
+    // }
 
     return {};
   }
+
   setViewRef(ref: any) {
     this._viewRef = ref;
   }
@@ -132,7 +133,7 @@ class Transition extends React.Component<TransitionProps> {
     const routeDirection = getDirectionForRoute(this._getName(), this._route);
     if (routeDirection === RouteDirection.unknown) return { opacity: 0 };
 
-    const inputRange = direction === NavigationDirection.forward ? 
+    const inputRange = direction === NavigationDirection.forward ?
       [index - 1, index] : [index, index + 1];
 
     const outputRange = routeDirection === RouteDirection.to ? [0, 1] : [1, 0];

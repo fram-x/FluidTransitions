@@ -1,18 +1,16 @@
 import React from 'react';
-import  { View, Animated, StyleSheet } from 'react-native';
-
-import { mergeStyles } from './mergeStyles';
+import { View, Animated, StyleSheet } from 'react-native';
 
 const createAnimated = () => {
   // Create wrapped view
   const wrapper = (<View />);
   return Animated.createAnimatedComponent(wrapper.type);
-}
+};
 
 const createAnimatedWrapper = (element, key, styles, setViewRefCallback, wrapper) => {
   // Create wrapped view
-  const animatedComponent = wrapper ? wrapper : createAnimated(element);
-  
+  const animatedComponent = wrapper || createAnimated();
+
   // Get style for outer view
   const wrapperElementStyle = getWrapperStyle(element.props.style, styles);
 
@@ -20,81 +18,84 @@ const createAnimatedWrapper = (element, key, styles, setViewRefCallback, wrapper
   const elementStyle = getElementStyle(element.props.style);
 
   // create inner element with element styles
-  const child = React.createElement(element.type, {...element.props, style: {
-    ...elementStyle,
-  }});
+  const child = React.createElement(element.type, { ...element.props,
+    style: {
+      ...elementStyle,
+    } });
 
   const props = {
     key,
     collapsable: false,
-    style: [wrapperElementStyle, ...styles, {overflow:'hidden'}],
+    style: [wrapperElementStyle, ...styles, { overflow: 'hidden' }],
     ref: setViewRefCallback,
   };
-  
-  return React.createElement(animatedComponent, props, child);
-}
 
-const getWrapperStyle = (style, styles) => {
+  return React.createElement(animatedComponent, props, child);
+};
+
+const getWrapperStyle = (style) => {
   const flattenedStyle = getStyle(style);
-  if(!flattenedStyle) return style;
+  if (!flattenedStyle) return style;
 
   const retVal = {};
   const keys = Object.keys(flattenedStyle);
   keys.forEach(key => {
-    if(!isNumber(key) && includePropsForWrapper.indexOf(key) > -1)
-      retVal[key] = flattenedStyle[key]    
+    if (!isNumber(key) && includePropsForWrapper.indexOf(key) > -1) {
+      retVal[key] = flattenedStyle[key];
+    }
   });
   return retVal;
-}
+};
 
 const getElementStyle = (style) => {
   const flattenedStyle = getStyle(style);
-  if(!flattenedStyle) return style;
+  if (!flattenedStyle) return style;
 
   const retVal = {};
   const keys = Object.keys(flattenedStyle);
   keys.forEach(key => {
-    if(!isNumber(key) && excludePropsForElement.indexOf(key) === -1)
-        retVal[key] = flattenedStyle[key];
+    if (!isNumber(key) && excludePropsForElement.indexOf(key) === -1) {
+      retVal[key] = flattenedStyle[key];
+    }
   });
 
   return retVal;
-}
+};
 
 const getStyle = (style) => {
-  if(!style) return style;
+  if (!style) return style;
   let flattenedStyle = style;
-  if(!(style instanceof Object)){
+  if (!(style instanceof Object)) {
     flattenedStyle = StyleSheet.flatten(style);
   }
   return flattenedStyle;
-}
+};
 
-function isNumber(n) { return !isNaN(parseFloat(n)) && !isNaN(n - 0) }
+function isNumber(n) { return !isNaN(parseFloat(n)) && !isNaN(n - 0); }
 
 const includePropsForWrapper = [
-  "display",
-  "width",
-  "height",
-  "start",
-  "end",
-  "top",
-  "left",
-  "right",
-  "bottom",
-  "minWidth",
-  "maxWidth",
-  "minHeight",
-  "maxHeight",
-  "margin",
-  "marginVertical",
-  "marginHorizontal",
-  "marginTop",
-  "marginBottom",
-  "marginLeft",
-  "marginRight",
-  "marginStart",
-  "marginEnd",
+  'display',
+  'width',
+  'height',
+  'start',
+  'end',
+  'top',
+  'left',
+  'right',
+  'bottom',
+  'minWidth',
+  'maxWidth',
+  'minHeight',
+  'maxHeight',
+  'margin',
+  'marginVertical',
+  'marginHorizontal',
+  'marginTop',
+  'marginBottom',
+  'marginLeft',
+  'marginRight',
+  'marginStart',
+  'marginEnd',
   // "padding",
   // "paddingVertical",
   // "paddingHorizontal",
@@ -104,18 +105,18 @@ const includePropsForWrapper = [
   // "paddingRight",
   // "paddingStart",
   // "paddingEnd",
-  "position",
-  "flexDirection",
-  "flexWrap",
-  "flex",
-  "flexGrow",
-  "flexShrink",
-  "flexBasis",
-  "alignSelf",
-  "aspectRatio",
-  "zIndex",
-  "direction",
-  // "transform", // AVOID adding this - it fails
+  'position',
+  'flexDirection',
+  'flexWrap',
+  'flex',
+  'flexGrow',
+  'flexShrink',
+  'flexBasis',
+  'alignSelf',
+  'aspectRatio',
+  'zIndex',
+  'direction',
+  // "transform", // AVOID adding transform - it fails on Android!
   // "transformMatrix",
   // "decomposedMatrix",
   // "scaleX",
@@ -123,50 +124,50 @@ const includePropsForWrapper = [
   // "rotation",
   // "translateX",
   // "translateY",
-  "backfaceVisibility",
-  "backgroundColor",
-  "borderColor",
-  "borderTopColor",
-  "borderRightColor",
-  "borderBottomColor",
-  "borderLeftColor",
-  "borderStartColor",
-  "borderEndColor",
-  "borderRadius",
-  "borderTopLeftRadius",
-  "borderTopRightRadius",
-  "borderTopStartRadius",
-  "borderTopEndRadius",
-  "borderBottomLeftRadius",
-  "borderBottomRightRadius",
-  "borderBottomStartRadius",
-  "borderBottomEndRadius",
-  "borderStyle",
+  'backfaceVisibility',
+  'backgroundColor',
+  'borderColor',
+  'borderTopColor',
+  'borderRightColor',
+  'borderBottomColor',
+  'borderLeftColor',
+  'borderStartColor',
+  'borderEndColor',
+  'borderRadius',
+  'borderTopLeftRadius',
+  'borderTopRightRadius',
+  'borderTopStartRadius',
+  'borderTopEndRadius',
+  'borderBottomLeftRadius',
+  'borderBottomRightRadius',
+  'borderBottomStartRadius',
+  'borderBottomEndRadius',
+  'borderStyle',
 ];
 
 const excludePropsForElement = [
-  "display",
+  'display',
   // "width",
   // "height",
-  "start",
-  "end",
-  "top",
-  "left",
-  "right",
-  "bottom",
-  "minWidth",
-  "maxWidth",
-  "minHeight",
-  "maxHeight",
-  "margin",
-  "marginVertical",
-  "marginHorizontal",
-  "marginTop",
-  "marginBottom",
-  "marginLeft",
-  "marginRight",
-  "marginStart",
-  "marginEnd",
+  'start',
+  'end',
+  'top',
+  'left',
+  'right',
+  'bottom',
+  'minWidth',
+  'maxWidth',
+  'minHeight',
+  'maxHeight',
+  'margin',
+  'marginVertical',
+  'marginHorizontal',
+  'marginTop',
+  'marginBottom',
+  'marginLeft',
+  'marginRight',
+  'marginStart',
+  'marginEnd',
   // "padding",
   // "paddingVertical",
   // "paddingHorizontal",
@@ -183,26 +184,26 @@ const excludePropsForElement = [
   // "borderRightWidth",
   // "borderBottomWidth",
   // "borderLeftWidth",
-  "position",
+  'position',
   // "flexDirection",
   // "flexWrap",
   // "justifyContent",
   // "alignItems",
-  "alignSelf",
-  "alignContent",
-  "overflow",
+  'alignSelf',
+  'alignContent',
+  'overflow',
   // "flex",
-  "flexGrow",
-  "flexShrink",
-  "flexBasis",
-  "aspectRatio",
-  "zIndex",
-  "direction",
-  "shadowColor",
-  "shadowOffset",
-  "shadowOpacity",
-  "shadowRadius",
-  // "transform",
+  'flexGrow',
+  'flexShrink',
+  'flexBasis',
+  'aspectRatio',
+  'zIndex',
+  'direction',
+  'shadowColor',
+  'shadowOffset',
+  'shadowOpacity',
+  'shadowRadius',
+  'transform',
   // "transformMatrix",
   // "decomposedMatrix",
   // "scaleX",
@@ -210,27 +211,27 @@ const excludePropsForElement = [
   // "rotation",
   // "translateX",
   // "translateY",
-  "backfaceVisibility",
-  "backgroundColor",
-  "borderColor",
-  "borderTopColor",
-  "borderRightColor",
-  "borderBottomColor",
-  "borderLeftColor",
-  "borderStartColor",
-  "borderEndColor",
-  "borderRadius",
-  "borderTopLeftRadius",
-  "borderTopRightRadius",
-  "borderTopStartRadius",
-  "borderTopEndRadius",
-  "borderBottomLeftRadius",
-  "borderBottomRightRadius",
-  "borderBottomStartRadius",
-  "borderBottomEndRadius",
-  "borderStyle",
-  "opacity",
-  "elevation"
+  'backfaceVisibility',
+  'backgroundColor',
+  'borderColor',
+  'borderTopColor',
+  'borderRightColor',
+  'borderBottomColor',
+  'borderLeftColor',
+  'borderStartColor',
+  'borderEndColor',
+  'borderRadius',
+  'borderTopLeftRadius',
+  'borderTopRightRadius',
+  'borderTopStartRadius',
+  'borderTopEndRadius',
+  'borderBottomLeftRadius',
+  'borderBottomRightRadius',
+  'borderBottomStartRadius',
+  'borderBottomEndRadius',
+  'borderStyle',
+  'opacity',
+  'elevation',
 ];
 
 export { createAnimatedWrapper, createAnimated };
