@@ -12,7 +12,7 @@ const createAnimatedWrapper = (element, key, styles, setViewRefCallback, wrapper
   const animatedComponent = wrapper || createAnimated();
 
   // Get style for outer view
-  const wrapperElementStyle = getWrapperStyle(element.props.style, styles);
+  const wrapperElementStyle = getWrapperStyle(element.props.style);
 
   // Get style for inner view
   const elementStyle = getElementStyle(element.props.style);
@@ -27,35 +27,45 @@ const createAnimatedWrapper = (element, key, styles, setViewRefCallback, wrapper
     key,
     collapsable: false,
     style: [wrapperElementStyle, ...styles, { overflow: 'hidden' }],
-    ref: setViewRefCallback,
+    ref: setViewRefCallback || element.ref,
   };
 
   return React.createElement(animatedComponent, props, child);
 };
 
-const getWrapperStyle = (style) => {
-  const flattenedStyle = getStyle(style);
-  if (!flattenedStyle) return style;
+const getWrapperStyle = (styles) => {
+  let flattenedStyle = getStyle(styles);
+  if (!flattenedStyle) return styles;
+  if (!(flattenedStyle instanceof Array)) { flattenedStyle = [flattenedStyle]; }
 
   const retVal = {};
-  const keys = Object.keys(flattenedStyle);
-  keys.forEach(key => {
-    if (!isNumber(key) && includePropsForWrapper.indexOf(key) > -1) {
-      retVal[key] = flattenedStyle[key];
+  flattenedStyle.forEach(s => {
+    if (s) {
+      const keys = Object.keys(s);
+      keys.forEach(key => {
+        if (!isNumber(key) && includePropsForWrapper.indexOf(key) > -1) {
+          retVal[key] = s[key];
+        }
+      });
     }
   });
   return retVal;
 };
 
-const getElementStyle = (style) => {
-  const flattenedStyle = getStyle(style);
-  if (!flattenedStyle) return style;
+const getElementStyle = (styles) => {
+  let flattenedStyle = getStyle(styles);
+  if (!flattenedStyle) return styles;
+  if (!(flattenedStyle instanceof Array)) { flattenedStyle = [flattenedStyle]; }
 
   const retVal = {};
-  const keys = Object.keys(flattenedStyle);
-  keys.forEach(key => {
-    if (!isNumber(key) && excludePropsForElement.indexOf(key) === -1) {
-      retVal[key] = flattenedStyle[key];
+  flattenedStyle.forEach(s => {
+    if (s) {
+      const keys = Object.keys(s);
+      keys.forEach(key => {
+        if (!isNumber(key) && excludePropsForElement.indexOf(key) === -1) {
+          retVal[key] = s[key];
+        }
+      });
     }
   });
 

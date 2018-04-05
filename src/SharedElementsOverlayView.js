@@ -203,8 +203,8 @@ const styles = StyleSheet.create({
   sharedElement: {
     position: 'absolute',
     // backgroundColor: '#00FF0022',
-    borderColor: '#00FF00',
-    borderWidth: 1,
+    // borderColor: '#00FF00',
+    // borderWidth: 1,
     left: 0,
     top: 0,
     right: 0,

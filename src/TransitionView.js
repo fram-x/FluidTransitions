@@ -51,6 +51,7 @@ class Transition extends React.Component<TransitionProps> {
   _isMounted: boolean;
   _viewRef: any;
   _animatedComponent: any;
+  _outerAnimatedComponent: any;
 
   componentWillMount() {
     const { register } = this.context;
@@ -60,7 +61,7 @@ class Transition extends React.Component<TransitionProps> {
         this._getName(), this.context.route,
         this, this.props.shared !== undefined, this.props.appear,
         this.props.disappear, this.props.delay !== undefined,
-        this.props.modifiers, this.props.rotation,
+        this.props.modifiers,
       ));
     }
   }
@@ -91,10 +92,11 @@ class Transition extends React.Component<TransitionProps> {
   }
 
   render() {
-    if (!this._animatedComponent) { this._animatedComponent = createAnimated(); }
-
     const element = React.Children.only(this.props.children);
     if (!element) { return null; }
+
+    if (!this._animatedComponent) { this._animatedComponent = createAnimated(); }
+    if (!this._outerAnimatedComponent) { this._outerAnimatedComponent = createAnimated(); }
 
     const visibilityStyle = this.getVisibilityStyle();
     const rotationStyle = this.getRotationStyle(element);
@@ -102,7 +104,21 @@ class Transition extends React.Component<TransitionProps> {
     const style = [visibilityStyle, rotationStyle, styles.transition];
     const key = `${this._getName()}-${this._route}`;
 
-    return createAnimatedWrapper(element, key, style, this.setViewRef, this._animatedComponent);
+    const innerComp = createAnimatedWrapper(
+      element,
+      key,
+      {},
+      this.setViewRef,
+      this._animatedComponent,
+    );
+
+    return createAnimatedWrapper(
+      innerComp,
+      `${key}-outer`,
+      style,
+      null,
+      this._outerAnimatedComponent,
+    );
   }
 
   getRotationStyle(element) {
