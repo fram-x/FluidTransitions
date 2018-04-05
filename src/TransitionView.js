@@ -99,32 +99,26 @@ class Transition extends React.Component<TransitionProps> {
     if (!this._outerAnimatedComponent) { this._outerAnimatedComponent = createAnimated(); }
 
     const visibilityStyle = this.getVisibilityStyle();
-    const rotationStyle = this.getRotationStyle(element);
-
+    const rotationStyle = this.getRotationStyle(element);    
     const style = [visibilityStyle, rotationStyle, styles.transition];
     const key = `${this._getName()}-${this._route}`;
-
-    const innerComp = createAnimatedWrapper(
+    return createAnimatedWrapper(
       element,
       key,
-      {},
-      this.setViewRef,
-      this._animatedComponent,
-    );
-
-    return createAnimatedWrapper(
-      innerComp,
-      `${key}-outer`,
       style,
-      null,
-      this._outerAnimatedComponent,
+      this.setViewRef,
+      this._animatedComponent
     );
   }
 
   getRotationStyle(element) {
-    const rotationInfo = getRotationFromStyle(element.props.style);
-    if (rotationInfo.rotate) {
-      return { transform: [{ rotate: rotationInfo.rotate.rotate }] };
+    const ri = getRotationFromStyle(element.props.style);
+    if (ri.rotate) {
+      const transform = [];
+      if (ri.rotate.rotate) { transform.push({ rotate: ri.rotate.rotate }); }
+      if (ri.rotate.rotateX) { transform.push({ rotateX: ri.rotate.rotateX }); }
+      if (ri.rotate.rotateY) { transform.push({ rotateY: ri.rotate.rotateY }); }
+      return { transform };
     }
 
     return {};

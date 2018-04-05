@@ -1,11 +1,11 @@
 import { StyleSheet } from 'react-native';
 
-function isNumber(n) { return !isNaN(parseFloat(n)) && !isNaN(n - 0) }
+function isNumber(n) { return !isNaN(parseFloat(n)) && !isNaN(n - 0); }
 
 const getRotationFromStyle = (style) => {
-  if(!style) return {};
+  if (!style) return {};
   let flattenedStyle = style;
-  if(isNumber(style)){
+  if (isNumber(style)) {
     flattenedStyle = StyleSheet.flatten(style);
   }
   const rotationInfo = flattenedStyle.transform ? {
@@ -14,9 +14,9 @@ const getRotationFromStyle = (style) => {
     rotateY: flattenedStyle.transform.find(i => i.rotateY),
   } : {};
 
-  if(rotationInfo === {}) return {};
+  if (rotationInfo === {}) return {};
 
   return rotationInfo;
-}
+};
 
 export { getRotationFromStyle };
