@@ -213,9 +213,9 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
         } else {
           // Start/stop first/last half of transition
           if (routeDirection === RouteDirection.from) {
-            end -= distance;
-          } else {
             start += distance;
+          } else {
+            end -= distance;
           }
         }
 
