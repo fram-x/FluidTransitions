@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Image, Dimensions, Text, TouchableWithoutFeedback, StyleSheet } from 'react-native';
 import { Transition, FluidNavigator } from 'react-navigation-fluid-transitions';
+import { StackNavigator } from 'react-navigation';
 
 const styles = StyleSheet.create({
   container: {
@@ -45,7 +46,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     right: 0,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     paddingTop: 70,
     padding: 10,
   },
@@ -94,7 +95,7 @@ const Screen1 = (props) => (
   <View style={styles.container}>
     <TouchableWithoutFeedback onPress={() => props.navigation.navigate('screen2')}>
       <View style={styles.top1}>
-        <Transition appear="left" shared="paper" modifiers="layout">
+        <Transition appear="left" shared="paper">
           <View style={styles.paper1}>
             <Text style={styles.boxHeader}>NIKE AIR JORDAN</Text>
           </View>
@@ -110,11 +111,9 @@ const Screen2 = (props) => (
   <View style={styles.container}>
     <TouchableWithoutFeedback onPress={() => props.navigation.goBack()}>
       <View style={styles.top2}>
-        <Transition shared="paper" modifiers="layout">
+        <Transition shared="paper">
           <View style={styles.paper2}>
-            <Transition appear="left">
-              <Text style={styles.boxHeader2}>NIKE AIR JORDAN</Text>
-            </Transition>
+            <Text style={styles.boxHeader2}>NIKE AIR JORDAN</Text>
           </View>
         </Transition>
         <Transition shared="image">
