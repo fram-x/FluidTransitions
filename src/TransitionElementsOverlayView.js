@@ -4,11 +4,11 @@ import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
 import { createAnimatedWrapper, createAnimated, mergeStyles, getRotationFromStyle } from './Utils';
-import { 
-  TransitionContext, 
-  RouteDirection, 
-  NavigationDirection, 
-  TransitionSpecification 
+import {
+  TransitionContext,
+  RouteDirection,
+  NavigationDirection,
+  TransitionSpecification,
 } from './Types';
 import {
   getScaleTransition,
@@ -38,6 +38,14 @@ const styles: StyleSheet.NamedStyles = StyleSheet.create({
     // borderColor: '#0000FF',
     // borderWidth: 1,
     margin: 0,
+    marginVertical: 0,
+    marginHorizontal: 0,
+    marginTop: 0,
+    marginBottom: 0,
+    marginLeft: 0,
+    marginRight: 0,
+    marginStart: 0,
+    marginEnd: 0,
   },
 });
 
@@ -131,27 +139,30 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     const delayToFactor = -1;
 
     const transitionViews = transitionElements.map((item, idx) => {
-      const routeDirection = getDirectionForRoute(item.name, item.route);  
-      const element = React.Children.only(item.reactElement.props.children);
-      const key = "ti-"  + idx.toString();
+      const routeDirection = getDirectionForRoute(item.name, item.route);
+      let element = React.Children.only(item.reactElement.props.children);
+      const key = `ti-${idx.toString()}`;
+      
       const transitionStyle = this.getPositionStyle(
         item, routeDirection === RouteDirection.from ?
           delayCountFrom + 1 : delayCountTo + 1,
         routeDirection === RouteDirection.from ?
           delayIndexFrom : delayIndexTo,
       );
-      const rotationInfo = getRotationFromStyle(element.props.style);
-      if(rotationInfo.rotate) {
-        const transform = transitionStyle.transform ? transitionStyle.transform : [];
-        transform.push({ rotate: new Animated.Value(0).interpolate({
-          inputRange: [0, 1],
-          outputRange: [rotationInfo.rotate.rotate, '0deg']
-        })});
-        transitionStyle.transform = transform;
-      }
+
+      // const rotationInfo = getRotationFromStyle(element.props.style);
+      // if (rotationInfo.rotate) {
+      //   const transform = transitionStyle.transform ? transitionStyle.transform : [];
+      //   transform.push({ rotate: new Animated.Value(0).interpolate({
+      //     inputRange: [0, 1],
+      //     outputRange: [rotationInfo.rotate.rotate, '0deg'],
+      //   }) });
+      //   transitionStyle.transform = transform;
+      // }
 
       const style = [transitionStyle, styles.transitionElement];
-      const comp =  createAnimatedWrapper(element, key, style);
+      element = React.createElement(element.type, { ...element.props, key });
+      const comp = createAnimatedWrapper(element, style);
 
       if (item.delay) {
         if (routeDirection === RouteDirection.from) {
@@ -175,8 +186,8 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
       left: item.metrics.x,
       top: item.metrics.y,
       width: item.metrics.width,
-      height: item.metrics.height, 
-      ...this.getTransitionStyle(item, delayCount, delayIndex)
+      height: item.metrics.height,
+      ...this.getTransitionStyle(item, delayCount, delayIndex),
     };
   }
 
@@ -191,7 +202,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     const direction = getDirection();
     const routeDirection = getDirectionForRoute(item.name, item.route);
     const progress = getTransitionProgress();
-    
+
     if (progress) {
       const transitionFunction = this.getTransitionFunction(item, routeDirection);
       if (transitionFunction) {
@@ -212,7 +223,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
           }
         } else {
           // Start/stop first/last half of transition
-          if (routeDirection === RouteDirection.from) {
+          if (routeDirection === RouteDirection.to) {
             start += distance;
           } else {
             end -= distance;

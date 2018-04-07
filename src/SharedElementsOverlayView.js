@@ -43,12 +43,15 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
   context: TransitionContext
   constructor(props: SharedElementsOverlayViewProps, context: TransitionContext) {
     super(props, context);
-    this._isMounted = false;
+    this._isMounted = false; 
+    this.getInterpolation = this.getInterpolation.bind(this);   
   }
 
   _isMounted: boolean;
   _nativeInterpolation: AnimatedInterpolation;
-  _interpolation: AnimatedInterpolation;
+  _interpolation: AnimatedInterpolation;  
+  _nativeInterpolationChildCount: number;
+  _interpolationChildCount: number;
 
   shouldComponentUpdate(nextProps) {
     if (!nextProps.fromRoute && !nextProps.toRoute) {
@@ -90,17 +93,23 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     }
 
     // console.log("RENDER SE " + this.props.sharedElements.length);
-
-    this.setupInterpolations();
+    this._nativeInterpolationChildCount = 0;
+    this._interpolationChildCount = 0;
+    this._interpolation = null;
+    this._nativeInterpolation = null;
 
     const self = this;
     const sharedElements = this.props.sharedElements.map((pair, idx) => {
       const { fromItem, toItem } = pair;
+      let element = React.Children.only(fromItem.reactElement.props.children);
       const transitionStyles = self.getTransitionStyle(fromItem, toItem);
-      const element = React.Children.only(fromItem.reactElement.props.children);
-      const key = "SharedOverlay-"  + idx.toString();
-      const style = [element.props.style, transitionStyles, styles.sharedElement];
-      return createAnimatedWrapper(element, key, style);
+      
+      const key = `so-${idx.toString()}`;
+      const style = transitionStyles.styles;
+      const nativeStyle = [transitionStyles.nativeStyles, styles.sharedElement]
+
+      element = React.createElement(element.type, { ...element.props, key });
+      return createAnimatedWrapper(element, nativeStyle, style);
     });
 
     return (
@@ -110,24 +119,31 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     );
   }
 
-  setupInterpolations() {
+  getInterpolation (useNativeDriver: boolean) {
     const { getTransitionProgress, getIndex, getDirection } = this.context;
-    if(!getTransitionProgress || !getIndex || !getDirection ) return null;
+    if (!getTransitionProgress || !getIndex || !getDirection) return null;
 
     const index = getIndex();
-    const direction = getDirection();    
-    const inputRange = direction === NavigationDirection.forward ? 
+    const direction = getDirection();
+    const inputRange = direction === NavigationDirection.forward ?
       [index - 1, index] : [index, index + 1];
 
-    // TODO: Seems like it is illegal to combine both native and non-native for
-    // same element
-    this._interpolation = getTransitionProgress(false).interpolate({
-      inputRange, outputRange: [0, 1],
-    });
-    
-    this._nativeInterpolation = getTransitionProgress(false).interpolate({
-      inputRange, outputRange: [0, 1],
-    });
+    if(useNativeDriver && !this._nativeInterpolation) {
+      this._nativeInterpolation = getTransitionProgress(true).interpolate({
+        inputRange, outputRange: [0, 1],
+      });
+    } else if (!useNativeDriver && !this._interpolation){
+      this._interpolation = getTransitionProgress(false).interpolate({
+        inputRange, outputRange: [0, 1],
+      });
+    }
+
+    if(useNativeDriver) {
+      this._nativeInterpolationChildCount++;
+      return this._nativeInterpolation;
+    } 
+    this._interpolationChildCount++;
+    return this._interpolation;
   }
 
   getMetricsReady(): boolean {
@@ -140,9 +156,8 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     }
     return false;
   }
-  
+
   getTransitionStyle(fromItem: TransitionItem, toItem: TransitionItem) {
-    
     const interpolatorInfo: InterpolatorSpecification = {
       from: {
         metrics: fromItem.metrics,
@@ -155,28 +170,40 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
         rotation: toItem.rotation,
       },
       scaleX: toItem.scaleRelativeTo(fromItem).x,
-      scaleY: toItem.scaleRelativeTo(fromItem).y,     
-      interpolation: this._interpolation,
-      nativeInterpolation: this._nativeInterpolation,
+      scaleY: toItem.scaleRelativeTo(fromItem).y,
+      getInterpolation: this.getInterpolation,
       dimensions: Dimensions.get('window'),
       modifiers: fromItem.modifiers ? fromItem.modifiers : ""
     };
 
+    const nativeStyles = [];
     const styles = [];
-    
+
+    const self = this;
     interpolators.forEach(interpolator => {
-      const style = interpolator.interpolatorFunction(interpolatorInfo);
-      if(style)
-        styles.push(style);
+      const nativeChildCount = self._nativeInterpolationChildCount;
+      const childCount = self._interpolationChildCount;
+      const style = interpolator.interpolatorFunction(interpolatorInfo);      
+      if (style) { 
+        if(nativeChildCount < self._nativeInterpolationChildCount)
+          nativeStyles.push(style); 
+        else if(childCount < self._interpolationChildCount)
+          styles.push(style);
+      }
     });
 
     return {
-      width: fromItem.metrics.width,
-      height: fromItem.metrics.height,
-      ...mergeStyles(styles)
+      nativeStyles: {        
+        ...mergeStyles(nativeStyles),
+      },
+      styles: {
+        width: fromItem.metrics.width,
+        height: fromItem.metrics.height,
+        ...mergeStyles(styles),
+      }
     };
   }
-  
+
   componentDidMount() {
     this._isMounted = true;
   }

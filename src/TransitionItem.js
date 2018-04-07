@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 import { Metrics } from './Types/Metrics';
 import { getRotationFromStyle } from './Utils';
 
@@ -54,12 +54,14 @@ export default class TransitionItem {
     return this.flattenedStyle;
   }
 
-  updateMetrics(viewMetrics: Metrics, itemMetrics: Metrics) {
-    const t = this.getRotationRad();
+  updateMetrics(viewMetrics: Metrics, itemMetrics: Metrics) {    
     const { x, y, width, height } = itemMetrics;
+    const t = this.getRotationRad();
+    
     if(t !== 0) {
       const rotWidth = Math.abs((1/(Math.pow(Math.cos(t),2)-Math.pow(Math.sin(t),2))) * 
         (width * Math.cos(t) - height * Math.sin(t)));
+
       const rotHeight = Math.abs((1/(Math.pow(Math.cos(t),2)-Math.pow(Math.sin(t),2))) * 
         (- width * Math.sin(t) + height * Math.cos(t)));
         
@@ -68,8 +70,8 @@ export default class TransitionItem {
       this.metrics = {
         x: (x - viewMetrics.x) + diffWidth, 
         y: (y - viewMetrics.y) + diffHeight, 
-        width: rotWidth, 
-        height: rotHeight
+        width: Platform.OS === 'ios' ? rotWidth : width, 
+        height: Platform.OS === 'ios' ? rotHeight : height,
       };
     } else {
       this.metrics = {x: x - viewMetrics.x, y: y - viewMetrics.y, width, height };

@@ -16,7 +16,7 @@ export const getStyleInterpolator = (
   const fromValue = fromStyle[key] ? fromStyle[key] : defaultValue;
   const toValue = toStyle[key] ? toStyle[key] : defaultValue;
   
-  const interpolator = (useNative ? spec.nativeInterpolation : spec.interpolation)
+  const interpolator = (spec.getInterpolation(useNative))
     .interpolate({
       inputRange: [0, 1],
       outputRange: [fromValue, toValue],

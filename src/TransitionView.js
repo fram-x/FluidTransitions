@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, findNodeHandle } from 'react-native';
+import { StyleSheet, Animated, findNodeHandle } from 'react-native';
 
 import TransitionItem from './TransitionItem';
 import { RouteDirection, NavigationDirection } from './Types';
@@ -42,8 +42,7 @@ class Transition extends React.Component<TransitionProps> {
   constructor(props: TransitionProps, context: any) {
     super(props, context);
     this._name = `${uniqueBaseId}-${uuidCount++}`;
-    this._animatedComponent = null;
-    this.setViewRef = this.setViewRef.bind(this);
+    this._animatedComponent = null;    
   }
 
   _name: string
@@ -92,39 +91,57 @@ class Transition extends React.Component<TransitionProps> {
   }
 
   render() {
-    const element = React.Children.only(this.props.children);
+    let element = React.Children.only(this.props.children);
     if (!element) { return null; }
 
     if (!this._animatedComponent) { this._animatedComponent = createAnimated(); }
     if (!this._outerAnimatedComponent) { this._outerAnimatedComponent = createAnimated(); }
 
     const visibilityStyle = this.getVisibilityStyle();
-    const rotationStyle = this.getRotationStyle(element);    
-    const style = [visibilityStyle, rotationStyle, styles.transition];
+    const style = [visibilityStyle, styles.transition];
     const key = `${this._getName()}-${this._route}`;
-    return createAnimatedWrapper(
-      element,
-      key,
-      style,
-      this.setViewRef,
-      this._animatedComponent
-    );
+
+    element = React.createElement(element.type, { ...element.props, key, ref: this.setViewRef });
+    return createAnimatedWrapper(element, style, null, this._outerAnimatedComponent, this._animatedComponent);
   }
 
   getRotationStyle(element) {
     const ri = getRotationFromStyle(element.props.style);
     if (ri.rotate) {
       const transform = [];
-      if (ri.rotate.rotate) { transform.push({ rotate: ri.rotate.rotate }); }
-      if (ri.rotate.rotateX) { transform.push({ rotateX: ri.rotate.rotateX }); }
-      if (ri.rotate.rotateY) { transform.push({ rotateY: ri.rotate.rotateY }); }
+      const ip = new Animated.Value(1);
+      const inputRange = [0, 1];
+      if (ri.rotate.rotate) {
+        transform.push({
+          rotate: ip.interpolate({
+            inputRange,
+            outputRange: [ri.rotate.rotate, ri.rotate.rotate],
+          }),
+        });
+      }
+      if (ri.rotate.rotateX) {
+        transform.push({
+          rotateX: ip.interpolate({
+            inputRange,
+            outputRange: [ri.rotate.rotateX, ri.rotate.rotateX],
+          }),
+        });
+      }
+      if (ri.rotate.rotateY) {
+        transform.push({
+          rotateY: ip.interpolate({
+            inputRange,
+            outputRange: [ri.rotate.rotateY, ri.rotate.rotateY],
+          }),
+        });
+      }
       return { transform };
     }
 
     return {};
   }
 
-  setViewRef(ref: any) {
+  setViewRef = (ref: any) => {
     this._viewRef = ref;
   }
 
@@ -164,9 +181,9 @@ class Transition extends React.Component<TransitionProps> {
         inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_OUT,
         outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE_ANIM_OUT,
       }) };
-    } else {
-      return {};
     }
+    return {};
+
 
     return { opacity: visibilityProgress.interpolate({
       inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_OUT,
