@@ -4,5 +4,5 @@ import { getStyleInterpolator } from './getStyleInterpolator';
 
 export const getBackgroundInterpolator = (spec: InterpolatorSpecification): StyleSheet.NamedStyles => {  
   const backgroundColor = getStyleInterpolator('backgroundColor', 'transparent', false, spec);
-  return { backgroundColor };
+  return { animationStyles: { backgroundColor }};
 }

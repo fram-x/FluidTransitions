@@ -150,16 +150,6 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
           delayIndexFrom : delayIndexTo,
       );
 
-      // const rotationInfo = getRotationFromStyle(element.props.style);
-      // if (rotationInfo.rotate) {
-      //   const transform = transitionStyle.transform ? transitionStyle.transform : [];
-      //   transform.push({ rotate: new Animated.Value(0).interpolate({
-      //     inputRange: [0, 1],
-      //     outputRange: [rotationInfo.rotate.rotate, '0deg'],
-      //   }) });
-      //   transitionStyle.transform = transform;
-      // }
-
       const style = [transitionStyle, styles.transitionElement];
       element = React.createElement(element.type, { ...element.props, key });
       const comp = createAnimatedWrapper(element, style);

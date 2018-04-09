@@ -4,7 +4,12 @@ import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
 import { createAnimatedWrapper, createAnimated, mergeStyles } from './Utils';
-import { TransitionContext, NavigationDirection, InterpolatorSpecification } from './Types';
+import { 
+  TransitionContext, 
+  NavigationDirection, 
+  InterpolatorSpecification,
+  InterpolatorResult 
+} from './Types';
 import {
   getScaleInterpolator,
   getRotationInterpolator,
@@ -15,7 +20,7 @@ import {
 
 type InterpolatorEntry = {
   name: string,
-  interpolatorFunction: Function
+  interpolatorFunction: (spec: InterpolatorSpecification) => InterpolatorResult,
 }
 
 const interpolators: Array<InterpolatorEntry> = [];
@@ -50,9 +55,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
   _isMounted: boolean;
   _nativeInterpolation: AnimatedInterpolation;
   _interpolation: AnimatedInterpolation;  
-  _nativeInterpolationChildCount: number;
-  _interpolationChildCount: number;
-
+  
   shouldComponentUpdate(nextProps) {
     if (!nextProps.fromRoute && !nextProps.toRoute) {
       return false;
@@ -93,8 +96,6 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     }
 
     // console.log("RENDER SE " + this.props.sharedElements.length);
-    this._nativeInterpolationChildCount = 0;
-    this._interpolationChildCount = 0;
     this._interpolation = null;
     this._nativeInterpolation = null;
 
@@ -107,6 +108,8 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
       const key = `so-${idx.toString()}`;
       const style = transitionStyles.styles;
       const nativeStyle = [transitionStyles.nativeStyles, styles.sharedElement]
+console.log(fromItem.name + "/" + fromItem.route + ":" + 
+JSON.stringify(transitionStyles.styles) + " - " + JSON.stringify(transitionStyles.nativeStyles));
 
       element = React.createElement(element.type, { ...element.props, key });
       return createAnimatedWrapper(element, nativeStyle, style);
@@ -138,11 +141,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
       });
     }
 
-    if(useNativeDriver) {
-      this._nativeInterpolationChildCount++;
-      return this._nativeInterpolation;
-    } 
-    this._interpolationChildCount++;
+    if(useNativeDriver) return this._nativeInterpolation;
     return this._interpolation;
   }
 
@@ -180,15 +179,13 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     const styles = [];
 
     const self = this;
-    interpolators.forEach(interpolator => {
-      const nativeChildCount = self._nativeInterpolationChildCount;
-      const childCount = self._interpolationChildCount;
-      const style = interpolator.interpolatorFunction(interpolatorInfo);      
-      if (style) { 
-        if(nativeChildCount < self._nativeInterpolationChildCount)
-          nativeStyles.push(style); 
-        else if(childCount < self._interpolationChildCount)
-          styles.push(style);
+    interpolators.forEach(interpolator => {      
+      const interpolatorResult = interpolator.interpolatorFunction(interpolatorInfo);
+      if (interpolatorResult) { 
+        if(interpolatorResult.nativeAnimationStyles)
+          nativeStyles.push(interpolatorResult.nativeAnimationStyles); 
+        if(interpolatorResult.animationStyles)
+          styles.push(interpolatorResult.animationStyles);
       }
     });
 

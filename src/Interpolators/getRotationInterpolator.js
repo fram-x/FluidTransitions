@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 import { InterpolatorSpecification } from './../Types/InterpolatorSpecification';
 import { getRotationFromStyle } from './../Utils';
+import { IntepolatorResult } from './../Types/InterpolatorResult';
 
 export const getRotationInterpolator = (spec: InterpolatorSpecification): StyleSheet.NamedStyles => {
   
@@ -8,12 +9,12 @@ export const getRotationInterpolator = (spec: InterpolatorSpecification): StyleS
   const toStyle = spec.to.style;
 
   if((!fromStyle || !fromStyle.transform) && 
-    (!toStyle || !toStyle.transform)) return null;
+    (!toStyle || !toStyle.transform)) return {};
 
   const rotateFrom = getRotationFromStyle(fromStyle);
   const rotateTo = getRotationFromStyle(toStyle);
   
-  if(rotateFrom === {} && rotateTo === {}) return null;
+  if(rotateFrom === {} && rotateTo === {}) return {};
 
   const retVal = [];
   const interpolator = spec.getInterpolation(true);
@@ -43,8 +44,8 @@ export const getRotationInterpolator = (spec: InterpolatorSpecification): StyleS
     })});
   }
   
-  if(retVal.length === 0) return null;
+  if(retVal.length === 0) return {};
   const transform = [];
   retVal.forEach(r => transform.push(r));
-  return { transform };
+  return { nativeAnimationStyles: { transform } };
 }

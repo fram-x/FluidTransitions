@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { InterpolatorSpecification } from './../Types/InterpolatorSpecification';
+import { IntepolatorResult } from './../Types/InterpolatorResult';
 
 export const getScaleInterpolator = (spec: InterpolatorSpecification): StyleSheet.NamedStyles => {
   
@@ -29,5 +30,5 @@ export const getScaleInterpolator = (spec: InterpolatorSpecification): StyleShee
     outputRange: [1, spec.scaleY],
   });
 
-  return { transform: [{ scaleX }, { scaleY }]};  
+  return { nativeAnimationStyles: {transform: [{ scaleX }, { scaleY }]}};  
 }

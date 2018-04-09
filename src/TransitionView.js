@@ -105,42 +105,6 @@ class Transition extends React.Component<TransitionProps> {
     return createAnimatedWrapper(element, style, null, this._outerAnimatedComponent, this._animatedComponent);
   }
 
-  getRotationStyle(element) {
-    const ri = getRotationFromStyle(element.props.style);
-    if (ri.rotate) {
-      const transform = [];
-      const ip = new Animated.Value(1);
-      const inputRange = [0, 1];
-      if (ri.rotate.rotate) {
-        transform.push({
-          rotate: ip.interpolate({
-            inputRange,
-            outputRange: [ri.rotate.rotate, ri.rotate.rotate],
-          }),
-        });
-      }
-      if (ri.rotate.rotateX) {
-        transform.push({
-          rotateX: ip.interpolate({
-            inputRange,
-            outputRange: [ri.rotate.rotateX, ri.rotate.rotateX],
-          }),
-        });
-      }
-      if (ri.rotate.rotateY) {
-        transform.push({
-          rotateY: ip.interpolate({
-            inputRange,
-            outputRange: [ri.rotate.rotateY, ri.rotate.rotateY],
-          }),
-        });
-      }
-      return { transform };
-    }
-
-    return {};
-  }
-
   setViewRef = (ref: any) => {
     this._viewRef = ref;
   }
