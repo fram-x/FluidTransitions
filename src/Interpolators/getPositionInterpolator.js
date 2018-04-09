@@ -5,6 +5,7 @@ import { IntepolatorResult } from './../Types/InterpolatorResult';
 export const getPositionInterpolator = (spec: InterpolatorSpecification): StyleSheet.NamedStyles => {  
   const layout = spec.modifiers.indexOf("layout") > -1;  
   if(layout) {    
+    // Create non-native transition
     const interpolator = spec.getInterpolation(false);
     const translateX = interpolator.interpolate({
       inputRange: [0, 1],
@@ -33,6 +34,7 @@ export const getPositionInterpolator = (spec: InterpolatorSpecification): StyleS
     };
   }
 
+  // Create Native interpolation
   const interpolator = spec.getInterpolation(true);
   const translateX = interpolator.interpolate({
     inputRange: [0, 1],
