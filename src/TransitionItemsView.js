@@ -197,7 +197,6 @@ export default class TransitionItemsView extends React.Component<
     await new Promise(resolve => {
       UIManager.measureInWindow(nodeHandle, (x, y, width, height) => {
         item.updateMetrics(viewMetrics, { x, y, width, height });
-        console.log(item.metrics);
         resolve();
       });
     });

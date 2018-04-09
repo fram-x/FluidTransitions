@@ -97,14 +97,14 @@ class Transition extends React.Component<TransitionProps> {
     if (!this._animatedComponent) { this._animatedComponent = createAnimated(); }
     if (!this._outerAnimatedComponent) { this._outerAnimatedComponent = createAnimated(); }
 
-    const visibilityStyle = this.getVisibilityStyle();
-    const style = [visibilityStyle, styles.transition];
+    const visibilityStyle = this.getVisibilityStyle();    
     const key = `${this._getName()}-${this._route}`;
 
     element = React.createElement(element.type, { ...element.props, key, ref: this.setViewRef });
     return createAnimatedWrapper(
       element, 
-      style, 
+      [visibilityStyle, styles.transition], 
+      null,
       null, 
       this._outerAnimatedComponent, 
       this._animatedComponent, 

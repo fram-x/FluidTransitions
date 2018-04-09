@@ -30,20 +30,22 @@ import { mergeStyles } from '../Utils/mergeStyles';
   </View>
 
   Parameters:
-  component:    The component to create wrapper for. Can be a regular class based or
-                stateless component.
-  nativeStyles: Styles for the native part of the wrapper. Put any native animations
-                (transforms & opacity) here. (optional)
-  styles:       Styles for the non-native animations (optional)
-  nativeCached: Provide a cached AnimatedComponent wrapper for the native part (optional)
-  cached:       Provide a cached AnimatedComponent wrapper for the non-native part (optional)
-  log:          Writes to debug output if true.
-  logPrefix:    Prefix for the log output
+  component:      The component to create wrapper for. Can be a regular class based or
+                  stateless component.
+  nativeStyles:   Styles for the native part of the wrapper. Put any native animations
+                  (transforms & opacity) here. (optional)
+  overrideStyles: Last styles to put on the outer wrapper
+  styles:         Styles for the non-native animations (optional)
+  nativeCached:   Provide a cached AnimatedComponent wrapper for the native part (optional)
+  cached:         Provide a cached AnimatedComponent wrapper for the non-native part (optional)
+  log:            Writes to debug output if true.
+  logPrefix:      Prefix for the log output
 */
 const createAnimatedWrapper = (
   component: any,
   nativeStyles: ?StyleSheet.NamedStyles,
   styles: ?StyleSheet.NamedStyles,
+  overrideStyles: ?StyleSheet.NamedStyles,
   nativeCached: ?any,
   cached: any,
   log: ?Boolean,
@@ -92,7 +94,8 @@ const createAnimatedWrapper = (
   // Setup props for the outer wrapper (and native animated component)
   const finalNativeAnimatedStyles = [
     ...getStylesWithMergedTransforms([...nativeStyles, nativeAnimatedStyles]), 
-    getDebugBorder('#00F')
+    getDebugBorder('#00F'),
+    overrideStyles
   ];
 
   let props = {
@@ -111,7 +114,7 @@ const createAnimatedWrapper = (
     props, animatedElement,
   );
 
-  if(log) {
+  if(log && false) {
     const log = (logPrefix ? logPrefix + "\n" : "") + 
                 "  originalStyles:        " + JSON.stringify(StyleSheet.flatten(component.props.style)) + "\n" + 
                 "  componentStyles:       " + JSON.stringify(componentStyles) + "\n" + 
@@ -130,7 +133,7 @@ const createAnimated = () => {
   return Animated.createAnimatedComponent(wrapper.type);
 };
 
-const getDebugBorder = (color: string) => ({ borderWidth: 1, borderColor: color});
+const getDebugBorder = (color: string) => ({});// ({ borderWidth: 1, borderColor: color});
 
 const getStylesWithMergedTransforms = (styles: Array<StyleSheet.NamedStyles>): Array<StyleSheet.NamedStyles> => {  
   const retVal = [];

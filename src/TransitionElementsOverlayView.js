@@ -24,28 +24,6 @@ import {
 
 import * as Constants from './TransitionConstants';
 
-const styles: StyleSheet.NamedStyles = StyleSheet.create({
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  transitionElement: {
-    position: 'absolute',
-    margin: 0,
-    marginVertical: 0,
-    marginHorizontal: 0,
-    marginTop: 0,
-    marginBottom: 0,
-    marginLeft: 0,
-    marginRight: 0,
-    marginStart: 0,
-    marginEnd: 0,
-  },
-});
-
 type TransitionEntry = {
   name: string,
   transitionFunction: Function
@@ -287,5 +265,27 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     getRoutes: PropTypes.func,
   }
 }
+
+const styles: StyleSheet.NamedStyles = StyleSheet.create({
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  transitionElement: {
+    position: 'absolute',
+    margin: 0,
+    marginVertical: 0,
+    marginHorizontal: 0,
+    marginTop: 0,
+    marginBottom: 0,
+    marginLeft: 0,
+    marginRight: 0,
+    marginStart: 0,
+    marginEnd: 0,
+  },
+});
 
 export default TransitionElementsOverlayView;
