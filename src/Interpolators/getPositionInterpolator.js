@@ -26,7 +26,11 @@ export const getPositionInterpolator = (spec: InterpolatorSpecification): StyleS
       outputRange: [spec.from.metrics.height, spec.to.metrics.height]
     });
   
-    return { animationStyles: { width, height, transform: [{ translateX }, { translateY }]} };
+    return { animationStyles: { 
+      width, 
+      height, 
+      transform: [{ translateX }, { translateY }]} 
+    };
   }
 
   const interpolator = spec.getInterpolation(true);
@@ -42,5 +46,9 @@ export const getPositionInterpolator = (spec: InterpolatorSpecification): StyleS
       spec.from.metrics.height / 2 * (spec.scaleY - 1)],
   });
 
-  return { nativeAnimationStyles: { transform: [{ translateX }, { translateY }]} };
+  return { nativeAnimationStyles: { 
+    width: spec.from.metrics.width, 
+    height: spec.from.metrics.height, 
+    transform: [{ translateX }, { translateY }]} 
+  };
 }
