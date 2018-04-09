@@ -37,6 +37,8 @@ import { mergeStyles } from '../Utils/mergeStyles';
   styles:       Styles for the non-native animations (optional)
   nativeCached: Provide a cached AnimatedComponent wrapper for the native part (optional)
   cached:       Provide a cached AnimatedComponent wrapper for the non-native part (optional)
+  log:          Writes to debug output if true.
+  logPrefix:    Prefix for the log output
 */
 const createAnimatedWrapper = (
   component: any,
@@ -44,6 +46,8 @@ const createAnimatedWrapper = (
   styles: ?StyleSheet.NamedStyles,
   nativeCached: ?any,
   cached: any,
+  log: ?Boolean,
+  logPrefix: ?String
 ) => {
   // Create wrapped views
   const nativeAnimatedComponent = nativeCached || createAnimated();
@@ -57,7 +61,7 @@ const createAnimatedWrapper = (
   // create inner element
   const innerElement = React.createElement(component.type, {
     ...component.props,
-    style: [componentStyles, {}],
+    style: [componentStyles, getDebugBorder('#FF0')],
   });
 
   // Check if we have an absolute positioned element
@@ -70,18 +74,17 @@ const createAnimatedWrapper = (
   }
 
   // Create Animated element
+  const finalAnimatedStyles = [animatedStyles, styles, additionalAnimatedStyles, getDebugBorder('#0F0')];
   const animatedElement = React.createElement(
-    animatedComponent, { style: [animatedStyles, styles, additionalAnimatedStyles] },
+    animatedComponent, { style: finalAnimatedStyles },
     innerElement,
   );
 
   // Setup props for the outer wrapper (and native animated component)
+  const finalNativeAnimatedStyles = [...getStylesWithMergedTransforms([...nativeStyles, nativeAnimatedStyles]), getDebugBorder('#00F')];
   let props = {
     collapsable: false, // Used to fix measure on Android
-    style: [ 
-      nativeAnimatedStyles,
-      nativeStyles,      
-    ],
+    style: finalNativeAnimatedStyles,
   };
 
   // Copy some key properties
@@ -95,6 +98,15 @@ const createAnimatedWrapper = (
     props, animatedElement,
   );
 
+  if(log) {
+    const log = (logPrefix ? logPrefix + "\n" : "") + 
+                "  originalStyles:        " + JSON.stringify(StyleSheet.flatten(component.props.style)) + "\n" + 
+                "  componentStyles:       " + JSON.stringify(componentStyles) + "\n" + 
+                "  animatedStyles:        " + JSON.stringify(finalAnimatedStyles) + "\n" + 
+                "  nativeAnimatedStyles:  " + JSON.stringify(finalNativeAnimatedStyles);
+    console.log(log);
+  }
+
   return nativeAnimatedElement;
 };
 
@@ -103,6 +115,32 @@ const createAnimated = () => {
   const wrapper = (<View />);
   return Animated.createAnimatedComponent(wrapper.type);
 };
+
+const getDebugBorder = (color: string) => ({ borderWidth: 1, borderColor: color});
+
+const getStylesWithMergedTransforms = (styles: Array<StyleSheet.NamedStyles>): Array<StyleSheet.NamedStyles> => {
+  const retVal = [];
+  const transforms = [];
+  if(styles){
+    styles.forEach(s => {
+      if(s) {
+        if(s.transform) {
+          const t = s.transform;
+          delete s.transform;
+          t.forEach(ti => {
+            if(!transforms.find(el => Object.keys(el)[0] === Object.keys(ti)[0]))
+              transforms.push(ti);
+          });
+        } 
+        retVal.push(s);
+      }
+    })
+    retVal.push({ transform: transforms });
+    return retVal;
+  }
+  
+  return styles;
+}
 
 const getNativeAnimatableStyles = (styles: Array<StyleSheet.NamedStyles>|StyleSheet.NamedStyles) =>
   getFilteredStyle(styles, (key) => includePropsForNativeStyles.indexOf(key) > -1);
