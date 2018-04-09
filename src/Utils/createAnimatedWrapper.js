@@ -53,10 +53,13 @@ const createAnimatedWrapper = (
   const nativeAnimatedComponent = nativeCached || createAnimated();
   const animatedComponent = cached || createAnimated();
 
+  // Flatten style
+  const flattenedStyle = StyleSheet.flatten(component.props.style);
+
   // Get styles
-  const nativeAnimatedStyles = getNativeAnimatableStyles(component.props.style);
-  const animatedStyles = getAnimatableStyles(component.props.style);
-  const componentStyles = getComponentStyles(component.props.style);
+  const nativeAnimatedStyles = getNativeAnimatableStyles(flattenedStyle);
+  const animatedStyles = getAnimatableStyles(flattenedStyle);
+  const componentStyles = getComponentStyles(flattenedStyle);
 
   // create inner element
   const innerElement = React.createElement(component.type, {
@@ -74,14 +77,24 @@ const createAnimatedWrapper = (
   }
 
   // Create Animated element
-  const finalAnimatedStyles = [animatedStyles, styles, additionalAnimatedStyles, getDebugBorder('#0F0')];
+  const finalAnimatedStyles = [
+    animatedStyles, 
+    styles, 
+    additionalAnimatedStyles, 
+    getDebugBorder('#0F0')
+  ];
+
   const animatedElement = React.createElement(
     animatedComponent, { style: finalAnimatedStyles },
     innerElement,
   );
 
   // Setup props for the outer wrapper (and native animated component)
-  const finalNativeAnimatedStyles = [...getStylesWithMergedTransforms([...nativeStyles, nativeAnimatedStyles]), getDebugBorder('#00F')];
+  const finalNativeAnimatedStyles = [
+    ...getStylesWithMergedTransforms([...nativeStyles, nativeAnimatedStyles]), 
+    getDebugBorder('#00F')
+  ];
+
   let props = {
     collapsable: false, // Used to fix measure on Android
     style: finalNativeAnimatedStyles,
@@ -104,6 +117,7 @@ const createAnimatedWrapper = (
                 "  componentStyles:       " + JSON.stringify(componentStyles) + "\n" + 
                 "  animatedStyles:        " + JSON.stringify(finalAnimatedStyles) + "\n" + 
                 "  nativeAnimatedStyles:  " + JSON.stringify(finalNativeAnimatedStyles);
+                
     console.log(log);
   }
 
@@ -118,7 +132,7 @@ const createAnimated = () => {
 
 const getDebugBorder = (color: string) => ({ borderWidth: 1, borderColor: color});
 
-const getStylesWithMergedTransforms = (styles: Array<StyleSheet.NamedStyles>): Array<StyleSheet.NamedStyles> => {
+const getStylesWithMergedTransforms = (styles: Array<StyleSheet.NamedStyles>): Array<StyleSheet.NamedStyles> => {  
   const retVal = [];
   const transforms = [];
   if(styles){
