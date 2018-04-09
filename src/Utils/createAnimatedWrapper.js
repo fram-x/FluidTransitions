@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Animated, StyleSheet } from 'react-native';
 
+import { mergeStyles } from '../Utils/mergeStyles';
+
 /*
   This HOC wrapper creates animatable wrappers around the provided component
   to make it animatable - independent of wether it is a stateless or class
@@ -43,7 +45,6 @@ const createAnimatedWrapper = (
   nativeCached: ?any,
   cached: any,
 ) => {
-  
   // Create wrapped views
   const nativeAnimatedComponent = nativeCached || createAnimated();
   const animatedComponent = cached || createAnimated();
@@ -56,24 +57,34 @@ const createAnimatedWrapper = (
   // create inner element
   const innerElement = React.createElement(component.type, {
     ...component.props,
-    style: componentStyles,
+    style: [componentStyles, {}],
   });
+
+  // Check if we have an absolute positioned element
+  const additionalAnimatedStyles = { overflow: 'hidden' };
+
+  // For absolute positioned elements we need to set the flex property
+  // to enable full fill of the inner element.
+  if (nativeAnimatedStyles && nativeAnimatedStyles.position === 'absolute') {
+    additionalAnimatedStyles.flex = 1;
+  }
 
   // Create Animated element
   const animatedElement = React.createElement(
-    animatedComponent, { style: [animatedStyles, styles, { overflow: 'hidden' } ], },
+    animatedComponent, { style: [animatedStyles, styles, additionalAnimatedStyles] },
     innerElement,
   );
 
   // Setup props for the outer wrapper (and native animated component)
   let props = {
-    collapsable: false, // Used to fix measure on Android    
-    style: [
+    collapsable: false, // Used to fix measure on Android
+    style: [ 
       nativeAnimatedStyles,
       nativeStyles,      
     ],
   };
 
+  // Copy some key properties
   if (component.key) { props = { ...props, key: component.key }; }
   if (component.ref) { props = { ...props, ref: component.ref }; }
   if (component.onLayout) { props = { ...props, onLayout: component.onLayout }; }
@@ -99,7 +110,7 @@ const getNativeAnimatableStyles = (styles: Array<StyleSheet.NamedStyles>|StyleSh
 const getAnimatableStyles = (styles: Array<StyleSheet.NamedStyles>|StyleSheet.NamedStyles) =>
   getFilteredStyle(styles, (key) => excludePropsForStyles.indexOf(key) === -1);
 
-  const getComponentStyles = (styles: Array<StyleSheet.NamedStyles>|StyleSheet.NamedStyles) =>
+const getComponentStyles = (styles: Array<StyleSheet.NamedStyles>|StyleSheet.NamedStyles) =>
   getFilteredStyle(styles, (key) => excludePropsForComponent.indexOf(key) === -1);
 
 const getFilteredStyle = (
@@ -157,16 +168,16 @@ const excludePropsForComponent = [
   'marginRight',
   'marginStart',
   'marginEnd',
-  "padding",
-  "paddingVertical",
-  "paddingHorizontal",
-  "paddingTop",
-  "paddingBottom",
-  "paddingLeft",
-  "paddingRight",
-  "paddingStart",
-  "paddingEnd",
-  'position',  
+  'padding',
+  'paddingVertical',
+  'paddingHorizontal',
+  'paddingTop',
+  'paddingBottom',
+  'paddingLeft',
+  'paddingRight',
+  'paddingStart',
+  'paddingEnd',
+  'position',
   'flexWrap',
   'flex',
   'flexGrow',
@@ -177,13 +188,13 @@ const excludePropsForComponent = [
   'zIndex',
   'direction',
   'transform',
-  "transformMatrix",
-  "decomposedMatrix",
-  "scaleX",
-  "scaleY",
-  "rotation",
-  "translateX",
-  "translateY",
+  'transformMatrix',
+  'decomposedMatrix',
+  'scaleX',
+  'scaleY',
+  'rotation',
+  'translateX',
+  'translateY',
   'backfaceVisibility',
   'backgroundColor',
   'borderColor',
