@@ -7,7 +7,7 @@ import { RouteDirection, NavigationDirection } from './Types';
 import * as Constants from './TransitionConstants';
 import { createAnimatedWrapper, createAnimated, getRotationFromStyle } from './Utils';
 
-const uniqueBaseId: string = `transitionCompId-${Date.now()}`;
+const uniqueBaseId: string = `tcid-${Date.now()}`;
 let uuidCount: number = 0;
 
 const styles = StyleSheet.create({
@@ -102,9 +102,17 @@ class Transition extends React.Component<TransitionProps> {
     const key = `${this._getName()}-${this._route}`;
 
     element = React.createElement(element.type, { ...element.props, key, ref: this.setViewRef });
-    return createAnimatedWrapper(element, style, null, this._outerAnimatedComponent, this._animatedComponent);
+    return createAnimatedWrapper(
+      element, 
+      style, 
+      null, 
+      this._outerAnimatedComponent, 
+      this._animatedComponent, 
+      true, 
+      "TV " + this._getName() + "/" + this._route
+    );  
   }
-
+  
   setViewRef = (ref: any) => {
     this._viewRef = ref;
   }
