@@ -4,11 +4,11 @@ import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
 import { createAnimatedWrapper, createAnimated, mergeStyles } from './Utils';
-import { 
-  TransitionContext, 
-  NavigationDirection, 
+import {
+  TransitionContext,
+  NavigationDirection,
   InterpolatorSpecification,
-  InterpolatorResult 
+  InterpolatorResult
 } from './Types';
 import {
   getScaleInterpolator,
@@ -48,14 +48,14 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
   context: TransitionContext
   constructor(props: SharedElementsOverlayViewProps, context: TransitionContext) {
     super(props, context);
-    this._isMounted = false; 
-    this.getInterpolation = this.getInterpolation.bind(this);   
+    this._isMounted = false;
+    this.getInterpolation = this.getInterpolation.bind(this);
   }
 
   _isMounted: boolean;
   _nativeInterpolation: AnimatedInterpolation;
-  _interpolation: AnimatedInterpolation;  
-  
+  _interpolation: AnimatedInterpolation;
+
   shouldComponentUpdate(nextProps) {
     if (!nextProps.fromRoute && !nextProps.toRoute) {
       return false;
@@ -104,15 +104,20 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
       const { fromItem, toItem } = pair;
       let element = React.Children.only(fromItem.reactElement.props.children);
       const transitionStyles = self.getTransitionStyle(fromItem, toItem);
-      
+
       const key = `so-${idx.toString()}`;
       const style = transitionStyles.styles;
       const nativeStyle = [transitionStyles.nativeStyles, styles.sharedElement]
-console.log(fromItem.name + "/" + fromItem.route + ":" + 
-JSON.stringify(transitionStyles.styles) + " - " + JSON.stringify(transitionStyles.nativeStyles));
 
       element = React.createElement(element.type, { ...element.props, key });
-      return createAnimatedWrapper(element, nativeStyle, style);
+      return createAnimatedWrapper(
+        element, 
+        nativeStyle, 
+        style, 
+        null, 
+        null, 
+        true, 
+        "SE: " + fromItem.name + "/" + fromItem.route);
     });
 
     return (
@@ -179,18 +184,18 @@ JSON.stringify(transitionStyles.styles) + " - " + JSON.stringify(transitionStyle
     const styles = [];
 
     const self = this;
-    interpolators.forEach(interpolator => {      
+    interpolators.forEach(interpolator => {
       const interpolatorResult = interpolator.interpolatorFunction(interpolatorInfo);
-      if (interpolatorResult) { 
+      if (interpolatorResult) {
         if(interpolatorResult.nativeAnimationStyles)
-          nativeStyles.push(interpolatorResult.nativeAnimationStyles); 
+          nativeStyles.push(interpolatorResult.nativeAnimationStyles);
         if(interpolatorResult.animationStyles)
           styles.push(interpolatorResult.animationStyles);
       }
     });
 
     return {
-      nativeStyles: {        
+      nativeStyles: {
         ...mergeStyles(nativeStyles),
       },
       styles: {
