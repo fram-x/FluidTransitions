@@ -162,10 +162,7 @@ class FluidTransitioner extends React.Component<*> {
         route={scene.route.routeName}
         sceneKey={scene.key}
       >
-        <Scene
-          navigation={navigation}
-          screenProps={this.props.screenProps}
-        />
+        <Scene navigation={navigation} />
       </TransitionRouteView>
     );
   }
