@@ -106,14 +106,14 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
       const transitionStyles = self.getTransitionStyle(fromItem, toItem);
 
       const key = `so-${idx.toString()}`;
-      const style = transitionStyles.styles;
-      const nativeStyle = [transitionStyles.nativeStyles, styles.sharedElement]
+      const animationStyle = transitionStyles.styles;
+      const nativeAnimationStyle = [transitionStyles.nativeStyles, styles.sharedElement]
 
       element = React.createElement(element.type, { ...element.props, key });
       return createAnimatedWrapper(
         element, 
-        nativeStyle, 
-        style, 
+        nativeAnimationStyle, 
+        animationStyle, 
         null, 
         null, 
         true, 
