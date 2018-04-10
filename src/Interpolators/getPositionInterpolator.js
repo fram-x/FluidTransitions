@@ -27,7 +27,7 @@ export const getPositionInterpolator = (spec: InterpolatorSpecification): StyleS
       outputRange: [spec.from.metrics.height, spec.to.metrics.height]
     });
   
-    return { animationStyles: { 
+    return { animationStyles: {       
       width, 
       height, 
       transform: [{ translateX }, { translateY }]} 
