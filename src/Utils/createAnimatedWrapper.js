@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Animated, StyleSheet } from 'react-native';
+import { View, Animated, Platform, StyleSheet } from 'react-native';
 
-import { mergeStyles } from '../Utils/mergeStyles';
+import { getRotationFromStyle } from '../Utils/getRotationFromStyle';
 
 /*
   This HOC wrapper creates animatable wrappers around the provided component
@@ -92,11 +92,11 @@ const createAnimatedWrapper = (
   );
 
   // Setup props for the outer wrapper (and native animated component)
-  const finalNativeAnimatedStyles = [
+  const finalNativeAnimatedStyles = getFixedAndroidRotation([
     ...getStylesWithMergedTransforms([...nativeStyles, nativeAnimatedStyles]), 
     getDebugBorder('#00F'),
     overrideStyles
-  ];
+  ]);
 
   let props = {
     collapsable: false, // Used to fix measure on Android
@@ -133,7 +133,46 @@ const createAnimated = () => {
   return Animated.createAnimatedComponent(wrapper.type);
 };
 
-const getDebugBorder = (color: string) => ({});// ({ borderWidth: 1, borderColor: color});
+const getDebugBorder = (color: string) => ({}); //({ borderWidth: 1, borderColor: color});
+
+const getFixedAndroidRotation = (styles: Array<StyleSheet.NamedStyles>) => {
+  if(Platform.OS === 'ios') return styles;
+  const stylesCopy = styles.filter(i => i).map(s => {
+    if(!s) return null; 
+    if(isNumber(s)) return s;
+    const sc = {...s};
+    if(sc.transform) {
+      sc.transform = [...s.transform];
+      sc.transform = sc.transform.map(t => ({...t}));
+    }
+    return sc;
+  });
+  const a = new Animated.Value(0);
+  const retVal = [];
+  stylesCopy.forEach(style => {
+    if(style && style.transform) {
+      const ri = getRotationFromStyle(style);
+      if(ri.rotate) {
+        if(ri.rotate.rotate && (typeof ri.rotate.rotate) === 'string')
+          style.transform.find(t => Object.keys(t)[0] === 'rotate').rotate = 
+            a.interpolate({inputRange: [0, 1], 
+              outputRange: [ri.rotate.rotate, '0deg']});
+
+        if(ri.rotate.rotateX && (typeof ri.rotate.rotateX) === 'string')
+        style.transform.find(t => Object.keys(t)[0] === 'rotateX').rotateX = 
+          a.interpolate({inputRange: [0, 1], 
+            outputRange: [ri.rotateX.rotateX, '0deg']});
+
+        if(ri.rotate.rotateY && (typeof ri.rotate.rotateY) === 'string')
+        style.transform.find(t => Object.keys(t)[0] === 'rotateY').rotateY =
+          a.interpolate({inputRange: [0, 1], 
+            outputRange: [ri.rotateY.rotateY, '0deg']});
+      }
+    }    
+  })
+
+  return stylesCopy;
+}
 
 const getStylesWithMergedTransforms = (styles: Array<StyleSheet.NamedStyles>): Array<StyleSheet.NamedStyles> => {  
   const retVal = [];
