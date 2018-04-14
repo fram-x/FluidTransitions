@@ -7,39 +7,60 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  shoe1: {
-    width: 230,
-    height: 150,
-    position: 'absolute',
-    left: Dimensions.get('window').width - 180,
-    top: Dimensions.get('window').height * 0.5 - 120,
-    transform: [{ rotate: '20deg' }],
-  },
-  shoe2: {
-    width: 200,
-    height: 130,
-    position: 'absolute',
-    left: Dimensions.get('window').width * 0.5 - 100,
-    top: Dimensions.get('window').height * 0.5 - 80,
-  },
   top1: {
-    backgroundColor: '#CCC',
+    backgroundColor: '#C14534',
     flex: 1,
   },
   paper1: {
-    backgroundColor: '#AF2222',
-    width: 220,
-    height: 220,
+    backgroundColor: '#EC806E',
+    width: Dimensions.get('window').width * 0.65,
+    height: Dimensions.get('window').height * 0.45,
     position: 'absolute',
-    left: Dimensions.get('window').width * 0.5 - 110,
+    left: 10,
     top: Dimensions.get('window').height * 0.5 - 150,
     transform: [{ rotate: '-20deg' }],
     alignItems: 'flex-start',
     justifyContent: 'flex-end',
     padding: 10,
+    shadowColor: '#000',
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.4,
+    elevation: 7,
+  },
+  shoe1: {
+    width: 350,
+    height: 240,
+    position: 'absolute',
+    left: Dimensions.get('window').width * 0.2,
+    top: Dimensions.get('window').height * 0.5 - 120,
+    transform: [{ rotate: '35deg' }],
+  },
+  headerContainer1: {
+    padding: 20,
+    paddingTop: Dimensions.get('window').height * 0.2,
+  },
+  header1: {
+    color: '#FFF',
+    fontSize: 60,
+  },
+  subHeader1: {
+    color: '#FFF',
+    fontSize: 18,
+  },
+  top2: {
+    backgroundColor: '#C14534',
+    flex: 1,
+  },
+  shoe2: {
+    width: 291,
+    height: 200,
+    position: 'absolute',
+    left: Dimensions.get('window').width * 0.5 - (291 / 2),
+    top: 60,
   },
   paper2: {
-    backgroundColor: '#AA020222',
+    backgroundColor: '#FFFFFF',
     position: 'absolute',
     left: 0,
     top: Dimensions.get('window').height * 0.5,
@@ -50,26 +71,29 @@ const styles = StyleSheet.create({
     paddingTop: 70,
     padding: 10,
   },
-  top2: {
-    backgroundColor: '#EFEFEF',
-    flex: 1,
+  headerContainer2: {
+    padding: 20,
+    justifyContent: 'center',
+    paddingTop: Dimensions.get('window').height * 0.52,
   },
-  boxHeader: {
-    color: '#FFF',
+  header2: {
+    color: '#444',
+    fontSize: 42,
+    textAlign: 'center',
   },
-  boxHeader2: {
-    color: '#555555',
-    fontWeight: 'bold',
-    fontSize: 18,
+  subHeader2: {
+    color: '#444',
+    fontSize: 14,
+    textAlign: 'center',
   },
   smallImageContainer: {
     position: 'absolute',
     left: 0,
-    top: Dimensions.get('window').height * 0.5,
+    top: Dimensions.get('window').height * 0.54,
     bottom: 0,
     right: 0,
     alignItems: 'center',
-    paddingTop: 70,
+    paddingTop: 50,
     flexDirection: 'row',
     justifyContent: 'center',
     marginLeft: 80,
@@ -77,17 +101,17 @@ const styles = StyleSheet.create({
     margin: 30,
   },
   smallImageWrapper: {
-    width: 90,
-    height: 90,
+    width: 150,
+    height: 150,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFF',
+    backgroundColor: '#ECECEC',
     marginLeft: 5,
     marginRight: 5,
   },
   smallImage: {
-    width: 80,
-    height: 45,
+    width: 110,
+    height: 60,
   },
 });
 
@@ -96,13 +120,17 @@ const Screen1 = (props) => (
     <TouchableWithoutFeedback onPress={() => props.navigation.navigate('screen2')}>
       <View style={styles.top1}>
         <Transition appear="left" shared="paper">
-          <View style={styles.paper1}>
-            <Text style={styles.boxHeader}>NIKE AIR JORDAN</Text>
-          </View>
+          <View style={styles.paper1} />
         </Transition>
-        <Transition appear="right" shared="image">
+        {/*  <Transition appear="right" shared="image">
           <Image style={styles.shoe1} source={require('./assets/air-jordan-1.png')} />
         </Transition>
+        <Transition appear="horizontal">
+          <View style={styles.headerContainer1}>
+            <Text style={styles.header1}>THE TEN</Text>
+            <Text style={styles.subHeader1}>AIR JORDAN 1</Text>
+          </View>
+        </Transition> */}
       </View>
     </TouchableWithoutFeedback>
   </View>
@@ -112,11 +140,9 @@ const Screen2 = (props) => (
     <TouchableWithoutFeedback onPress={() => props.navigation.goBack()}>
       <View style={styles.top2}>
         <Transition shared="paper">
-          <View style={styles.paper2}>
-            <Text style={styles.boxHeader2}>NIKE AIR JORDAN</Text>
-          </View>
+          <View style={styles.paper2} />
         </Transition>
-        <Transition shared="image">
+        {/* <Transition shared="image">
           <Image style={styles.shoe2} source={require('./assets/air-jordan-1.png')} />
         </Transition>
         <View style={styles.smallImageContainer}>
@@ -130,12 +156,13 @@ const Screen2 = (props) => (
               <Image style={styles.smallImage} source={require('./assets/air-jordan-1.png')} />
             </View>
           </Transition>
-          <Transition appear="horizontal" delay>
-            <View style={styles.smallImageWrapper}>
-              <Image style={styles.smallImage} source={require('./assets/air-jordan-1.png')} />
-            </View>
-          </Transition>
         </View>
+        <Transition appear="horizontal">
+          <View style={styles.headerContainer2}>
+            <Text style={styles.header2}>THE TEN</Text>
+            <Text style={styles.subHeader2}>AIR JORDAN 1</Text>
+          </View>
+        </Transition> */}
       </View>
     </TouchableWithoutFeedback>
   </View>
