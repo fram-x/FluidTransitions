@@ -121,18 +121,18 @@ const createAnimatedWrapper = (params: Parameters) => {
     animatedElement,
   );
 
-  if (__DEV__) {
-    if(params.log) {
-      const log = (params.logPrefix ? params.logPrefix + "\n" : "") + 
-        "  innerElement:          " + JSON.stringify(StyleSheet.flatten(innerElement.props.style)) + "\n" + 
-        "  animatedElement:       " + JSON.stringify(StyleSheet.flatten(animatedElement.props.style)) + "\n" + 
-        "  nativeAnimatedElement: " + JSON.stringify(StyleSheet.flatten(nativeAnimatedElement.props.style));
-      if(lastLog !== log){            
-        lastLog = log;
-        console.log("\n" + log + "\n");
-      }
-    }
-  }
+  // if (__DEV__) {
+  //   if(params.log) {
+  //     const log = (params.logPrefix ? params.logPrefix + "\n" : "") + 
+  //       "  innerElement:          " + JSON.stringify(StyleSheet.flatten(innerElement.props.style)) + "\n" + 
+  //       "  animatedElement:       " + JSON.stringify(StyleSheet.flatten(animatedElement.props.style)) + "\n" + 
+  //       "  nativeAnimatedElement: " + JSON.stringify(StyleSheet.flatten(nativeAnimatedElement.props.style));
+  //     if(lastLog !== log){            
+  //       lastLog = log;
+  //       console.log("\n" + log + "\n");
+  //     }
+  //   }
+  // }
 
   return nativeAnimatedElement;
 };

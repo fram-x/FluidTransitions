@@ -50,5 +50,5 @@ describe('Transition', () => {
 });
 
 const writeTree = (root) => {
-  console.log(JSON.stringify(root));
+  // console.log(JSON.stringify(root));
 };
