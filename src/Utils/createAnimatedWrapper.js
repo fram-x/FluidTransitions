@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Animated, Platform, StyleSheet } from 'react-native';
 
-import { getRotationFromStyle } from '../Utils/getRotationFromStyle';
+import { getRotationFromStyle } from './getRotationFromStyle';
 
 /*
   This HOC wrapper creates animatable wrappers around the provided component
@@ -41,22 +41,23 @@ import { getRotationFromStyle } from '../Utils/getRotationFromStyle';
   log:            Writes to debug output if true.
   logPrefix:      Prefix for the log output
 */
-const createAnimatedWrapper = (
+type Parameters = {
   component: any,
   nativeStyles: ?StyleSheet.NamedStyles,
   styles: ?StyleSheet.NamedStyles,
   overrideStyles: ?StyleSheet.NamedStyles,
   nativeCached: ?any,
-  cached: any,
+  cached: ?any,  
   log: ?Boolean,
-  logPrefix: ?String
-) => {
+  logPrefix: ?string
+}
+const createAnimatedWrapper = (params: Parameters) => {
   // Create wrapped views
-  const nativeAnimatedComponent = nativeCached || createAnimated();
-  const animatedComponent = cached || createAnimated();
+  const nativeAnimatedComponent = params.nativeCached || createAnimated();
+  const animatedComponent = params.cached || createAnimated();
 
   // Flatten style
-  const flattenedStyle = StyleSheet.flatten(component.props.style);
+  const flattenedStyle = StyleSheet.flatten(params.component.props.style);
 
   // Get styles
   const nativeAnimatedStyles = getNativeAnimatableStyles(flattenedStyle);
@@ -64,8 +65,8 @@ const createAnimatedWrapper = (
   const componentStyles = getComponentStyles(flattenedStyle);
 
   // create inner element
-  const innerElement = React.createElement(component.type, {
-    ...component.props,
+  const innerElement = React.createElement(params.component.type, {
+    ...params.component.props,
     style: [componentStyles, getDebugBorder('#FF0')],
   });
 
@@ -74,14 +75,15 @@ const createAnimatedWrapper = (
 
   // For absolute positioned elements we need to set the flex property
   // to enable full fill of the inner element.
-  if (nativeAnimatedStyles && nativeAnimatedStyles.position === 'absolute') {
+  if (nativeAnimatedStyles && 
+    nativeAnimatedStyles.position === 'absolute') {
     additionalAnimatedStyles.flex = 1;
   }
 
   // Create Animated element
   const finalAnimatedStyles = [
     animatedStyles, 
-    styles, 
+    params.styles, 
     additionalAnimatedStyles, 
     getDebugBorder('#0F0')
   ];
@@ -92,11 +94,15 @@ const createAnimatedWrapper = (
   );
 
   // Setup props for the outer wrapper (and native animated component)
-  const finalNativeAnimatedStyles = getFixedAndroidRotation([
-    ...getStylesWithMergedTransforms([...nativeStyles, nativeAnimatedStyles]), 
-    getDebugBorder('#00F'),
-    overrideStyles
-  ]);
+  const finalNativeAnimatedStyles = 
+    getResolvedRotation(
+        [...getStylesWithMergedTransforms([
+          ...(params.nativeStyles ? params.nativeStyles : []), 
+          nativeAnimatedStyles
+        ]), 
+      getDebugBorder('#00F'),
+      params.overrideStyles
+    ]);
 
   let props = {
     collapsable: false, // Used to fix measure on Android
@@ -104,28 +110,33 @@ const createAnimatedWrapper = (
   };
 
   // Copy some key properties
-  if (component.key) { props = { ...props, key: component.key }; }
-  if (component.ref) { props = { ...props, ref: component.ref }; }
-  if (component.onLayout) { props = { ...props, onLayout: component.onLayout }; }
+  if (params.component.key) { props = { ...props, key: params.component.key }; }
+  if (params.component.ref) { props = { ...props, ref: params.component.ref }; }
+  if (params.component.onLayout) { props = { ...props, onLayout: params.component.onLayout }; }
 
   // Create native animated component
   const nativeAnimatedElement = React.createElement(
     nativeAnimatedComponent,
-    props, animatedElement,
+    props, 
+    animatedElement,
   );
 
-  if(log && false) {
-    const log = (logPrefix ? logPrefix + "\n" : "") + 
-                "  originalStyles:        " + JSON.stringify(StyleSheet.flatten(component.props.style)) + "\n" + 
-                "  componentStyles:       " + JSON.stringify(componentStyles) + "\n" + 
-                "  animatedStyles:        " + JSON.stringify(finalAnimatedStyles) + "\n" + 
-                "  nativeAnimatedStyles:  " + JSON.stringify(finalNativeAnimatedStyles);
-                
-    console.log(log);
+  if (__DEV__) {
+    if(params.log) {
+      const log = (params.logPrefix ? params.logPrefix + "\n" : "") + 
+        "  innerElement:          " + JSON.stringify(StyleSheet.flatten(innerElement.props.style)) + "\n" + 
+        "  animatedElement:       " + JSON.stringify(StyleSheet.flatten(animatedElement.props.style)) + "\n" + 
+        "  nativeAnimatedElement: " + JSON.stringify(StyleSheet.flatten(nativeAnimatedElement.props.style));
+      if(lastLog !== log){            
+        lastLog = log;
+        console.log("\n" + log + "\n");
+      }
+    }
   }
 
   return nativeAnimatedElement;
 };
+let lastLog = "";
 
 const createAnimated = () => {
   // Create wrapped view
@@ -133,10 +144,10 @@ const createAnimated = () => {
   return Animated.createAnimatedComponent(wrapper.type);
 };
 
-const getDebugBorder = (color: string) => ({}); //({ borderWidth: 1, borderColor: color});
+const getDebugBorder = (color: string) => ({});// ({ borderWidth: 1, borderColor: color});
 
-const getFixedAndroidRotation = (styles: Array<StyleSheet.NamedStyles>) => {
-  if(Platform.OS === 'ios') return styles;
+const getResolvedRotation = (styles: Array<StyleSheet.NamedStyles>) => {
+  // if(Platform.OS === 'ios') return styles;
   const stylesCopy = styles.filter(i => i).map(s => {
     if(!s) return null; 
     if(isNumber(s)) return s;
@@ -159,18 +170,18 @@ const getFixedAndroidRotation = (styles: Array<StyleSheet.NamedStyles>) => {
               outputRange: [ri.rotate.rotate, '0deg']});
 
         if(ri.rotate.rotateX && (typeof ri.rotate.rotateX) === 'string')
-        style.transform.find(t => Object.keys(t)[0] === 'rotateX').rotateX = 
-          a.interpolate({inputRange: [0, 1], 
-            outputRange: [ri.rotateX.rotateX, '0deg']});
+          style.transform.find(t => Object.keys(t)[0] === 'rotateX').rotateX = 
+            a.interpolate({inputRange: [0, 1], 
+              outputRange: [ri.rotateX.rotateX, '0deg']});
 
         if(ri.rotate.rotateY && (typeof ri.rotate.rotateY) === 'string')
-        style.transform.find(t => Object.keys(t)[0] === 'rotateY').rotateY =
-          a.interpolate({inputRange: [0, 1], 
-            outputRange: [ri.rotateY.rotateY, '0deg']});
+          style.transform.find(t => Object.keys(t)[0] === 'rotateY').rotateY =
+            a.interpolate({inputRange: [0, 1], 
+              outputRange: [ri.rotateY.rotateY, '0deg']});            
       }
     }    
   })
-
+  
   return stylesCopy;
 }
 
@@ -380,6 +391,11 @@ const includePropsForNativeStyles = [
   // 'borderBottomStartRadius',
   // 'borderBottomEndRadius',
   // 'borderStyle',
+  'shadowColor',
+  'shadowOffset',
+  'shadowOpacity',
+  'shadowRadius',
+  'elevation',
 ];
 
 const excludePropsForStyles = [

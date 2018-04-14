@@ -12,7 +12,7 @@ export default class TransitionItem {
   constructor(
     name: string, route: string, reactElement: Object,
     shared: boolean, appear: string, disappear: string, 
-    delay: boolean, modifiers: string
+    delay: boolean
   ) {
     this.name = name;
     this.route = route;
@@ -21,7 +21,6 @@ export default class TransitionItem {
     this.appear = appear;
     this.disappear = disappear;
     this.delay = delay;
-    this.modifiers = modifiers;
   }
 
   name: string
@@ -32,7 +31,6 @@ export default class TransitionItem {
   appear: string | Function
   disappear: string | Function
   delay: boolean
-  modifiers: string
   layoutReady: boolean
   flattenedStyle: ?any  
 
@@ -56,43 +54,83 @@ export default class TransitionItem {
 
   updateMetrics(viewMetrics: Metrics, itemMetrics: Metrics) {    
     const { x, y, width, height } = itemMetrics;
-    const t = this.getRotationRad();
+
+    const ri = this.getRotation();
+    const t = this.getRotationRad(ri);
     
     if(t !== 0) {
-      const rotWidth = Math.abs((1/(Math.pow(Math.cos(t),2)-Math.pow(Math.sin(t),2))) * 
+      
+      const rotWidth = ((1.0 / ((Math.pow(Math.cos(t), 2) - Math.pow(Math.sin(t), 2)))) * 
         (width * Math.cos(t) - height * Math.sin(t)));
 
-      const rotHeight = Math.abs((1/(Math.pow(Math.cos(t),2)-Math.pow(Math.sin(t),2))) * 
-        (- width * Math.sin(t) + height * Math.cos(t)));
-        
-      const diffWidth = (width - rotWidth) * 0.5;
-      const diffHeight = (height - rotHeight) * 0.5;
-      this.metrics = {
-        x: (x - viewMetrics.x) + diffWidth, 
-        y: (y - viewMetrics.y) + diffHeight, 
-        width: Platform.OS === 'ios' ? rotWidth : width, 
-        height: Platform.OS === 'ios' ? rotHeight : height,
-      };
-    } else {
-      this.metrics = {x: x - viewMetrics.x, y: y - viewMetrics.y, width, height };
-    }
-  }
+      const rotHeight = ((1.0 / ((Math.pow(Math.cos(t), 2) - Math.pow(Math.sin(t),2)))) * 
+        (-width * Math.sin(t) + height * Math.cos(t)));
 
-  getRotationRad() {
+      const cos = Math.cos(t*-1);
+      const sin = Math.sin(t*-1);
+      const cx = x + viewMetrics.x + (rotWidth/2);
+      const cy = y + viewMetrics.y + (rotHeight/2);
+      const nx = (cos * (x - cx)) + (sin * (y - cy)) + cx;
+      const ny = (cos * (y - cy)) - (sin * (x - cx)) + cy;
+        
+      if(Platform.OS === 'ios'){             
+        
+        const a = this.getRotationDeg(ri);
+        if((a > 90 && a < 180) || (a > 270 && a < 360)){
+          // TODO: Fix wrong calculations
+        }
+
+        const diffWidth = (width - Math.abs(rotWidth)) * 0.5;
+        const diffHeight = (height - Math.abs(rotHeight)) * 0.5;
+        
+        this.metrics = {
+          x: nx, 
+          y: ny, 
+          width: Math.abs(rotWidth), 
+          height: Math.abs(rotHeight),
+        };     
+
+      } else if(Platform.OS === 'android') {      
+        this.metrics = {
+          x: nx, 
+          y: ny,  
+          width, 
+          height,
+        };        
+      } 
+    } else {
+      this.metrics = {x: x - viewMetrics.x, y: y - viewMetrics.y, width, height };        
+    }
+  }  
+
+  getRotation() {
     const ri = getRotationFromStyle(this.getFlattenedStyle());
-    let retVal = 0;
-    if(ri.rotate && ri.rotate.rotate){
-      const rotation: String = ri.rotate.rotate;
-      if(rotation.endsWith('deg')){
-        let degrees = parseInt(rotation.substring(0, rotation.length-3));
-        if(degrees < 0) degrees = degrees * -1;
-        retVal = (degrees * Math.PI / 180);
-      } else if(rotation.endsWith('rad')) {
-        retVal = parseInt(rotation.substring(0, rotation.length-3));
+    let retVal = { type: 'unknown', value: 0};
+    if(ri.rotate) {      
+      if(ri.rotate.rotate){
+        const rotation: String = ri.rotate.rotate;
+        if(rotation.endsWith('deg')){
+          retVal = { type: 'deg', value: Math.abs(parseInt(rotation.substring(0, rotation.length-3)))};
+        } else if(rotation.endsWith('rad')) {
+          retVal = { type: 'rad', value: parseInt(rotation.substring(0, rotation.length-3))};
+        }
       }
     }
     return retVal;
   }
+
+  getRotationRad(ri) {
+    if(ri.type === 'deg') return this.getDegreesToRadians(ri.value);
+    return ri.value;
+  }
+
+  getRotationDeg(ri) {
+    if(ri.type === 'rad') return this.getRadiansToDegrees(ri.value);
+    return ri.value;
+  }
+
+  getDegreesToRadians = (degrees: number): number => degrees * Math.PI / 180;
+  getRadiansToDegrees = (rad: number): number => rad * 180/Math.PI;
 
   scaleRelativeTo(other: TransitionItem): Size {
     const validate = i => {
@@ -108,3 +146,4 @@ export default class TransitionItem {
     };
   }
 }
+

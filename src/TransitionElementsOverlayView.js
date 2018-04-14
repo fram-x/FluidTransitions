@@ -128,7 +128,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
 
       const style = [transitionStyle, styles.transitionElement];
       element = React.createElement(element.type, { ...element.props, key });
-      const comp = createAnimatedWrapper(element, style);
+      const comp = createAnimatedWrapper({component: element, nativeStyles: style});
 
       if (item.delay) {
         if (routeDirection === RouteDirection.from) {
@@ -275,6 +275,8 @@ const styles: StyleSheet.NamedStyles = StyleSheet.create({
     bottom: 0,
   },
   transitionElement: {
+    // borderColor: '#00F',
+    // borderWidth: 1,
     position: 'absolute',
     margin: 0,
     marginVertical: 0,

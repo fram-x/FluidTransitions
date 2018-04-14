@@ -108,17 +108,23 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
       const key = `so-${idx.toString()}`;
       const animationStyle = transitionStyles.styles;
       const nativeAnimationStyle = [transitionStyles.nativeStyles];
+      const overrideStyles = {
+        position: 'absolute',
+        left: fromItem.metrics.x,
+        top: fromItem.metrics.y,
+        width: fromItem.metrics.width,
+        height: fromItem.metrics.height,        
+      };
 
       element = React.createElement(element.type, { ...element.props, key });
-      return createAnimatedWrapper(
-        element, 
-        nativeAnimationStyle, 
-        animationStyle, 
-        styles.sharedElement,
-        null, 
-        null, 
-        true, 
-        "SE: " + fromItem.name + "/" + fromItem.route);
+      return createAnimatedWrapper({
+        component: element,
+        nativeStyles: nativeAnimationStyle,
+        styles: animationStyle,
+        overrideStyles,        
+        log: true,
+        logPrefix: "SE: " + fromItem.name + "/" + fromItem.route
+      });
     });
 
     return (
@@ -177,8 +183,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
       scaleX: toItem.scaleRelativeTo(fromItem).x,
       scaleY: toItem.scaleRelativeTo(fromItem).y,
       getInterpolation: this.getInterpolation,
-      dimensions: Dimensions.get('window'),
-      modifiers: fromItem.modifiers ? fromItem.modifiers : ""
+      dimensions: Dimensions.get('window'),      
     };
 
     const nativeStyles = [];
