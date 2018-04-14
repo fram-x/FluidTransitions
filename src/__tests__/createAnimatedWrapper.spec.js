@@ -42,6 +42,6 @@ describe('createAnimatedWrapper', () => {
 });
 
 const getClassTree = (component) => {
-  const MyComp = () => (createAnimatedWrapper(component));
+  const MyComp = () => (createAnimatedWrapper({ component }));
   return renderer.create(<MyComp />).toJSON();
 };
