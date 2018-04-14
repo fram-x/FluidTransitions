@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.4,
-    elevation: 7,
+    elevation: 17,
   },
   shoe1: {
     width: 350,
@@ -122,15 +122,15 @@ const Screen1 = (props) => (
         <Transition appear="left" shared="paper">
           <View style={styles.paper1} />
         </Transition>
-        {/*  <Transition appear="right" shared="image">
-          <Image style={styles.shoe1} source={require('./assets/air-jordan-1.png')} />
-        </Transition>
+        <Transition appear="right" shared="image">
+           <Image style={styles.shoe1} source={require('./assets/air-jordan-1.png')} />
+         </Transition>
         <Transition appear="horizontal">
           <View style={styles.headerContainer1}>
             <Text style={styles.header1}>THE TEN</Text>
             <Text style={styles.subHeader1}>AIR JORDAN 1</Text>
           </View>
-        </Transition> */}
+        </Transition>
       </View>
     </TouchableWithoutFeedback>
   </View>
@@ -142,7 +142,7 @@ const Screen2 = (props) => (
         <Transition shared="paper">
           <View style={styles.paper2} />
         </Transition>
-        {/* <Transition shared="image">
+        <Transition shared="image">
           <Image style={styles.shoe2} source={require('./assets/air-jordan-1.png')} />
         </Transition>
         <View style={styles.smallImageContainer}>
@@ -162,7 +162,7 @@ const Screen2 = (props) => (
             <Text style={styles.header2}>THE TEN</Text>
             <Text style={styles.subHeader2}>AIR JORDAN 1</Text>
           </View>
-        </Transition> */}
+        </Transition>
       </View>
     </TouchableWithoutFeedback>
   </View>
