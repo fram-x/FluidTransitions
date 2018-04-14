@@ -76,7 +76,7 @@ const Screen1 = (props) => (
       <Text>1.Screen</Text>
     </Transition>
     <View style={styles.screen1}>
-      <Transition shared="circle" modifiers="layout">
+      <Transition shared="circle">
         <View style={styles.circle1} />
       </Transition>
     </View>
@@ -107,7 +107,7 @@ const Screen2 = (props) => (
       <Text>2.Screen</Text>
     </Transition>
     <View style={styles.screen2}>
-      <Transition shared="circle" modifiers="layout">
+      <Transition shared="circle">
         <View style={styles.circle2} />
       </Transition>
     </View>
@@ -140,7 +140,7 @@ const Screen3 = (props) => (
       <Text>3.Screen</Text>
     </Transition>
     <View style={styles.screen3}>
-      <Transition shared="circle" modifiers="layout">
+      <Transition shared="circle">
         <View style={styles.circle3} />
       </Transition>
     </View>
