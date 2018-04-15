@@ -35,7 +35,7 @@ describe('getRotatedRect', () => {
     expect(valueToTest).toEqual(rect);
   });
 
-  it('returns original rect when rotation is 45', () => {
+  it('returns original rect when rotation is 45m the middle of quad 1', () => {
     const theta = degToRad(45);
     const rect = { x: 10, y: 10, width: 40, height: 40 };
     const boundingBox = getBoundingBox({ rect, theta });
@@ -51,7 +51,7 @@ describe('getRotatedRect', () => {
     expect(valueToTest).toEqual(rect);
   });
 
-  it('returns original rect when rotation is 135', () => {
+  it('returns original rect when rotation is 135, the middle of quad 2', () => {
     const theta = degToRad(135);
     const rect = { x: 100, y: 164, width: 100, height: 100 };
     const boundingBox = getBoundingBox({ rect, theta });
@@ -68,7 +68,7 @@ describe('getRotatedRect', () => {
   });
 
   it('returns original rect when rotation is 225', () => {
-    const theta = degToRad(225);
+    const theta = degToRad(179);
     const rect = { x: 100, y: 164, width: 100, height: 100 };
     const boundingBox = getBoundingBox({ rect, theta });
     const valueToTest = getOriginalRect({ boundingBox, theta });
@@ -76,7 +76,7 @@ describe('getRotatedRect', () => {
   });
 
   it('returns original rect when rotation is 270', () => {
-    const theta = degToRad(270);
+    const theta = degToRad(89);
     const rect = { x: 100, y: 164, width: 100, height: 100 };
     const boundingBox = getBoundingBox({ rect, theta });
     const valueToTest = getOriginalRect({ boundingBox, theta });
@@ -90,8 +90,8 @@ describe('rotatePoint', () => {
     const cx = rect.x + (rect.width / 2);
     const cy = rect.y + (rect.height / 2);
     const rotatedPoint = rotatePoint({ x: rect.x, y: rect.y, cx, cy, theta: degToRad(20) });
-    expect(rotatedPoint.x).toEqual(85.91436179442114);
-    expect(rotatedPoint.y).toEqual(184.116376126988);
+    expect(rotatedPoint.x.toNumber()).toEqual(85.91436179442114);
+    expect(rotatedPoint.y.toNumber()).toEqual(184.11637612698803);
   });
 });
 
@@ -99,22 +99,18 @@ describe('getBoundingBox', () => {
   it('returns correct bounding box for rect and rotation -20', () => {
     const rect = { x: 100, y: 164, width: 100, height: 100 };
     const bb = getBoundingBox({ rect, theta: degToRad(-20) });
-    expect(bb).toEqual({
-      x: 85.91436179442114,
-      y: 149.91436179442115,
-      width: 128.1712764111577,
-      height: 128.1712764111577,
-    });
+    expect(bb.x.toNumber()).toEqual(85.91436179442114);
+    expect(bb.y.toNumber()).toEqual(149.91436179442115);
+    expect(bb.width.toNumber()).toEqual(128.17127641115772);
+    expect(bb.height.toNumber()).toEqual(128.17127641115772);
   });
 
   it('returns correct bounding box for rect and rotation 45', () => {
     const rect = { x: 100, y: 164, width: 100, height: 100 };
     const bb = getBoundingBox({ rect, theta: degToRad(45) });
-    expect(bb).toEqual({
-      x: 79.28932188134524,
-      y: 143.28932188134524,
-      width: 141.4213562373095,
-      height: 141.4213562373095,
-    });
+    expect(bb.x.toNumber()).toEqual(79.28932188134524);
+    expect(bb.y.toNumber()).toEqual(143.28932188134524);
+    expect(bb.width.toNumber()).toEqual(141.4213562373095);
+    expect(bb.height.toNumber()).toEqual(141.4213562373095);
   });
 });
