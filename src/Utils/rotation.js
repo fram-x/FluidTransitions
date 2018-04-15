@@ -1,7 +1,6 @@
 
 import { Metrics } from './../Types/Metrics';
 
-export const useMathJS = false;
 const math = require('mathjs');
 
 math.config({ number: 'BigNumber' });
@@ -16,42 +15,6 @@ export const getOriginalRect = (params: GetOriginalRectParameters): Metrics => {
   }
 
   const { x, y, width, height } = params.boundingBox;
-
-  if (useMathJS) {
-    const bx = math.bignumber(x);
-    const by = math.bignumber(y);
-    const bwidth = math.bignumber(width);
-    const bheight = math.bignumber(height);
-
-    const cos = math.bignumber(math.cos(-params.theta));
-    const sin = math.bignumber(math.sin(-params.theta));
-
-    // Get rotated height/width
-    const a = math.divide(1, math.subtract(math.pow(cos, 2), math.pow(sin, 2)));
-    const nw = math.bignumber(math.multiply(a, math.subtract(
-      math.multiply(bwidth, cos),
-      math.multiply(bheight, sin),
-    )));
-
-    const nh = math.bignumber(math.multiply(a, math.add(
-      math.multiply(math.multiply(-1, bwidth), sin),
-      math.multiply(bheight, cos),
-    )));
-
-    const retVal = {
-      x: math.round(math.add(bx, math.multiply(
-        math.subtract(bwidth, math.abs(nw)),
-        0.5,
-      ))).toNumber(),
-      y: math.round(math.add(by, math.multiply(
-        math.subtract(bheight, math.abs(nh)),
-        0.5,
-      ))).toNumber(),
-      width: math.abs(math.round(nw)).toNumber(),
-      height: math.abs(math.round(nh)).toNumber(),
-    };
-    return retVal;
-  }
 
   const cos = Math.cos(-1 * params.theta);
   const sin = Math.sin(-1 * params.theta);
@@ -85,23 +48,6 @@ export type RotatePointParameters = {
 export const rotatePoint = (params: RotatePointParameters) => {
   const { x, y, cx, cy, theta } = params;
 
-  if (useMathJS) {
-    const cos = math.cos(theta);
-    const sin = math.sin(theta);
-
-    const nx = math.add(math.add(
-      math.multiply(cos, math.subtract(x, cx)),
-      math.multiply(sin, math.subtract(y, cy)),
-    ), cx);
-
-    const ny = math.add(math.subtract(
-      math.multiply(cos, math.subtract(y, cy)),
-      math.multiply(sin, math.subtract(x, cx)),
-    ), cy);
-
-    return { x: nx, y: ny };
-  }
-
   const cos = Math.cos(theta);
   const sin = Math.sin(theta);
 
@@ -127,19 +73,6 @@ export const getBoundingBox = (params: GetBoundingBoxParameters) => {
   const tr = rotatePoint({ x: x + width, y, cx, cy, theta });
   const br = rotatePoint({ x: x + width, y: y + height, cx, cy, theta });
 
-  if (useMathJS) {
-    const minX = math.min(tl.x, bl.x, tr.x, br.x);
-    const maxX = math.max(tl.x, bl.x, tr.x, br.x);
-    const minY = math.min(tl.y, bl.y, tr.y, br.y);
-    const maxY = math.max(tl.y, bl.y, tr.y, br.y);
-
-    return {
-      y: minY,
-      height: math.subtract(maxY, minY),
-      x: minX,
-      width: math.subtract(maxX, minX),
-    };
-  }
   const minX = Math.min(tl.x, bl.x, tr.x, br.x);
   const maxX = Math.max(tl.x, bl.x, tr.x, br.x);
   const minY = Math.min(tl.y, bl.y, tr.y, br.y);
@@ -153,8 +86,5 @@ export const getBoundingBox = (params: GetBoundingBoxParameters) => {
   };
 };
 
-export const degToRad = (deg: number): number =>
-  (useMathJS ? math.multiply(deg, math.divide(math.PI, 180)) : deg * Math.PI / 180);
-
-export const radToDeg = (rad: number): number =>
-  (useMathJS ? math.multiply(rad, math.divide(180, math.PI)) : rad * 180 / Math.PI);
+export const degToRad = (deg: number): number => deg * Math.PI / 180;
+export const radToDeg = (rad: number): number => rad * 180 / Math.PI;

@@ -26,11 +26,11 @@
   "homepage": "https://github.com/fram-x/FluidTransitions#readme",
   "peerDependencies": {
     "lodash": "*",
+    "mathjs": "^4.1.1",
     "prop-types": "*",
     "react": "*",
     "react-native": "*",
-    "react-navigation": "*",
-    "mathjs": "*"
+    "react-navigation": "*"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.2",
@@ -58,7 +58,7 @@
   "jest": {
     "preset": "react-native",
     "modulePathIgnorePatterns": [
-      "Examples/node_modules",    
+      "Examples/node_modules",
       ".vscode",
       "docs"
     ]
