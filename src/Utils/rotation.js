@@ -16,26 +16,31 @@ export const getOriginalRect = (params: GetOriginalRectParameters): Metrics => {
 
   const { x, y, width, height } = params.boundingBox;
 
-  const cos = Math.cos(-1 * params.theta);
-  const sin = Math.sin(-1 * params.theta);
+  const theta = (-1 * params.theta) % degToRad(360);
+  const cos = Math.cos(theta);
+  const sin = Math.sin(theta);
 
-  const cos2 = math.bignumber(math.cos(-params.theta));
-  const sin2 = math.bignumber(math.sin(-params.theta));
+  const cos2 = math.bignumber(math.cos(theta));
+  const sin2 = math.bignumber(math.sin(theta));
+
+  // Get rotated height/width - use mathjs to get precision
+  const a = math.divide(1, math.subtract(
+    math.pow(cos2, 2),
+    math.pow(sin2, 2),
+  )).toNumber();
 
   // Get rotated height/width
-  const a = math.divide(1, math.subtract(math.pow(cos2, 2), math.pow(sin2, 2))).toNumber();
-
-  // Get rotated height/width
-  // const a = (1 / (cos ** 2 - sin ** 2));
   const nw = a * (width * cos - height * sin);
   const nh = a * (-width * sin + height * cos);
 
-  return {
+  const retVal = {
     x: Math.round(x + (width - Math.abs(nw)) * 0.5),
     y: Math.round(y + (height - Math.abs(nh)) * 0.5),
     width: Math.abs(Math.round(nw)),
     height: Math.abs(Math.round(nh)),
   };
+
+  return retVal;
 };
 
 export type RotatePointParameters = {
@@ -79,10 +84,10 @@ export const getBoundingBox = (params: GetBoundingBoxParameters) => {
   const maxY = Math.max(tl.y, bl.y, tr.y, br.y);
 
   return {
-    y: minY,
-    height: maxY - minY,
     x: minX,
+    y: minY,
     width: maxX - minX,
+    height: maxY - minY,
   };
 };
 
