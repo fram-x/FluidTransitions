@@ -29,7 +29,8 @@
     "prop-types": "*",
     "react": "*",
     "react-native": "*",
-    "react-navigation": "*"
+    "react-navigation": "*",
+    "mathjs": "*"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.2",
@@ -57,7 +58,7 @@
   "jest": {
     "preset": "react-native",
     "modulePathIgnorePatterns": [
-      "<rootDir>/Examples/",
+      "Examples/node_modules",    
       ".vscode",
       "docs"
     ]
