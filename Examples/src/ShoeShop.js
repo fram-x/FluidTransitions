@@ -43,6 +43,7 @@ const styles = StyleSheet.create({
   header1: {
     color: '#FFF',
     fontSize: 80,
+    marginBottom: -14,
     fontFamily: 'Bebas Neue',
   },
   subHeader1: {
@@ -83,10 +84,11 @@ const styles = StyleSheet.create({
     fontSize: 42,
     textAlign: 'center',
     fontFamily: 'Bebas Neue',
+    marginBottom: -6,
   },
   subHeader2: {
     color: '#444',
-    fontSize: 14,
+    fontSize: 22,
     textAlign: 'center',
     fontFamily: 'Bebas Neue',
   },
