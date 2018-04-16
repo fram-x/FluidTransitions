@@ -16,7 +16,7 @@ export const getOriginalRect = (params: GetOriginalRectParameters): Metrics => {
 
   const { x, y, width, height } = params.boundingBox;
 
-  let theta = math.multiply(-1, params.theta);
+  let theta = math.multiply(-1, math.bignumber(params.theta));
   const bx = math.bignumber(x);
   const by = math.bignumber(y);
   const bwidth = math.bignumber(width);
@@ -57,19 +57,19 @@ export const getOriginalRect = (params: GetOriginalRectParameters): Metrics => {
     nh = math.multiply(a, math.subtract(ah, bh));
   }
 
-  console.log(`COS: ${cos.toNumber()}\n` +
-              `SIN: ${sin.toNumber()}\n` +
-              `A:   ${a.toNumber()}\n` +
-              `w:   ${bwidth.toNumber()}\n` +
-              `h:   ${bheight.toNumber()}\n` +
-              `aw:  ${aw.toNumber()}\n` +
-              `bw:  ${bw.toNumber()}\n` +
-              `ah:  ${ah.toNumber()}\n` +
-              `bh:  ${bh.toNumber()}\n` +
-              `nw:  ${nw.toNumber()}\n` +
-              `nh:  ${nh.toNumber()}\n` +
-              `qad: ${quad}\n` +
-              `is:  ${isEqual}`);
+  // console.log(`COS: ${cos.toNumber()}\n` +
+  //             `SIN: ${sin.toNumber()}\n` +
+  //             `A:   ${a.toNumber()}\n` +
+  //             `w:   ${bwidth.toNumber()}\n` +
+  //             `h:   ${bheight.toNumber()}\n` +
+  //             `aw:  ${aw.toNumber()}\n` +
+  //             `bw:  ${bw.toNumber()}\n` +
+  //             `ah:  ${ah.toNumber()}\n` +
+  //             `bh:  ${bh.toNumber()}\n` +
+  //             `nw:  ${nw.toNumber()}\n` +
+  //             `nh:  ${nh.toNumber()}\n` +
+  //             `qad: ${quad}\n` +
+  //             `is:  ${isEqual}`);
 
   const retVal = {
     x: math.round(math.add(bx, math.multiply(math.subtract(bwidth, math.abs(nw)), 0.5))),

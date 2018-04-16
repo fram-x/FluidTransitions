@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Platform } from 'react-native';
 import { Metrics } from './Types/Metrics';
-import { getRotationFromStyle } from './Utils';
+import { getRotationFromStyle, getOriginalRect } from './Utils';
 
 type Size = {
   x: number,
@@ -58,55 +58,18 @@ export default class TransitionItem {
     const ri = this.getRotation();
     const t = this.getRotationRad(ri);
     
-    if(t !== 0) {
-      
-      const rotWidth = ((1.0 / ((Math.pow(Math.cos(t), 2) - Math.pow(Math.sin(t), 2)))) * 
-        (width * Math.cos(t) - height * Math.sin(t)));
-
-      const rotHeight = ((1.0 / ((Math.pow(Math.cos(t), 2) - Math.pow(Math.sin(t),2)))) * 
-        (-width * Math.sin(t) + height * Math.cos(t)));
-
-      const cos = Math.cos(t*-1);
-      const sin = Math.sin(t*-1);
-      const cx = x + viewMetrics.x + (rotWidth/2);
-      const cy = y + viewMetrics.y + (rotHeight/2);
-      const nx = (cos * (x - cx)) + (sin * (y - cy)) + cx;
-      const ny = (cos * (y - cy)) - (sin * (x - cx)) + cy;
-        
-      if(Platform.OS === 'ios'){             
-        
-        const a = this.getRotationDeg(ri);
-        if((a > 90 && a < 180) || (a > 270 && a < 360)){
-          // TODO: Fix wrong calculations
-        }
-
-        const diffWidth = (width - Math.abs(rotWidth)) * 0.5;
-        const diffHeight = (height - Math.abs(rotHeight)) * 0.5;
-        
-        this.metrics = {
-          x: nx, 
-          y: ny, 
-          width: Math.abs(rotWidth), 
-          height: Math.abs(rotHeight),
-        };     
-
-      } else if(Platform.OS === 'android') {      
-        this.metrics = {
-          x: nx, 
-          y: ny,  
-          width, 
-          height,
-        };        
-      } 
+    if(t !== 0) {      
+      const r = getOriginalRect({ boundingBox: { x, y, width, height }, theta: t });
+      this.metrics = {x: r.x - viewMetrics.x, y: r.y - viewMetrics.y, width: r.width, height: r.height };        
     } else {
       this.metrics = {x: x - viewMetrics.x, y: y - viewMetrics.y, width, height };        
     }
 
-    console.log({ 
-      r: this.name + "/" + this.route,
-      org: { x: itemMetrics.x, y: itemMetrics.y, width: itemMetrics.width, height: itemMetrics.height},
-      new: { x: this.metrics.x, y: this.metrics.y, width: this.metrics.width, height: this.metrics.height}
-    });
+    // console.log({ 
+    //   r: this.name + "/" + this.route,
+    //   org: { x: itemMetrics.x, y: itemMetrics.y, width: itemMetrics.width, height: itemMetrics.height},
+    //   new: { x: this.metrics.x, y: this.metrics.y, width: this.metrics.width, height: this.metrics.height}
+    // });
   }  
 
   getRotation() {
