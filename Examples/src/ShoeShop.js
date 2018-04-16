@@ -33,21 +33,21 @@ const styles = StyleSheet.create({
     height: 240,
     position: 'absolute',
     left: Dimensions.get('window').width * 0.2,
-    top: Dimensions.get('window').height * 0.5 - 120,
+    top: Dimensions.get('window').height * 0.5 - 160,
     transform: [{ rotate: '35deg' }],
   },
   headerContainer1: {
     padding: 20,
-    paddingTop: Dimensions.get('window').height * 0.2,
+    paddingTop: Dimensions.get('window').height * 0.1,
   },
   header1: {
     color: '#FFF',
-    fontSize: 70,
+    fontSize: 80,
     fontFamily: 'Bebas Neue',
   },
   subHeader1: {
     color: '#FFF',
-    fontSize: 24,
+    fontSize: 34,
     fontFamily: 'Bebas Neue',
   },
   top2: {
