@@ -42,11 +42,13 @@ const styles = StyleSheet.create({
   },
   header1: {
     color: '#FFF',
-    fontSize: 60,
+    fontSize: 70,
+    fontFamily: 'Bebas Neue',
   },
   subHeader1: {
     color: '#FFF',
-    fontSize: 18,
+    fontSize: 24,
+    fontFamily: 'Bebas Neue',
   },
   top2: {
     backgroundColor: '#C14534',
@@ -80,11 +82,13 @@ const styles = StyleSheet.create({
     color: '#444',
     fontSize: 42,
     textAlign: 'center',
+    fontFamily: 'Bebas Neue',
   },
   subHeader2: {
     color: '#444',
     fontSize: 14,
     textAlign: 'center',
+    fontFamily: 'Bebas Neue',
   },
   smallImageContainer: {
     position: 'absolute',
@@ -123,8 +127,8 @@ const Screen1 = (props) => (
           <View style={styles.paper1} />
         </Transition>
         <Transition appear="right" shared="image">
-           <Image style={styles.shoe1} source={require('./assets/air-jordan-1.png')} />
-         </Transition>
+          <Image style={styles.shoe1} source={require('./assets/air-jordan-1.png')} />
+        </Transition>
         <Transition appear="horizontal">
           <View style={styles.headerContainer1}>
             <Text style={styles.header1}>THE TEN</Text>
