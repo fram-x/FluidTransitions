@@ -1,11 +1,58 @@
 import { getOriginalRect, rotatePoint, getBoundingBox, degToRad } from './../Utils/rotation';
 import { Metrics } from './../Types/Metrics';
 
-describe('getRotatedRect', () => {
+describe('getRotatedRect for Android', () => {
   it('returns original rect when rotation is 0', () => {
     const boundingBox = { x: 100, y: 100, width: 100, height: 100 };
     const valueToTest = getOriginalRect({ boundingBox, theta: 0 });
     expect(valueToTest).toBe(boundingBox);
+  });
+
+  it('returns original rect when rotation is 45', () => {
+    const theta = degToRad(45);
+    const boundingBox = { x: 150, y: 135.7142791748047, width: 100, height: 100 };
+    const valueToTest = getOriginalRect({ boundingBox, theta, skipWidth: true });
+    expect(valueToTest).toEqual({ x: 100, y: 156, width: 100, height: 100 });
+  });
+
+  it('returns original rect when rotation is 45', () => {
+    const theta = degToRad(45);
+    const p0 = rotatePoint({ x: 100, y: 156.28, cx: 150, cy: 156.28 + 50, theta: -theta });
+    const boundingBox = { x: p0.x.toNumber(), y: p0.y.toNumber(), width: 100, height: 100 };
+    const valueToTest = getOriginalRect({ boundingBox, theta, skipWidth: true });
+    expect(valueToTest).toEqual({ x: 100, y: 156, width: 100, height: 100 });
+  });
+
+  it('returns original rect when rotation is 90', () => {
+    const theta = degToRad(90);
+    const p0 = rotatePoint({ x: 100, y: 156.28, cx: 150, cy: 156.28 + 50, theta: -theta });
+    const boundingBox = { x: p0.x.toNumber(), y: p0.y.toNumber(), width: 100, height: 100 };
+    const valueToTest = getOriginalRect({ boundingBox, theta, skipWidth: true });
+    expect(valueToTest).toEqual({ x: 100, y: 156, width: 100, height: 100 });
+  });
+
+  it('returns original rect when rotation is 170', () => {
+    const theta = degToRad(170);
+    const p0 = rotatePoint({ x: 100, y: 156.28, cx: 150, cy: 156.28 + 50, theta: -theta });
+    const boundingBox = { x: p0.x.toNumber(), y: p0.y.toNumber(), width: 100, height: 100 };
+    const valueToTest = getOriginalRect({ boundingBox, theta, skipWidth: true });
+    expect(valueToTest).toEqual({ x: 100, y: 156, width: 100, height: 100 });
+  });
+
+  it('returns original rect when rotation is -20', () => {
+    const theta = degToRad(-20);
+    const p0 = rotatePoint({ x: 100, y: 156.28, cx: 150, cy: 156.28 + 50, theta: -theta });
+    const boundingBox = { x: p0.x.toNumber(), y: p0.y.toNumber(), width: 100, height: 100 };
+    const valueToTest = getOriginalRect({ boundingBox, theta, skipWidth: true });
+    expect(valueToTest).toEqual({ x: 100, y: 156, width: 100, height: 100 });
+  });
+});
+
+describe('getRotatedRect for iOS', () => {
+  it('returns original rect when rotation is 0', () => {
+    const boundingBox = { x: 100, y: 100, width: 100, height: 100 };
+    const valueToTest = getOriginalRect({ boundingBox, theta: 0 });
+    expect(valueToTest).toEqual(boundingBox);
   });
 
   it('returns original rect when rotation is -20', () => {

@@ -8,6 +8,8 @@ math.config({ number: 'BigNumber' });
 export type GetOriginalRectParameters = {
   boundingBox: Metrics, // Bounding box
   theta: number, // Original rotation in radians
+  skipWidth: ?Boolean // Should we perform the Android version of the rotation where
+                      // Width/Height is same (no bounding box, just x/y is set?)
 }
 export const getOriginalRect = (params: GetOriginalRectParameters): Metrics => {
   if (params.theta === 0) {
@@ -15,6 +17,18 @@ export const getOriginalRect = (params: GetOriginalRectParameters): Metrics => {
   }
 
   const { x, y, width, height } = params.boundingBox;
+
+  if (params.skipWidth) {
+    const cx = x + ((math.cos(params.theta) * width - math.sin(params.theta) * height) / 2);
+    const cy = y + ((math.sin(params.theta) * width + math.cos(params.theta) * height) / 2);
+    const p0 = rotatePoint({ x, y, cx, cy, theta: params.theta });
+    return {
+      x: math.round(p0.x).toNumber(),
+      y: math.round(p0.y).toNumber(),
+      width,
+      height,
+    };
+  }
 
   let theta = math.multiply(-1, math.bignumber(params.theta));
   const bx = math.bignumber(x);
