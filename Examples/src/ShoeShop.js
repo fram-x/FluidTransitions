@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.4,
-    elevation: 17,
+    // elevation: 17,
   },
   shoe1: {
     width: 350,
@@ -101,23 +101,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 50,
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-around',
     marginLeft: 80,
     marginRight: 80,
     margin: 30,
   },
   smallImageWrapper: {
-    width: 150,
-    height: 150,
+    width: Dimensions.get('window').width / 4,
+    height: Dimensions.get('window').width / 4,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#ECECEC',
-    marginLeft: 5,
-    marginRight: 5,
+
   },
   smallImage: {
-    width: 110,
-    height: 60,
+    width: 90,
+    height: 50,
   },
 });
 
