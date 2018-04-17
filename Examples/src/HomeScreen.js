@@ -3,9 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-nati
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+
   },
   buttonContainer: {
     alignSelf: 'stretch',
@@ -36,5 +34,6 @@ export default (props) => (
     <ItemButton backgroundColor="#DCDCDC" text="Layout Transitions" nav={props.navigation} target="layout" />
     <ItemButton backgroundColor="#AEAEAE" text="Onboarding Transitions" nav={props.navigation} target="onboarding" />
     <ItemButton backgroundColor="#AEAEAE" text="Shoe Shopping" nav={props.navigation} target="shoes" />
+    <ItemButton backgroundColor="#DEDEDE" text="FlatList" nav={props.navigation} target="flatlist" />
   </ScrollView>
 );
