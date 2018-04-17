@@ -14,6 +14,7 @@ import ImageTransition from './src/ImageTransition';
 import LayoutTransition from './src/LayoutTransition';
 import Onboarding from './src/Onboarding';
 import ShoeShop from './src/ShoeShop';
+import Playground from './src/Playground';
 
 const ExampleNavigator = StackNavigator({
   home: { screen: HomeScreen, navigationOptions: { title: 'Fluid Transitions' } },
