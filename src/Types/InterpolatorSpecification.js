@@ -14,7 +14,5 @@ export type InterpolatorSpecification = {
   scaleX: number,
   scaleY: number,
   dimensions: ScaledSize,
-  interpolation: AnimatedInterpolation,
-  nativeInterpolation: AnimatedInterpolation,
-  modifiers: string,
+  getInterpolation: (useNativeDriver) => AnimatedInterpolation,  
 }

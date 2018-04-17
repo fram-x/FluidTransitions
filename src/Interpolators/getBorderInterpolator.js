@@ -23,22 +23,24 @@ export const getBorderInterpolator = (spec: InterpolatorSpecification): StyleShe
   const borderBottomEndRadius = getStyleInterpolator("borderBottomEndRadius", 0, false, spec);
   
   return { 
-    borderWidth,
-    borderColor,
-    borderTopColor,
-    borderRightColor,
-    borderBottomColor,
-    borderLeftColor,
-    borderStartColor,
-    borderEndColor,
-    borderRadius,
-    borderTopLeftRadius,
-    borderTopRightRadius,
-    borderTopStartRadius, 
-    borderTopEndRadius,
-    borderBottomLeftRadius,
-    borderBottomRightRadius,
-    borderBottomStartRadius,
-    borderBottomEndRadius
+    animationStyles: {
+      borderWidth,
+      borderColor,
+      borderTopColor,
+      borderRightColor,
+      borderBottomColor,
+      borderLeftColor,
+      borderStartColor,
+      borderEndColor,
+      borderRadius,
+      borderTopLeftRadius,
+      borderTopRightRadius,
+      borderTopStartRadius, 
+      borderTopEndRadius,
+      borderBottomLeftRadius,
+      borderBottomRightRadius,
+      borderBottomStartRadius,
+      borderBottomEndRadius
+    }
   };
 }

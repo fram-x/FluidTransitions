@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node copyPackage.js && node node_modules/react-native/local-cli/cli.js start",
+    "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest"
   },
   "dependencies": {
@@ -12,7 +12,7 @@
     "react": "16.2.0",
     "react-native": "0.53.3",
     "react-navigation": "^1.1.1",
-    "react-navigation-fluid-transitions": "*"
+    "react-navigation-fluid-transitions": "../"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.2",

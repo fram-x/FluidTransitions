@@ -1,18 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { View, Animated, StyleSheet, findNodeHandle } from 'react-native';
+import { StyleSheet, Animated, findNodeHandle } from 'react-native';
 
 import TransitionItem from './TransitionItem';
 import { RouteDirection, NavigationDirection } from './Types';
 import * as Constants from './TransitionConstants';
-import { createAnimatedWrapper, createAnimated } from './createAnimatedWrapper';
+import { createAnimatedWrapper, createAnimated, getRotationFromStyle } from './Utils';
 
-const uniqueBaseId: string = `transitionCompId-${Date.now()}`;
+const uniqueBaseId: string = `tcid-${Date.now()}`;
 let uuidCount: number = 0;
 
 const styles = StyleSheet.create({
   transition: {
-    // backgroundColor: '#0000EF22',    
+    // backgroundColor: '#0000EF22',
+    // borderColor: '#FF0000',
+    // borderWidth: 1,
   },
 });
 
@@ -22,10 +24,10 @@ type TransitionProps = {
   shared: ?string,
   delay: ?boolean,
   children: Array<any>,
-  modifiers: ?string
+  modifiers: ?string,
 }
 
-class Transition extends React.PureComponent<TransitionProps> {  
+class Transition extends React.Component<TransitionProps> {
   static contextTypes = {
     register: PropTypes.func,
     unregister: PropTypes.func,
@@ -40,8 +42,7 @@ class Transition extends React.PureComponent<TransitionProps> {
   constructor(props: TransitionProps, context: any) {
     super(props, context);
     this._name = `${uniqueBaseId}-${uuidCount++}`;
-    this._animatedComponent = null;
-    this.setViewRef = this.setViewRef.bind(this);
+    this._animatedComponent = null;    
   }
 
   _name: string
@@ -49,6 +50,7 @@ class Transition extends React.PureComponent<TransitionProps> {
   _isMounted: boolean;
   _viewRef: any;
   _animatedComponent: any;
+  _outerAnimatedComponent: any;
 
   componentWillMount() {
     const { register } = this.context;
@@ -58,7 +60,7 @@ class Transition extends React.PureComponent<TransitionProps> {
         this._getName(), this.context.route,
         this, this.props.shared !== undefined, this.props.appear,
         this.props.disappear, this.props.delay !== undefined,
-        this.props.modifiers
+        this.props.modifiers,
       ));
     }
   }
@@ -89,22 +91,27 @@ class Transition extends React.PureComponent<TransitionProps> {
   }
 
   render() {
-    if(!this._animatedComponent)
-      this._animatedComponent = createAnimated();
-      
-    // Get child
     let element = React.Children.only(this.props.children);
     if (!element) { return null; }
 
-    const visibilityStyle = this.getVisibilityStyle();
-    const style = [visibilityStyle, styles.transition];
-    const key = this._getName() + "-"  + this._route;  
+    if (!this._animatedComponent) { this._animatedComponent = createAnimated(); }
+    if (!this._outerAnimatedComponent) { this._outerAnimatedComponent = createAnimated(); }
 
-    return createAnimatedWrapper(
-      element, key, style, this.setViewRef, this._animatedComponent);
+    const visibilityStyle = this.getVisibilityStyle();    
+    const key = `${this._getName()}-${this._route}`;
+
+    element = React.createElement(element.type, { ...element.props, key, ref: this.setViewRef });
+    return createAnimatedWrapper({
+      component: element,
+      nativeStyles: [visibilityStyle, styles.transition],
+      nativeCached: this._outerAnimatedComponent,
+      cached: this._animatedComponent,
+      log: true,
+      logPrefix: "TV " + this._getName() + "/" + this._route
+    });      
   }
-
-  setViewRef(ref: any) {
+  
+  setViewRef = (ref: any) => {
     this._viewRef = ref;
   }
 
@@ -123,7 +130,7 @@ class Transition extends React.PureComponent<TransitionProps> {
     const routeDirection = getDirectionForRoute(this._getName(), this._route);
     if (routeDirection === RouteDirection.unknown) return { opacity: 0 };
 
-    const inputRange = direction === NavigationDirection.forward ? 
+    const inputRange = direction === NavigationDirection.forward ?
       [index - 1, index] : [index, index + 1];
 
     const outputRange = routeDirection === RouteDirection.to ? [0, 1] : [1, 0];
@@ -139,9 +146,14 @@ class Transition extends React.PureComponent<TransitionProps> {
         };
       }
       return {};
-    } else if (this.props.appear === undefined) {
-      return {};
+    } else if (this.props.appear !== undefined || this.props.disappear !== undefined) {
+      return { opacity: visibilityProgress.interpolate({
+        inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_OUT,
+        outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE_ANIM_OUT,
+      }) };
     }
+    return {};
+
 
     return { opacity: visibilityProgress.interpolate({
       inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_OUT,

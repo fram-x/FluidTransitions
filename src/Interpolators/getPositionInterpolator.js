@@ -1,33 +1,25 @@
 import { StyleSheet } from 'react-native';
 import { InterpolatorSpecification } from './../Types/InterpolatorSpecification';
+import { IntepolatorResult } from './../Types/InterpolatorResult';
 
-export const getPositionInterpolator = (spec: InterpolatorSpecification): StyleSheet.NamedStyles => {
-  
-  const layout = spec.modifiers.indexOf("layout") > -1;
-  if(layout) {
-    const translateX = spec.nativeInterpolation.interpolate({
-      inputRange: [0, 1],
-      outputRange: [spec.from.metrics.x, spec.to.metrics.x],
-    });
-  
-    const translateY = spec.nativeInterpolation.interpolate({
-      inputRange: [0, 1],
-      outputRange: [spec.from.metrics.y, spec.to.metrics.y],
-    });
-  
-    return { transform: [{ translateX }, { translateY }]};
-  }
-  const translateX = spec.nativeInterpolation.interpolate({
+export const getPositionInterpolator = (spec: InterpolatorSpecification): StyleSheet.NamedStyles => {  
+  const nativeInterpolator = spec.getInterpolation(true);  
+  // Create Native interpolation  
+  const translateX = nativeInterpolator.interpolate({
     inputRange: [0, 1],
-    outputRange: [spec.from.metrics.x, spec.to.metrics.x +
+    outputRange: [0, (spec.to.metrics.x - spec.from.metrics.x) +
       spec.from.metrics.width / 2 * (spec.scaleX - 1)],
   });
 
-  const translateY = spec.nativeInterpolation.interpolate({
+  const translateY = nativeInterpolator.interpolate({
     inputRange: [0, 1],
-    outputRange: [spec.from.metrics.y, spec.to.metrics.y +
+    outputRange: [0, (spec.to.metrics.y - spec.from.metrics.y) +
       spec.from.metrics.height / 2 * (spec.scaleY - 1)],
   });
 
-  return { transform: [{ translateX }, { translateY }]};
+  return { nativeAnimationStyles: { 
+    width: spec.from.metrics.width, 
+    height: spec.from.metrics.height, 
+    transform: [{ translateX }, { translateY }]} 
+  };
 }

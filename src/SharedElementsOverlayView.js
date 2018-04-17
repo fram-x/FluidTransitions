@@ -3,8 +3,13 @@ import { View, Dimensions, AnimatedInterpolation, StyleSheet, Animated } from 'r
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
-import { createAnimatedWrapper } from './createAnimatedWrapper';
-import { TransitionContext, NavigationDirection, InterpolatorSpecification } from './Types';
+import { createAnimatedWrapper, createAnimated, mergeStyles } from './Utils';
+import {
+  TransitionContext,
+  NavigationDirection,
+  InterpolatorSpecification,
+  InterpolatorResult
+} from './Types';
 import {
   getScaleInterpolator,
   getRotationInterpolator,
@@ -15,7 +20,7 @@ import {
 
 type InterpolatorEntry = {
   name: string,
-  interpolatorFunction: Function
+  interpolatorFunction: (spec: InterpolatorSpecification) => InterpolatorResult,
 }
 
 const interpolators: Array<InterpolatorEntry> = [];
@@ -44,6 +49,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
   constructor(props: SharedElementsOverlayViewProps, context: TransitionContext) {
     super(props, context);
     this._isMounted = false;
+    this.getInterpolation = this.getInterpolation.bind(this);
   }
 
   _isMounted: boolean;
@@ -90,18 +96,35 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     }
 
     // console.log("RENDER SE " + this.props.sharedElements.length);
-
-    this.setupInterpolations();
+    this._interpolation = null;
+    this._nativeInterpolation = null;
 
     const self = this;
     const sharedElements = this.props.sharedElements.map((pair, idx) => {
       const { fromItem, toItem } = pair;
+      let element = React.Children.only(fromItem.reactElement.props.children);
       const transitionStyles = self.getTransitionStyle(fromItem, toItem);
 
-      const element = React.Children.only(fromItem.reactElement.props.children);
-      const key = "SharedOverlay-"  + idx.toString();
-      const style = [element.props.style, styles.sharedElement, transitionStyles];
-      return createAnimatedWrapper(element, key, style);
+      const key = `so-${idx.toString()}`;
+      const animationStyle = transitionStyles.styles;
+      const nativeAnimationStyle = [transitionStyles.nativeStyles];
+      const overrideStyles = {
+        position: 'absolute',
+        left: fromItem.metrics.x,
+        top: fromItem.metrics.y,
+        width: fromItem.metrics.width,
+        height: fromItem.metrics.height,        
+      };
+
+      element = React.createElement(element.type, { ...element.props, key });
+      return createAnimatedWrapper({
+        component: element,
+        nativeStyles: nativeAnimationStyle,
+        styles: animationStyle,
+        overrideStyles,        
+        log: true,
+        logPrefix: "SE: " + fromItem.name + "/" + fromItem.route
+      });
     });
 
     return (
@@ -111,24 +134,27 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     );
   }
 
-  setupInterpolations() {
+  getInterpolation (useNativeDriver: boolean) {
     const { getTransitionProgress, getIndex, getDirection } = this.context;
-    if(!getTransitionProgress || !getIndex || !getDirection ) return null;
+    if (!getTransitionProgress || !getIndex || !getDirection) return null;
 
     const index = getIndex();
-    const direction = getDirection();    
-    const inputRange = direction === NavigationDirection.forward ? 
+    const direction = getDirection();
+    const inputRange = direction === NavigationDirection.forward ?
       [index - 1, index] : [index, index + 1];
 
-    // TODO: Seems like it is illegal to combine both native and non-native for
-    // same element
-    this._interpolation = getTransitionProgress(false).interpolate({
-      inputRange, outputRange: [0, 1],
-    });
-    
-    this._nativeInterpolation = getTransitionProgress(false).interpolate({
-      inputRange, outputRange: [0, 1],
-    });
+    if(useNativeDriver && !this._nativeInterpolation) {
+      this._nativeInterpolation = getTransitionProgress(true).interpolate({
+        inputRange, outputRange: [0, 1],
+      });
+    } else if (!useNativeDriver && !this._interpolation){
+      this._interpolation = getTransitionProgress(false).interpolate({
+        inputRange, outputRange: [0, 1],
+      });
+    }
+
+    if(useNativeDriver) return this._nativeInterpolation;
+    return this._interpolation;
   }
 
   getMetricsReady(): boolean {
@@ -141,56 +167,49 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     }
     return false;
   }
-  
+
   getTransitionStyle(fromItem: TransitionItem, toItem: TransitionItem) {
-    
     const interpolatorInfo: InterpolatorSpecification = {
       from: {
         metrics: fromItem.metrics,
         style: fromItem.getFlattenedStyle(),
+        rotation: fromItem.rotation,
       },
       to: {
         metrics: toItem.metrics,
         style: toItem.getFlattenedStyle(),
+        rotation: toItem.rotation,
       },
       scaleX: toItem.scaleRelativeTo(fromItem).x,
       scaleY: toItem.scaleRelativeTo(fromItem).y,
-      interpolation: this._interpolation,
-      nativeInterpolation: this._nativeInterpolation,
-      dimensions: Dimensions.get('window'),
-      modifiers: fromItem.modifiers ? fromItem.modifiers : ""
+      getInterpolation: this.getInterpolation,
+      dimensions: Dimensions.get('window'),      
     };
 
+    const nativeStyles = [];
     const styles = [];
-    
+
+    const self = this;
     interpolators.forEach(interpolator => {
-      const style = interpolator.interpolatorFunction(interpolatorInfo);
-      if(style)
-        styles.push(style);
+      const interpolatorResult = interpolator.interpolatorFunction(interpolatorInfo);
+      if (interpolatorResult) {
+        if(interpolatorResult.nativeAnimationStyles)
+          nativeStyles.push(interpolatorResult.nativeAnimationStyles);
+        if(interpolatorResult.animationStyles)
+          styles.push(interpolatorResult.animationStyles);
+      }
     });
 
     return {
-      width: fromItem.metrics.width,
-      height: fromItem.metrics.height,
-      ...this.mergeStyles(styles)
+      nativeStyles: {
+        ...mergeStyles(nativeStyles),
+      },
+      styles: {
+        width: fromItem.metrics.width,
+        height: fromItem.metrics.height,
+        ...mergeStyles(styles),
+      }
     };
-  }
-
-  mergeStyles(styles: Array<any>): StyleSheet.NamedStyles {
-    const retVal = { transform: [] };
-    styles.forEach(s => {      
-      Object.keys(s).forEach(key => {
-        if(s[key] && s[key] instanceof Array){
-          const a = s[key];
-          if(!retVal[key]) retVal[key] = [];
-          a.forEach(i => retVal[key].push(i));
-        } else {
-          retVal[key] = s[key];
-        }
-      })
-    })
-
-    return retVal;
   }
 
   componentDidMount() {
@@ -218,7 +237,13 @@ const styles = StyleSheet.create({
   },
   sharedElement: {
     position: 'absolute',
-    // backgroundColor: '#FF000022',
+    // backgroundColor: '#00FF0022',
+    // borderColor: '#00FF00',
+    // borderWidth: 1,
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0,
     padding: 0,
     margin: 0,
   },

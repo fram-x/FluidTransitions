@@ -35,5 +35,6 @@ export default (props) => (
     <ItemButton backgroundColor="#BEBEBE" text="Image Transitions" nav={props.navigation} target="image" />
     <ItemButton backgroundColor="#DCDCDC" text="Layout Transitions" nav={props.navigation} target="layout" />
     <ItemButton backgroundColor="#AEAEAE" text="Onboarding Transitions" nav={props.navigation} target="onboarding" />
+    <ItemButton backgroundColor="#AEAEAE" text="Shoe Shopping" nav={props.navigation} target="shoes" />
   </ScrollView>
 );

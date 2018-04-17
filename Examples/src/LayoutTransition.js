@@ -15,11 +15,15 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flex: 1,
     justifyContent: 'flex-end',
+    backgroundColor: '#EDEDED',
+    marginBottom: 20,
   },
   buttonRotatedContainer: {
     flex: 1,
     justifyContent: 'flex-end',
-    transform: [{ rotate: '180deg' }],
+    transform: [{ rotate: '100deg' }],
+    backgroundColor: '#EDEDED',
+    marginBottom: 20,
   },
   textContainer: {
 

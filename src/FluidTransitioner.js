@@ -52,7 +52,7 @@ class FluidTransitioner extends React.Component<*> {
     return {
       route: this.props.navigation.state.routes[
         this.props.navigation.state.index].routeName,
-        onSceneReady: this._onSceneReady,
+      onSceneReady: this._onSceneReady,
       getTransitionConfig: this._getSceneTransitionConfiguration,
     };
   }
@@ -85,7 +85,7 @@ class FluidTransitioner extends React.Component<*> {
     if (this._layoutsReady && !this._scenes.find(sri => !sri.isMounted)) {
       if (this._scenesReadyResolveFunc) {
         this._scenesReadyResolveFunc();
-        
+
         this._scenesReadyPromise = new Promise(resolve =>
           this._scenesReadyResolveFunc = resolve);
       }
@@ -115,7 +115,7 @@ class FluidTransitioner extends React.Component<*> {
     }
     return {
       timing: Animated.timing,
-      duration: 550,
+      duration: 750,
       easing: Easing.inOut(Easing.poly(4)),
       ...this.props.transitionConfig,
       ...sceneTransitionConfig,
@@ -149,8 +149,8 @@ class FluidTransitioner extends React.Component<*> {
     );
   }
 
-  _renderScene(transitionProps, prevProps) {
-    const { position, scene } = transitionProps;
+  _renderScene(transitionProps) {
+    const { scene } = transitionProps;
     const { index } = scene;
     const navigation = this._getChildNavigation(scene);
     const Scene = this.props.router.getComponentForRouteName(scene.route.routeName);
