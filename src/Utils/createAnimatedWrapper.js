@@ -284,7 +284,7 @@ const excludePropsForComponent = [
   'paddingEnd',
   'position',
   'flexWrap',
-  'flex',
+  // 'flex',
   'flexGrow',
   'flexShrink',
   'flexBasis',
