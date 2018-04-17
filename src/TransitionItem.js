@@ -69,11 +69,11 @@ export default class TransitionItem {
       this.metrics = { x: x - viewMetrics.x, y: y - viewMetrics.y, width, height };
     }
 
-    console.log({
-      r: `${this.name}/${this.route}`,
-      org: { x: itemMetrics.x, y: itemMetrics.y, width: itemMetrics.width, height: itemMetrics.height },
-      new: { x: this.metrics.x, y: this.metrics.y, width: this.metrics.width, height: this.metrics.height },
-    });
+    // console.log({
+    //   r: `${this.name}/${this.route}`,
+    //   org: { x: itemMetrics.x, y: itemMetrics.y, width: itemMetrics.width, height: itemMetrics.height },
+    //   new: { x: this.metrics.x, y: this.metrics.y, width: this.metrics.width, height: this.metrics.height },
+    // });
   }
 
   getRotation() {
