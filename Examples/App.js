@@ -14,6 +14,7 @@ import ImageTransition from './src/ImageTransition';
 import LayoutTransition from './src/LayoutTransition';
 import Onboarding from './src/Onboarding';
 import ShoeShop from './src/ShoeShop';
+import FlatList from './src/FlatList';
 import Playground from './src/Playground';
 
 const ExampleNavigator = StackNavigator({
@@ -24,6 +25,7 @@ const ExampleNavigator = StackNavigator({
   layout: { screen: LayoutTransition },
   onboarding: { screen: Onboarding },
   shoes: { screen: ShoeShop },
+  flatlist: { screen: FlatList },
 });
 
 class MyApp extends React.Component<any> {
