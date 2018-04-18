@@ -1,10 +1,6 @@
 
 import { Metrics } from './../Types/Metrics';
 
-import math, { BigNumber } from 'mathjs';
-
-math.config({ number: 'BigNumber' });
-
 export type GetOriginalRectParameters = {
   boundingBox: Metrics, // Bounding box
   theta: number, // Original rotation in radians
@@ -19,79 +15,41 @@ export const getOriginalRect = (params: GetOriginalRectParameters): Metrics => {
   const { x, y, width, height } = params.boundingBox;
 
   if (params.skipWidth) {
-    const cx = x + ((math.cos(params.theta) * width - math.sin(params.theta) * height) / 2);
-    const cy = y + ((math.sin(params.theta) * width + math.cos(params.theta) * height) / 2);
+    const cx = x + ((Math.cos(params.theta) * width - Math.sin(params.theta) * height) / 2);
+    const cy = y + ((Math.sin(params.theta) * width + Math.cos(params.theta) * height) / 2);
     const p0 = rotatePoint({ x, y, cx, cy, theta: params.theta });
-    return {
-      x: math.round(p0.x).toNumber(),
-      y: math.round(p0.y).toNumber(),
-      width,
-      height,
-    };
+    return { x: Math.round(p0.x), y: Math.round(p0.y), width, height };
   }
 
-  let theta = math.multiply(-1, math.bignumber(params.theta));
-  const bx = math.bignumber(x);
-  const by = math.bignumber(y);
-  const bwidth = math.bignumber(width);
-  const bheight = math.bignumber(height);
+  let theta = -1 * params.theta;
+  let cos = Math.cos(theta);
+  let sin = Math.sin(theta);
 
-  let cos = math.bignumber(math.cos(theta));
-  let sin = math.bignumber(math.sin(theta));
-
-  const isEqual = math.equal(math.abs(cos), math.abs(sin));
-  if (isEqual) {
-    const small = degToRad(0.00000001);
-    theta = math.add(small, theta);
-    cos = math.bignumber(math.cos(theta));
-    sin = math.bignumber(math.sin(theta));
+  if (Math.abs(Math.abs(sin) - Math.abs(cos)) <= Number.EPSILON) {
+    theta = small + theta;
+    cos = Math.cos(theta);
+    sin = Math.sin(theta);
   }
 
   // Get rotated height/width
-  const quad = getQuadrant(theta.toNumber());
-  const a = math.divide(1, math.subtract(math.pow(cos, 2), math.pow(sin, 2)));
+  const quad = getQuadrant(theta);
+  const a = 1 / (cos ** 2 - sin ** 2);
 
-  const aw = math.multiply(math.multiply(1, bwidth), cos);
-  const bw = math.multiply(bheight, sin);
+  const aw = (1 * width) * cos;
+  const bw = (height * sin);
+  const nw = (quad === 0 || quad === 2) ? a * (aw - bw) : a * (aw + bw);
 
-  let nw: BigNumber;
-  if (quad === 0 || quad === 2) {
-    nw = math.multiply(a, math.subtract(aw, bw));
-  } else {
-    nw = math.multiply(a, math.add(aw, bw));
-  }
-
-  const ah = math.multiply(math.multiply(-1, bwidth), sin);
-  const bh = math.multiply(bheight, cos);
-
-  let nh: BigNumber;
-  if (quad === 0 || quad === 2) {
-    nh = math.multiply(a, math.add(ah, bh));
-  } else {
-    nh = math.multiply(a, math.subtract(ah, bh));
-  }
-
-  // console.log(`COS: ${cos.toNumber()}\n` +
-  //             `SIN: ${sin.toNumber()}\n` +
-  //             `A:   ${a.toNumber()}\n` +
-  //             `w:   ${bwidth.toNumber()}\n` +
-  //             `h:   ${bheight.toNumber()}\n` +
-  //             `aw:  ${aw.toNumber()}\n` +
-  //             `bw:  ${bw.toNumber()}\n` +
-  //             `ah:  ${ah.toNumber()}\n` +
-  //             `bh:  ${bh.toNumber()}\n` +
-  //             `nw:  ${nw.toNumber()}\n` +
-  //             `nh:  ${nh.toNumber()}\n` +
-  //             `qad: ${quad}\n` +
-  //             `is:  ${isEqual}`);
+  const ah = (-1 * width) * sin;
+  const bh = (height * cos);
+  const nh = (quad === 0 || quad === 2) ? a * (ah + bh) : a * (ah - bh);
 
   const retVal = {
-    x: math.round(math.add(bx, math.multiply(math.subtract(bwidth, math.abs(nw)), 0.5))),
-    y: math.round(math.add(by, math.multiply(math.subtract(bheight, math.abs(nh)), 0.5))),
-    width: math.abs(math.round(nw)),
-    height: math.abs(math.round(nh)),
+    x: Math.round(x + (width - Math.abs(nw)) * 0.5),
+    y: Math.round(y + (height - Math.abs(nh)) * 0.5),
+    width: Math.abs(Math.round(nw)),
+    height: Math.abs(Math.round(nh)),
   };
-  return getNumericRect(retVal);
+  return retVal;
 };
 
 export type RotatePointParameters = {
@@ -104,19 +62,10 @@ export type RotatePointParameters = {
 export const rotatePoint = (params: RotatePointParameters) => {
   const { x, y, cx, cy, theta } = params;
 
-  const cos = math.cos(math.bignumber(theta));
-  const sin = math.sin(math.bignumber(theta));
-
-  const nx = math.add(math.add(
-    math.multiply(cos, math.subtract(math.bignumber(x), math.bignumber(cx))),
-    math.multiply(sin, math.subtract(math.bignumber(y), math.bignumber(cy))),
-  ), math.bignumber(cx));
-
-  const ny = math.add(math.subtract(
-    math.multiply(cos, math.subtract(math.bignumber(y), math.bignumber(cy))),
-    math.multiply(sin, math.subtract(math.bignumber(x), math.bignumber(cx))),
-  ), math.bignumber(cy));
-
+  const cos = Math.cos(theta);
+  const sin = Math.sin(theta);
+  const nx = (cos * (x - cx)) + (sin * (y - cy)) + cx;
+  const ny = (cos * (y - cy)) - (sin * (x - cx)) + cy;
   return { x: nx, y: ny };
 };
 
@@ -136,20 +85,20 @@ export const getBoundingBox = (params: GetBoundingBoxParameters) => {
   const tr = rotatePoint({ x: x + width, y, cx, cy, theta });
   const br = rotatePoint({ x: x + width, y: y + height, cx, cy, theta });
 
-  const minX = math.min(tl.x, bl.x, tr.x, br.x);
-  const maxX = math.max(tl.x, bl.x, tr.x, br.x);
-  const minY = math.min(tl.y, bl.y, tr.y, br.y);
-  const maxY = math.max(tl.y, bl.y, tr.y, br.y);
+  const minX = Math.min(tl.x, bl.x, tr.x, br.x);
+  const maxX = Math.max(tl.x, bl.x, tr.x, br.x);
+  const minY = Math.min(tl.y, bl.y, tr.y, br.y);
+  const maxY = Math.max(tl.y, bl.y, tr.y, br.y);
 
   return {
     x: minX,
     y: minY,
-    width: math.subtract(maxX, minX),
-    height: math.subtract(maxY, minY),
+    width: maxX - minX,
+    height: maxY - minY,
   };
 };
 
-export const getQuadrant = (theta: number): number => {
+export const getQuadrant = (theta: number) => {
   const angle = theta * 180 / Math.PI;
   let normangle = angle % 360;
   if (normangle < 0) {
@@ -160,15 +109,10 @@ export const getQuadrant = (theta: number): number => {
   if (p > 0.25 && p <= 0.5) return 1;
   if (p > 0.5 && p <= 0.75) return 2;
   if (p > 0.75 && p <= 1) return 3;
+  return -1;
 };
 
-export const degToRad = (deg: number): number => math.multiply(deg, math.divide(math.PI, 180));
-export const radToDeg = (rad: number): number => math.multiply(rad, math.divide(180, math.PI));
+export const degToRad = (deg: number): number => deg * Math.PI / 180;
+export const radToDeg = (rad: number): number => rad * 180 / Math.PI;
 
-export const getNumericRect = (rect): Metrics => ({
-  x: rect.x.toNumber(),
-  y: rect.y.toNumber(),
-  width: rect.width.toNumber(),
-  height: rect.height.toNumber(),
-});
-
+const small = degToRad(0.00000001);
