@@ -25,14 +25,11 @@
   },
   "homepage": "https://github.com/fram-x/FluidTransitions#readme",
   "peerDependencies": {
-    "lodash": "*",    
+    "lodash": "*",
     "prop-types": "*",
     "react": "*",
     "react-native": "*",
     "react-navigation": "*"
-  },
-  "dependencies": {
-    "mathjs": "^4.1.1"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.2",
