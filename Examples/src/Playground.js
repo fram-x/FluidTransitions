@@ -58,9 +58,9 @@ export default class Playground extends Component {
 
   _nativeProgress: Animated;
   _progress: Animated;
-  _rotate: AnimatedInterpolation;
-  _translate: AnimatedInterpolation;
-  _background: AnimatedInterpolation;
+  _rotate: any;
+  _translate: any;
+  _background: any;
   _ref: any;
 
   animate = () => {
@@ -96,7 +96,7 @@ export default class Playground extends Component {
           <View style={styles.buttonContainer}>
             <Button title="Back" onPress={() => {}} />
           </View>
-            </View>)}
+        </View>)}
       </View>
     );
   }

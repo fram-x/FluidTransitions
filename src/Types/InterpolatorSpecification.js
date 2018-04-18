@@ -1,6 +1,4 @@
-import { AnimatedInterpolation, ScaledSize } from 'react-native';
 import { Metrics } from './Metrics';
-import { RouteDirection } from './Direction';
 
 export type InterpolatorSpecification = {
   from: {
@@ -13,6 +11,6 @@ export type InterpolatorSpecification = {
   },
   scaleX: number,
   scaleY: number,
-  dimensions: ScaledSize,
-  getInterpolation: (useNativeDriver) => AnimatedInterpolation,  
+  dimensions: any,
+  getInterpolation: (useNativeDriver: Boolean) => any,
 }
