@@ -18,7 +18,7 @@ describe('getRotatedRect for Android', () => {
   it('returns original rect when rotation is 45', () => {
     const theta = degToRad(45);
     const p0 = rotatePoint({ x: 100, y: 156.28, cx: 150, cy: 156.28 + 50, theta: -theta });
-    const boundingBox = { x: p0.x.toNumber(), y: p0.y.toNumber(), width: 100, height: 100 };
+    const boundingBox = { x: p0.x, y: p0.y, width: 100, height: 100 };
     const valueToTest = getOriginalRect({ boundingBox, theta, skipWidth: true });
     expect(valueToTest).toEqual({ x: 100, y: 156, width: 100, height: 100 });
   });
@@ -26,7 +26,7 @@ describe('getRotatedRect for Android', () => {
   it('returns original rect when rotation is 90', () => {
     const theta = degToRad(90);
     const p0 = rotatePoint({ x: 100, y: 156.28, cx: 150, cy: 156.28 + 50, theta: -theta });
-    const boundingBox = { x: p0.x.toNumber(), y: p0.y.toNumber(), width: 100, height: 100 };
+    const boundingBox = { x: p0.x, y: p0.y, width: 100, height: 100 };
     const valueToTest = getOriginalRect({ boundingBox, theta, skipWidth: true });
     expect(valueToTest).toEqual({ x: 100, y: 156, width: 100, height: 100 });
   });
@@ -34,7 +34,7 @@ describe('getRotatedRect for Android', () => {
   it('returns original rect when rotation is 170', () => {
     const theta = degToRad(170);
     const p0 = rotatePoint({ x: 100, y: 156.28, cx: 150, cy: 156.28 + 50, theta: -theta });
-    const boundingBox = { x: p0.x.toNumber(), y: p0.y.toNumber(), width: 100, height: 100 };
+    const boundingBox = { x: p0.x, y: p0.y, width: 100, height: 100 };
     const valueToTest = getOriginalRect({ boundingBox, theta, skipWidth: true });
     expect(valueToTest).toEqual({ x: 100, y: 156, width: 100, height: 100 });
   });
@@ -42,7 +42,7 @@ describe('getRotatedRect for Android', () => {
   it('returns original rect when rotation is -20', () => {
     const theta = degToRad(-20);
     const p0 = rotatePoint({ x: 100, y: 156.28, cx: 150, cy: 156.28 + 50, theta: -theta });
-    const boundingBox = { x: p0.x.toNumber(), y: p0.y.toNumber(), width: 100, height: 100 };
+    const boundingBox = { x: p0.x, y: p0.y, width: 100, height: 100 };
     const valueToTest = getOriginalRect({ boundingBox, theta, skipWidth: true });
     expect(valueToTest).toEqual({ x: 100, y: 156, width: 100, height: 100 });
   });
@@ -137,8 +137,8 @@ describe('rotatePoint', () => {
     const cx = rect.x + (rect.width / 2);
     const cy = rect.y + (rect.height / 2);
     const rotatedPoint = rotatePoint({ x: rect.x, y: rect.y, cx, cy, theta: degToRad(20) });
-    expect(rotatedPoint.x.toNumber()).toEqual(85.91436179442114);
-    expect(rotatedPoint.y.toNumber()).toEqual(184.11637612698803);
+    expect(rotatedPoint.x).toEqual(85.91436179442114);
+    expect(rotatedPoint.y).toEqual(184.116376126988);
   });
 });
 
@@ -146,18 +146,18 @@ describe('getBoundingBox', () => {
   it('returns correct bounding box for rect and rotation -20', () => {
     const rect = { x: 100, y: 164, width: 100, height: 100 };
     const bb = getBoundingBox({ rect, theta: degToRad(-20) });
-    expect(bb.x.toNumber()).toEqual(85.91436179442114);
-    expect(bb.y.toNumber()).toEqual(149.91436179442115);
-    expect(bb.width.toNumber()).toEqual(128.17127641115772);
-    expect(bb.height.toNumber()).toEqual(128.17127641115772);
+    expect(bb.x).toEqual(85.91436179442114);
+    expect(bb.y).toEqual(149.91436179442115);
+    expect(bb.width).toEqual(128.1712764111577);
+    expect(bb.height).toEqual(128.1712764111577);
   });
 
   it('returns correct bounding box for rect and rotation 45', () => {
     const rect = { x: 100, y: 164, width: 100, height: 100 };
     const bb = getBoundingBox({ rect, theta: degToRad(45) });
-    expect(bb.x.toNumber()).toEqual(79.28932188134524);
-    expect(bb.y.toNumber()).toEqual(143.28932188134524);
-    expect(bb.width.toNumber()).toEqual(141.4213562373095);
-    expect(bb.height.toNumber()).toEqual(141.4213562373095);
+    expect(bb.x).toEqual(79.28932188134524);
+    expect(bb.y).toEqual(143.28932188134524);
+    expect(bb.width).toEqual(141.4213562373095);
+    expect(bb.height).toEqual(141.4213562373095);
   });
 });
