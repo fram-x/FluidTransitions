@@ -1,1 +1,9 @@
 Examples/
+.babelrc
+.eslintrc
+docs
+.vscode
+.flowconfig
+copyPackage.js
+yarn.lock
+package-lock.json
