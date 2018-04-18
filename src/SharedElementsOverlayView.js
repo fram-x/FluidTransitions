@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Dimensions, AnimatedInterpolation, StyleSheet, Animated } from 'react-native';
+import { View, Dimensions, StyleSheet, Animated } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
@@ -8,7 +8,7 @@ import {
   TransitionContext,
   NavigationDirection,
   InterpolatorSpecification,
-  InterpolatorResult
+  InterpolatorResult,
 } from './Types';
 import {
   getScaleInterpolator,
@@ -53,8 +53,8 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
   }
 
   _isMounted: boolean;
-  _nativeInterpolation: AnimatedInterpolation;
-  _interpolation: AnimatedInterpolation;
+  _nativeInterpolation: any;
+  _interpolation: any;
 
   shouldComponentUpdate(nextProps) {
     if (!nextProps.fromRoute && !nextProps.toRoute) {
@@ -113,7 +113,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
         left: fromItem.metrics.x,
         top: fromItem.metrics.y,
         width: fromItem.metrics.width,
-        height: fromItem.metrics.height,        
+        height: fromItem.metrics.height,
       };
 
       element = React.createElement(element.type, { ...element.props, key });
@@ -121,9 +121,9 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
         component: element,
         nativeStyles: nativeAnimationStyle,
         styles: animationStyle,
-        overrideStyles,        
+        overrideStyles,
         log: true,
-        logPrefix: "SE: " + fromItem.name + "/" + fromItem.route
+        logPrefix: 'SE: ' + fromItem.name + '/' + fromItem.route,
       });
     });
 
@@ -134,7 +134,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     );
   }
 
-  getInterpolation (useNativeDriver: boolean) {
+  getInterpolation(useNativeDriver: boolean) {
     const { getTransitionProgress, getIndex, getDirection } = this.context;
     if (!getTransitionProgress || !getIndex || !getDirection) return null;
 
@@ -143,17 +143,17 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     const inputRange = direction === NavigationDirection.forward ?
       [index - 1, index] : [index, index + 1];
 
-    if(useNativeDriver && !this._nativeInterpolation) {
+    if (useNativeDriver && !this._nativeInterpolation) {
       this._nativeInterpolation = getTransitionProgress(true).interpolate({
         inputRange, outputRange: [0, 1],
       });
-    } else if (!useNativeDriver && !this._interpolation){
+    } else if (!useNativeDriver && !this._interpolation) {
       this._interpolation = getTransitionProgress(false).interpolate({
         inputRange, outputRange: [0, 1],
       });
     }
 
-    if(useNativeDriver) return this._nativeInterpolation;
+    if (useNativeDriver) return this._nativeInterpolation;
     return this._interpolation;
   }
 
@@ -183,7 +183,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
       scaleX: toItem.scaleRelativeTo(fromItem).x,
       scaleY: toItem.scaleRelativeTo(fromItem).y,
       getInterpolation: this.getInterpolation,
-      dimensions: Dimensions.get('window'),      
+      dimensions: Dimensions.get('window'),
     };
 
     const nativeStyles = [];
@@ -193,10 +193,10 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     interpolators.forEach(interpolator => {
       const interpolatorResult = interpolator.interpolatorFunction(interpolatorInfo);
       if (interpolatorResult) {
-        if(interpolatorResult.nativeAnimationStyles)
-          nativeStyles.push(interpolatorResult.nativeAnimationStyles);
-        if(interpolatorResult.animationStyles)
-          styles.push(interpolatorResult.animationStyles);
+        if (interpolatorResult.nativeAnimationStyles)
+          {nativeStyles.push(interpolatorResult.nativeAnimationStyles);}
+        if (interpolatorResult.animationStyles)
+          {styles.push(interpolatorResult.animationStyles);}
       }
     });
 
@@ -208,7 +208,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
         width: fromItem.metrics.width,
         height: fromItem.metrics.height,
         ...mergeStyles(styles),
-      }
+      },
     };
   }
 
