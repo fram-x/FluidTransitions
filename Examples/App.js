@@ -13,6 +13,9 @@ import AppearingElements from './src/AppearingElements';
 import ImageTransition from './src/ImageTransition';
 import LayoutTransition from './src/LayoutTransition';
 import Onboarding from './src/Onboarding';
+import ShoeShop from './src/ShoeShop';
+import FlatList from './src/FlatList';
+import Playground from './src/Playground';
 
 const ExampleNavigator = StackNavigator({
   home: { screen: HomeScreen, navigationOptions: { title: 'Fluid Transitions' } },
@@ -21,6 +24,8 @@ const ExampleNavigator = StackNavigator({
   image: { screen: ImageTransition },
   layout: { screen: LayoutTransition },
   onboarding: { screen: Onboarding },
+  shoes: { screen: ShoeShop },
+  flatlist: { screen: FlatList },
 });
 
 class MyApp extends React.Component<any> {

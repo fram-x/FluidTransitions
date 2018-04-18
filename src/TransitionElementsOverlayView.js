@@ -3,8 +3,13 @@ import { View, StyleSheet, Animated, Dimensions } from 'react-native';
 import PropTypes from 'prop-types';
 
 import TransitionItem from './TransitionItem';
-import { createAnimatedWrapper } from './createAnimatedWrapper';
-import { TransitionContext, RouteDirection, NavigationDirection, TransitionSpecification } from './Types';
+import { createAnimatedWrapper, createAnimated, mergeStyles, getRotationFromStyle } from './Utils';
+import {
+  TransitionContext,
+  RouteDirection,
+  NavigationDirection,
+  TransitionSpecification,
+} from './Types';
 import {
   getScaleTransition,
   getTopTransition,
@@ -16,22 +21,8 @@ import {
   getFlipTransition,
 }
   from './Transitions';
-import * as Constants from './TransitionConstants';
 
-const styles: StyleSheet.NamedStyles = StyleSheet.create({
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  transitionElement: {
-    position: 'absolute',
-    // backgroundColor: '#00FF0022',
-    margin: 0,
-  },
-});
+import * as Constants from './TransitionConstants';
 
 type TransitionEntry = {
   name: string,
@@ -97,9 +88,9 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
   }
 
   render() {
-    const { getDirectionForRoute, getDirection } = this.context;
+    const { getDirectionForRoute, getDirection, getRoutes } = this.context;
     if (!this.props.transitionElements || !this.getMetricsReady() ||
-      !getDirectionForRoute || !getDirection) {
+      !getDirectionForRoute || !getDirection || !getRoutes) {
       // console.log("RENDER TE empty");
       return <View style={styles.overlay} pointerEvents="none" />;
     }
@@ -123,17 +114,21 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     const delayToFactor = -1;
 
     const transitionViews = transitionElements.map((item, idx) => {
-      const routeDirection = getDirectionForRoute(item.name, item.route);  
-      const element = React.Children.only(item.reactElement.props.children);
-      const key = "TransitionOverlay-"  + idx.toString();
-      const style = [this.getPositionStyle(
+      const routeDirection = getDirectionForRoute(item.name, item.route);
+      let element = React.Children.only(item.reactElement.props.children);
+      const key = `ti-${idx.toString()}`;
+      
+      const transitionStyle = this.getPositionStyle(
         item, routeDirection === RouteDirection.from ?
           delayCountFrom + 1 : delayCountTo + 1,
         routeDirection === RouteDirection.from ?
           delayIndexFrom : delayIndexTo,
-      ), styles.transitionElement];
+        navDirection
+      );
 
-      const comp =  createAnimatedWrapper(element, key, style);
+      const style = [transitionStyle, styles.transitionElement];
+      element = React.createElement(element.type, { ...element.props, key });
+      const comp = createAnimatedWrapper({component: element, nativeStyles: style});
 
       if (item.delay) {
         if (routeDirection === RouteDirection.from) {
@@ -152,27 +147,27 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     );
   }
 
-  getPositionStyle(item: TransitionItem, delayCount: number, delayIndex: number) {
+  getPositionStyle(item: TransitionItem, delayCount: number, delayIndex: number, direction: NavigationDirection) {
     return {
       left: item.metrics.x,
       top: item.metrics.y,
       width: item.metrics.width,
-      height: item.metrics.height, 
-      ...this.getTransitionStyle(item, delayCount, delayIndex)           
+      height: item.metrics.height,
+      ...this.getTransitionStyle(item, delayCount, delayIndex, direction),
     };
   }
 
-  getTransitionStyle(item: TransitionItem, delayCount: number, delayIndex: number) {
+  getTransitionStyle(item: TransitionItem, delayCount: number, delayIndex: number, direction: NavigationDirection) {
     const { getTransitionProgress, getDirectionForRoute,
-      getIndex, getDirection } = this.context;
+      getIndex, getRoutes } = this.context;
 
-    if (!getTransitionProgress || !getDirectionForRoute ||
-      !getIndex || !getDirection) { return {}; }
+    if (!getTransitionProgress || !getDirectionForRoute || !getIndex || !getRoutes) { return {}; }
 
-    const index = getIndex();
-    const direction = getDirection();
+    const index = getIndex();    
     const routeDirection = getDirectionForRoute(item.name, item.route);
-    const progress = getTransitionProgress(item.name, item.route);
+    const progress = getTransitionProgress();
+    const routes = getRoutes();
+
     if (progress) {
       const transitionFunction = this.getTransitionFunction(item, routeDirection);
       if (transitionFunction) {
@@ -180,8 +175,11 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
         let start = Constants.TRANSITION_PROGRESS_START;
         let end = Constants.TRANSITION_PROGRESS_END;
 
-        const distance = (1.0 - (Constants.TRANSITION_PROGRESS_START +
-          (1.0 - Constants.TRANSITION_PROGRESS_END))) * 0.5;
+        let distance = routes.length > 1 ? 
+          (1.0 - (Constants.TRANSITION_PROGRESS_START +
+          (1.0 - Constants.TRANSITION_PROGRESS_END))) * 0.5 : 
+          (1.0 - (Constants.TRANSITION_PROGRESS_START +
+          (1.0 - Constants.TRANSITION_PROGRESS_END)));
 
         if (item.delay) {
           // Start/stop in delay window
@@ -191,12 +189,12 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
           } else {
             end -= (delayStep * delayIndex);
           }
-        } else {
+        } else if (routes.length > 1) {
           // Start/stop first/last half of transition
-          if (routeDirection === RouteDirection.from) {
-            end -= distance;
-          } else {
+          if (routeDirection === RouteDirection.to) {
             start += distance;
+          } else {
+            end -= distance;
           }
         }
 
@@ -264,7 +262,32 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     getDirectionForRoute: PropTypes.func,
     getDirection: PropTypes.func,
     getIndex: PropTypes.func,
+    getRoutes: PropTypes.func,
   }
 }
+
+const styles: StyleSheet.NamedStyles = StyleSheet.create({
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  transitionElement: {
+    // borderColor: '#00F',
+    // borderWidth: 1,
+    position: 'absolute',
+    margin: 0,
+    marginVertical: 0,
+    marginHorizontal: 0,
+    marginTop: 0,
+    marginBottom: 0,
+    marginLeft: 0,
+    marginRight: 0,
+    marginStart: 0,
+    marginEnd: 0,
+  },
+});
 
 export default TransitionElementsOverlayView;

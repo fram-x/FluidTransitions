@@ -41,14 +41,14 @@ class TransitionOverlayView extends React.Component<TransitionOverlayViewProps> 
   render() {
     return (
       <Animated.View style={[styles.overlay, this.getVisibilityStyle()]} pointerEvents="none">
-        <TransitionElementsOverlayView
-          transitionElements={this.props.transitionElements}
+        <SharedElementsOverlayView
+          sharedElements={this.props.sharedElements}
           direction={this.props.direction}
           fromRoute={this.props.fromRoute}
           toRoute={this.props.toRoute}
         />
-        <SharedElementsOverlayView
-          sharedElements={this.props.sharedElements}
+        <TransitionElementsOverlayView
+          transitionElements={this.props.transitionElements}
           direction={this.props.direction}
           fromRoute={this.props.fromRoute}
           toRoute={this.props.toRoute}

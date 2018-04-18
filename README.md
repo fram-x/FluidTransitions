@@ -6,13 +6,19 @@
 <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
 
 ## Introduction
-This project aims to implement a simple yet powerful set of constructs for building fluid transitions between elements when navigating with [React Navigation](https://reactnavigation.org). The library is JavaScript only - no linking required.
+This project aims to implement a simple yet powerful set of constructs for building fluid transitions between elements when navigating with [React Navigation](https://reactnavigation.org). 
 
-<img src="https://github.com/fram-x/FluidTransitions/blob/develop/docs/example.gif" width="240">
+The library is JavaScript only - no linking required.
+
+<a href="https://snack.expo.io/@chrfalch/fluid-transitions-demo"><img src="https://github.com/fram-x/FluidTransitions/raw/develop/docs/example.gif" alt="Snack" width="240"></a>
+<a href="https://snack.expo.io/@chrfalch/onboarding-example"><img src="https://github.com/fram-x/FluidTransitions/raw/develop/docs/final.gif" alt="Snack" width="200"></a>
 
 The library implements a new navigator component called `FluidNavigator` with the same interface and routing configuration as the `StackNavigator`. The library has a component called `Transition` which can be used to build different types of transitions that will automatically be run when navigating between screens using the regular navigation actions.
 
 > The Navigator's API is identical to the StackNavigator except that it does not support a header component. It can easily be integrated with redux and your existing navigation setups.
+
+See Medium article:
+<https://medium.com/@christian.falch/fluid-transitions-with-react-navigation-a049d2f71494>
 
 ## Installation
 
@@ -89,7 +95,7 @@ The `Transition` element supports appear and disappear transitions (appear will 
 </Transition>
 ```
 
-#### Transitions
+#### Transition Types
 
 | Name        | Description | 
 | ----------  | ------------- | 
@@ -122,10 +128,11 @@ myCustomTransitionFunction = (transitionInfo) => {
 
 Read more about the parameters and functionality for building [custom transitions](./docs/CustomTransition.md).
 
-#### Delay
-Each transition can be delayed by setting the delay property. This will cause the transition to be started a little bit later than the previous one to give the impression that elements appear in sequence.
+### API
 
-### Technical
-This libraries uses native animations on both Android and iOS to get full 60 fps performance. Custom transitions trying to animate properties that are not supported by the native animation driver will not work.
+[FluidNavigator](./docs/FluidNavigator.md)  
 
-> Some of the concepts in the library builds on ideas from [@lintonye](https://github.com/lintonye)'s pull request and suggestion found here: [Shared element transition #941](https://github.com/react-navigation/react-navigation/pull/941).
+[Transition](./docs/Transition.md)
+
+### Credit
+Some of the concepts in the library builds on ideas from [@lintonye](https://github.com/lintonye)'s pull request and suggestion found here: [Shared element transition #941](https://github.com/react-navigation/react-navigation/pull/941).

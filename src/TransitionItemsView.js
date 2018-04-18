@@ -47,6 +47,7 @@ export default class TransitionItemsView extends React.Component<
       direction: NavigationDirection.Unknown,
       sharedElements: null,
       transitionElements: null,
+      index: -1,
     };
 
     this._transitionItems = new TransitionItems();
@@ -55,6 +56,9 @@ export default class TransitionItemsView extends React.Component<
     // props.progress.addListener(console.log);
 
     this.getIsPartOfSharedTransition = this.getIsPartOfSharedTransition.bind(this);
+    this.getTransitionProgress = this.getTransitionProgress.bind(this);
+    this.getRoutes = this.getRoutes.bind(this);
+    this._interactionDonePromise = new Promise(resolve => this._interactionDonePromiseDone = resolve);
   }
 
   _viewRef: ?View;
@@ -62,6 +66,9 @@ export default class TransitionItemsView extends React.Component<
   _transitionItems: TransitionItems;
   _isMounted: boolean;
   _transitionProgress: Animated.Value;
+  _nonNativeTransitionProgress: Animated.Value;
+  _interactionDonePromise: Promise;
+  _interactionDonePromiseDone: Function;
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.toRoute !== this.props.toRoute ||
@@ -121,6 +128,23 @@ export default class TransitionItemsView extends React.Component<
     return RouteDirection.unknown;
   }
 
+  getTransitionProgress = (useNative = true) => {
+    if(useNative) return this._transitionProgress;
+    
+    if(!this._nonNativeTransitionProgress) {
+      this._nonNativeTransitionProgress = new Animated.Value(-1);
+      this._nonNativeTransitionProgress.dada = 'non native';
+      this._transitionProgress.addListener(Animated.event([{
+        value: this._nonNativeTransitionProgress }],
+        { useNativeDriver: false }));
+    }
+    return this._nonNativeTransitionProgress;    
+  }
+
+  getRoutes() {
+    return [this.state.fromRoute, this.state.toRoute].filter(r => r !== null);
+  }
+
   getIsPartOfSharedTransition(name: string, route: string) {
     const item = this._transitionItems.getItemByNameAndRoute(name, route);
     if (!item || !item.shared) return false;
@@ -176,7 +200,7 @@ export default class TransitionItemsView extends React.Component<
 
     await new Promise(resolve => {
       UIManager.measureInWindow(nodeHandle, (x, y, width, height) => {
-        item.metrics = { x: x - viewMetrics.x, y: y - viewMetrics.y, width, height };
+        item.updateMetrics(viewMetrics, { x, y, width, height });
         resolve();
       });
     });
@@ -194,7 +218,11 @@ export default class TransitionItemsView extends React.Component<
       let sharedElements = this._transitionItems.getSharedElements(this.state.fromRoute, this.state.toRoute);
       let transitionElements = this._transitionItems.getTransitionElements(this.state.fromRoute, this.state.toRoute);
 
+      await this._interactionDonePromise;
       await this.measureItems(sharedElements, transitionElements);
+
+      // Update visibility style based on calculation by re-rendering all transition elements.
+      this._transitionItems.getItems().forEach(item => item.reactElement.forceUpdate());
 
       if (!sharedElements.find(p => !p.fromItem.metrics || !p.toItem.metrics) &&
         !transitionElements.find(i => !i.metrics)) {
@@ -249,9 +277,8 @@ export default class TransitionItemsView extends React.Component<
 
   componentDidMount() {
     this._isMounted = true;
-    InteractionManager.runAfterInteractions(async () => {
-      this.updateFromProps({ ...this.props, index: -1 });
-    });
+    this.updateFromProps({ ...this.props, index: -1 });
+    InteractionManager.runAfterInteractions(this._interactionDonePromiseDone);
   }
 
   componentWillUnmount() {
@@ -266,6 +293,7 @@ export default class TransitionItemsView extends React.Component<
     getDirection: PropTypes.func,
     getIndex: PropTypes.func,
     getIsPartOfSharedTransition: PropTypes.func,
+    getRoutes: PropTypes.func,
   }
 
   static contextTypes = {
@@ -276,12 +304,13 @@ export default class TransitionItemsView extends React.Component<
     return {
       register: (item) => this._transitionItems.add(item),
       unregister: (name, route) => this._transitionItems.remove(name, route),
-      getTransitionProgress: () => this._transitionProgress,
+      getTransitionProgress: this.getTransitionProgress,
       getDirectionForRoute: this.getDirectionForRoute.bind(this),
       getIndex: () => this.state.index,
       getDirection: () => (this.state.direction ?
         this.state.direction : NavigationDirection.unknown),
       getIsPartOfSharedTransition: this.getIsPartOfSharedTransition,
+      getRoutes: this.getRoutes
     };
   }
 }
@@ -289,5 +318,6 @@ export default class TransitionItemsView extends React.Component<
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    overflow: 'hidden'
   },
 });
