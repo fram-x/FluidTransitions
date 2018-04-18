@@ -221,6 +221,9 @@ export default class TransitionItemsView extends React.Component<
       await this._interactionDonePromise;
       await this.measureItems(sharedElements, transitionElements);
 
+      // Update visibility style based on calculation by re-rendering all transition elements.
+      this._transitionItems.getItems().forEach(item => item.reactElement.forceUpdate());
+
       if (!sharedElements.find(p => !p.fromItem.metrics || !p.toItem.metrics) &&
         !transitionElements.find(i => !i.metrics)) {
         // HACK: Setting state in componentDidUpdate is not nice - but

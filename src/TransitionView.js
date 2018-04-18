@@ -99,7 +99,7 @@ class Transition extends React.Component<TransitionProps> {
 
     const visibilityStyle = this.getVisibilityStyle();    
     const key = `${this._getName()}-${this._route}`;
-
+    
     element = React.createElement(element.type, { ...element.props, key, ref: this.setViewRef });
     return createAnimatedWrapper({
       component: element,
@@ -108,7 +108,7 @@ class Transition extends React.Component<TransitionProps> {
       cached: this._animatedComponent,
       log: true,
       logPrefix: "TV " + this._getName() + "/" + this._route
-    });      
+    });
   }
   
   setViewRef = (ref: any) => {
