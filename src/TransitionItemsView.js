@@ -47,6 +47,7 @@ export default class TransitionItemsView extends React.Component<
       direction: NavigationDirection.Unknown,
       sharedElements: null,
       transitionElements: null,
+      index: -1,
     };
 
     this._transitionItems = new TransitionItems();
@@ -57,6 +58,7 @@ export default class TransitionItemsView extends React.Component<
     this.getIsPartOfSharedTransition = this.getIsPartOfSharedTransition.bind(this);
     this.getTransitionProgress = this.getTransitionProgress.bind(this);
     this.getRoutes = this.getRoutes.bind(this);
+    this._interactionDonePromise = new Promise(resolve => this._interactionDonePromiseDone = resolve);
   }
 
   _viewRef: ?View;
@@ -65,6 +67,8 @@ export default class TransitionItemsView extends React.Component<
   _isMounted: boolean;
   _transitionProgress: Animated.Value;
   _nonNativeTransitionProgress: Animated.Value;
+  _interactionDonePromise: Promise;
+  _interactionDonePromiseDone: Function;
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.toRoute !== this.props.toRoute ||
@@ -214,6 +218,7 @@ export default class TransitionItemsView extends React.Component<
       let sharedElements = this._transitionItems.getSharedElements(this.state.fromRoute, this.state.toRoute);
       let transitionElements = this._transitionItems.getTransitionElements(this.state.fromRoute, this.state.toRoute);
 
+      await this._interactionDonePromise;
       await this.measureItems(sharedElements, transitionElements);
 
       if (!sharedElements.find(p => !p.fromItem.metrics || !p.toItem.metrics) &&
@@ -269,9 +274,8 @@ export default class TransitionItemsView extends React.Component<
 
   componentDidMount() {
     this._isMounted = true;
-    InteractionManager.runAfterInteractions(async () => {
-      this.updateFromProps({ ...this.props, index: -1 });
-    });
+    this.updateFromProps({ ...this.props, index: -1 });
+    InteractionManager.runAfterInteractions(this._interactionDonePromiseDone);
   }
 
   componentWillUnmount() {
