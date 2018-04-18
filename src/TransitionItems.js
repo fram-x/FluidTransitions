@@ -30,6 +30,9 @@ export default class TransitionItems {
     return false;
   }
 
+  getItems() {
+    return this._items;
+  }
   getRoutes() {
     const routes = [];
     for (let i = 0; i < this._items.length; i++) {
