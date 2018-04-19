@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Platform } from 'react-native';
 import { Metrics } from './Types/Metrics';
-import { getRotationFromStyle, getOriginalRect } from './Utils';
+import { getRotationFromStyle, getBoundingBox, getOriginalRect } from './Utils';
 
 type Size = {
   x: number,
@@ -33,6 +33,7 @@ export default class TransitionItem {
   delay: boolean
   layoutReady: boolean
   flattenedStyle: ?any
+  boundingBoxMetrics: Metrics
 
   getNodeHandle() {
     return this.reactElement.getNodeHandle();
@@ -64,15 +65,20 @@ export default class TransitionItem {
         theta: t,
         skipWidth: Platform.OS !== 'ios',
       });
+
       this.metrics = {
         x: r.x - viewMetrics.x,
         y: r.y - viewMetrics.y,
         width: r.width,
         height: r.height,
       };
+
+      this.boundingBoxMetrics = getBoundingBox({ rect: this.metrics, theta: t});
+
     } else {
       this.metrics = { x: x - viewMetrics.x, y: y - viewMetrics.y, width, height };
-    }
+      this.boundingBoxMetrics = this.metrics;
+    }    
   }
 
   getRotation() {
