@@ -11,6 +11,7 @@ export default (routeConfigMap, stackConfig = {}) => {
     onTransitionStart,
     onTransitionEnd,
     navigationOptions,
+    style,
   } = stackConfig;
 
   const stackRouterConfig = {
@@ -26,6 +27,7 @@ export default (routeConfigMap, stackConfig = {}) => {
   const navigator = createNavigator(router, routeConfigMap, stackConfig)(props => (
     <FluidTransitioner
       {...props}
+      style={stackConfig.style}
       transitionConfig={transitionConfig}
       onTransitionStart={onTransitionStart}
       onTransitionEnd={() => {
