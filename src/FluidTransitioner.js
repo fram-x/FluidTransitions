@@ -138,6 +138,7 @@ class FluidTransitioner extends React.Component<*> {
     return (
       <TransitionItemsView
         navigation={this.props.navigation}
+        style={this.props.style}
         progress={props.position}
         fromRoute={fromRoute}
         toRoute={toRoute}
@@ -244,7 +245,7 @@ const styles = StyleSheet.create({
   },
   scene: {
     position: 'absolute',
-    backgroundColor: '#FFF',
+    backgroundColor: 'transparent',
     top: 0,
     left: 0,
     right: 0,
