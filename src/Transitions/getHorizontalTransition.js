@@ -4,8 +4,8 @@ export const getHorizontalTransition = (transitionInfo: TransitionSpecification)
   if (!transitionInfo || transitionInfo.metrics === undefined)
     return {};
 
-  const { start, end, metrics, dimensions } = transitionInfo;
-  const { x, width } = metrics;
+  const { start, end, boundingbox, dimensions } = transitionInfo;
+  const { x, width } = boundingbox;
 
   let startPosition = 0;
   let endPosition = 0;

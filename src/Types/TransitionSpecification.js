@@ -11,6 +11,7 @@ export type TransitionSpecification = {
   progress: Animated.Value,
   direction: RouteDirection,
   metrics: Metrics,
+  boundingbox: Metrics,
   name: string,
   route: string,
   start: number,

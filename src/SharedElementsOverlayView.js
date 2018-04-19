@@ -172,12 +172,14 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     const interpolatorInfo: InterpolatorSpecification = {
       from: {
         metrics: fromItem.metrics,
+        boundingbox: fromItem.boundingBoxMetrics,
         style: fromItem.getFlattenedStyle(),
         rotation: fromItem.rotation,
       },
       to: {
         metrics: toItem.metrics,
         style: toItem.getFlattenedStyle(),
+        boundingbox: toItem.boundingBoxMetrics,
         rotation: toItem.rotation,
       },
       scaleX: toItem.scaleRelativeTo(fromItem).x,
