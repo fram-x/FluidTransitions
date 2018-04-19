@@ -3,11 +3,15 @@ import { Metrics } from './Metrics';
 export type InterpolatorSpecification = {
   from: {
     metrics: Metrics,
+    boundingbox: Metrics,
     style: any,
+    rotation: number,
   },
   to: {
     metrics: Metrics,
+    boundingbox: Metrics,
     style: any,
+    rotation: number,
   },
   scaleX: number,
   scaleY: number,

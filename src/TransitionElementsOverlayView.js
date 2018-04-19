@@ -209,6 +209,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
           name: item.name,
           route: item.route,
           metrics: item.metrics,
+          boundingbox: item.boundingBoxMetrics,
           direction: routeDirection,
           dimensions: Dimensions.get('window'),
           start,

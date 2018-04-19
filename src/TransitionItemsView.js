@@ -31,6 +31,7 @@ type Props = {
   toRoute: string,
   index: ?number,
   navigation: any,
+  style: StyleSheet.NamedStyles,
   onLayout: (evt: any) => void,
 }
 
@@ -97,13 +98,13 @@ export default class TransitionItemsView extends React.Component<
 
   render() {
     return (
-      <View 
-        style={styles.container} 
+      <View
+        style={[styles.container, this.props.style]}
         ref={(ref) => this._viewRef = ref}
-        collapsable={false} 
+        collapsable={false}
       >
         {this.props.children}
-        <TransitionOverlayView                  
+        <TransitionOverlayView
           direction={this.state.direction}
           fromRoute={this.state.fromRoute}
           toRoute={this.state.toRoute}
@@ -130,7 +131,7 @@ export default class TransitionItemsView extends React.Component<
 
   getTransitionProgress = (useNative = true) => {
     if(useNative) return this._transitionProgress;
-    
+
     if(!this._nonNativeTransitionProgress) {
       this._nonNativeTransitionProgress = new Animated.Value(-1);
       this._nonNativeTransitionProgress.dada = 'non native';
@@ -138,7 +139,7 @@ export default class TransitionItemsView extends React.Component<
         value: this._nonNativeTransitionProgress }],
         { useNativeDriver: false }));
     }
-    return this._nonNativeTransitionProgress;    
+    return this._nonNativeTransitionProgress;
   }
 
   getRoutes() {
@@ -222,6 +223,7 @@ export default class TransitionItemsView extends React.Component<
       await this.measureItems(sharedElements, transitionElements);
 
       // Update visibility style based on calculation by re-rendering all transition elements.
+      // Ref, https://github.com/fram-x/FluidTransitions/issues/8
       this._transitionItems.getItems().forEach(item => item.reactElement.forceUpdate());
 
       if (!sharedElements.find(p => !p.fromItem.metrics || !p.toItem.metrics) &&
@@ -318,6 +320,6 @@ export default class TransitionItemsView extends React.Component<
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    overflow: 'hidden'
+    overflow: 'hidden',
   },
 });

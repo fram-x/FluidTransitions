@@ -4,8 +4,8 @@ export const getTopTransition = (transitionSpecification: TransitionSpecificatio
   if(!transitionSpecification || transitionSpecification.metrics === undefined)
     return { };
 
-  const { start, end, metrics, dimensions } = transitionSpecification;
-  const { y, height } = metrics;
+  const { start, end, boundingbox, dimensions } = transitionSpecification;
+  const { y, height } = boundingbox;
   const distanceValue = -(height + y + 25);		
   const progress = transitionSpecification.progress.interpolate({
     inputRange: [0, start, end, 1],
