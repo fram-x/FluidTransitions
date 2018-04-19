@@ -176,7 +176,7 @@ const Screen2 = (props) => (
 const Navigator = FluidNavigator({
   screen1: { screen: Screen1 },
   screen2: { screen: Screen2 },
-});
+}, { style: { backgroundColor: '#C14534' } });
 
 export default () => (
   <Navigator />
