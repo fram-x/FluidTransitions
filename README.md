@@ -10,7 +10,7 @@ This project aims to implement a simple yet powerful set of constructs for build
 
 The library is JavaScript only - no linking required.
 
-<img src="https://github.com/fram-x/FluidTransitions/raw/develop/docs/example.gif" alt="Snack" width="240">
+<img src="https://github.com/fram-x/FluidTransitions/raw/develop/docs/example.gif" width="200">
 <a href="https://snack.expo.io/@chrfalch/onboarding-example"><img src="https://github.com/fram-x/FluidTransitions/raw/develop/docs/final.gif" alt="Snack" width="200"></a>
 
 The library implements a new navigator component called `FluidNavigator` with the same interface and routing configuration as the `StackNavigator`. The library has a component called `Transition` which can be used to build different types of transitions that will automatically be run when navigating between screens using the regular navigation actions.
