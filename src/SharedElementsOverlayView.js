@@ -10,32 +10,10 @@ import {
   InterpolatorSpecification,
   InterpolatorResult,
 } from './Types';
-import {
-  getScaleInterpolator,
-  getRotationInterpolator,
-  getPositionInterpolator,
-  getBackgroundInterpolator,
-  getBorderInterpolator,
-} from './Interpolators';
 
-type InterpolatorEntry = {
-  name: string,
-  interpolatorFunction: (spec: InterpolatorSpecification) => InterpolatorResult,
-}
+import { initInterpolatorTypes, getInterpolatorTypes } from './Interpolators';
 
-const interpolators: Array<InterpolatorEntry> = [];
-
-// This function can be called to register other transition functions
-export function registerInterpolator(name: string, interpolatorFunction: Function): InterpolatorEntry {
-  interpolators.push({ name, interpolatorFunction });
-}
-
-registerInterpolator('background', getBackgroundInterpolator);
-registerInterpolator('borderRadius', getBorderInterpolator);
-registerInterpolator('position', getPositionInterpolator);
-registerInterpolator('scale', getScaleInterpolator);
-registerInterpolator('rotation', getRotationInterpolator);
-
+initInterpolatorTypes();
 
 type SharedElementsOverlayViewProps = {
   fromRoute: string,
@@ -192,7 +170,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     const styles = [];
 
     const self = this;
-    interpolators.forEach(interpolator => {
+    getInterpolatorTypes().forEach(interpolator => {
       const interpolatorResult = interpolator.interpolatorFunction(interpolatorInfo);
       if (interpolatorResult) {
         if (interpolatorResult.nativeAnimationStyles)

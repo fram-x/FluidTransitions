@@ -1,5 +1,6 @@
-export * from './getPositionInterpolator';
-export * from './getScaleInterpolator';
-export * from './getRotationInterpolator';
-export * from './getBackgroundInterpolator';
-export * from './getBorderInterpolator';
+export { 
+  initInterpolatorTypes, 
+  registerInterpolatorType, 
+  getInterpolatorTypes
+}
+from './InterpolatorTypes';

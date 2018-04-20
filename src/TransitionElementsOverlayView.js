@@ -10,40 +10,11 @@ import {
   NavigationDirection,
   TransitionSpecification,
 } from './Types';
-import {
-  getScaleTransition,
-  getTopTransition,
-  getBottomTransition,
-  getLeftTransition,
-  getRightTransition,
-  getHorizontalTransition,
-  getVerticalTransition,
-  getFlipTransition,
-}
-  from './Transitions';
 
+import { initTransitionTypes, getTransitionType } from './Transitions';
 import * as Constants from './TransitionConstants';
 
-type TransitionEntry = {
-  name: string,
-  transitionFunction: Function
-}
-
-const transitionTypes: Array<TransitionEntry> = [];
-
-// This function can be called to register other transition functions
-export function registerTransitionType(name: string, transitionFunction: Function): TransitionEntry {
-  transitionTypes.push({ name, transitionFunction });
-}
-
-registerTransitionType('scale', getScaleTransition);
-registerTransitionType('top', getTopTransition);
-registerTransitionType('bottom', getBottomTransition);
-registerTransitionType('left', getLeftTransition);
-registerTransitionType('right', getRightTransition);
-registerTransitionType('horizontal', getHorizontalTransition);
-registerTransitionType('vertical', getVerticalTransition);
-registerTransitionType('flip', getFlipTransition);
+initTransitionTypes();
 
 type TransitionElementsOverlayViewProps = {
   fromRoute: string,
@@ -225,8 +196,7 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
   getTransitionFunction(item: TransitionItem, routeDirection: RouteDirection) {
     const getTransition = (transition: string | Function) => {
       if (transition instanceof Function) { return transition; }
-      const transitionType = transitionTypes.find(e => e.name === transition);
-      if (transitionType) return transitionType.transitionFunction;
+      return getTransitionType(transition);
     };
 
     if (routeDirection === RouteDirection.to && item.appear) {
