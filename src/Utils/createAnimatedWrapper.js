@@ -110,6 +110,7 @@ const createAnimatedWrapper = (params: Parameters) => {
   };
 
   // Copy some key properties
+  if (params.component.props.__index) { props = { ...props, index: params.component.props.__index }; }
   if (params.component.key) { props = { ...props, key: params.component.key }; }
   if (params.component.ref) { props = { ...props, ref: params.component.ref }; }
   if (params.component.onLayout) { props = { ...props, onLayout: params.component.onLayout }; }

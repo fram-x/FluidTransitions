@@ -12,7 +12,7 @@ export default class TransitionItem {
   constructor(
     name: string, route: string, reactElement: Object,
     shared: boolean, appear: string, disappear: string,
-    delay: boolean,
+    delay: boolean, index: number,
   ) {
     this.name = name;
     this.route = route;
@@ -21,6 +21,7 @@ export default class TransitionItem {
     this.appear = appear;
     this.disappear = disappear;
     this.delay = delay;
+    this.index = index;
   }
 
   name: string
@@ -34,6 +35,7 @@ export default class TransitionItem {
   layoutReady: boolean
   flattenedStyle: ?any
   boundingBoxMetrics: Metrics
+  index: number
 
   getNodeHandle() {
     return this.reactElement.getNodeHandle();
@@ -57,7 +59,7 @@ export default class TransitionItem {
     const { x, y, width, height } = itemMetrics;
 
     const ri = this.getRotation();
-    const t = this.getRotationRad(ri);
+    const t = getRotationRad(ri);
 
     if (t !== 0) {
       const r = getOriginalRect({
@@ -97,19 +99,6 @@ export default class TransitionItem {
     return retVal;
   }
 
-  getRotationRad(ri) {
-    if (ri.type === 'deg') return this.getDegreesToRadians(ri.value);
-    return ri.value;
-  }
-
-  getRotationDeg(ri) {
-    if (ri.type === 'rad') return this.getRadiansToDegrees(ri.value);
-    return ri.value;
-  }
-
-  getDegreesToRadians = (degrees: number): number => degrees * Math.PI / 180;
-  getRadiansToDegrees = (rad: number): number => rad * 180 / Math.PI;
-
   scaleRelativeTo(other: TransitionItem): Size {
     const validate = i => {
       if (!i.metrics) {
@@ -122,6 +111,19 @@ export default class TransitionItem {
       x: this.metrics.width / other.metrics.width,
       y: this.metrics.height / other.metrics.height,
     };
-  }
+  }  
 }
+
+const getRotationRad = (ri) => {
+  if (ri.type === 'deg') return getDegreesToRadians(ri.value);
+  return ri.value;
+}
+
+const getRotationDeg = (ri) => {
+  if (ri.type === 'rad') return getRadiansToDegrees(ri.value);
+  return ri.value;
+}
+
+const getDegreesToRadians = (degrees: number): number => degrees * Math.PI / 180;
+const getRadiansToDegrees = (rad: number): number => rad * 180 / Math.PI;
 
