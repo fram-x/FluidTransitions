@@ -136,3 +136,6 @@ Read more about the parameters and functionality for building [custom transition
 
 ### Credit
 Some of the concepts in the library builds on ideas from [@lintonye](https://github.com/lintonye)'s pull request and suggestion found here: [Shared element transition #941](https://github.com/react-navigation/react-navigation/pull/941).
+
+### Contributors
+Christian Falch (@chrfalch), Yuuki Arisawa (@uk-ar), Joe Goodall (@joegoodall1)
