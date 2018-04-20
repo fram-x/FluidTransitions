@@ -16,7 +16,7 @@ const getSharedElements = (sharedElements: Array<any>, getInterpolationFunction:
   
   return sharedElements.map((pair, idx) => {
     const { fromItem, toItem } = pair;
-    let element = React.Children.only(fromItem.reactElement.props.children);
+    const element = React.Children.only(fromItem.reactElement.props.children);
     const transitionStyles = getTransitionStyle(fromItem, toItem, getInterpolationFunction);
 
     const key = `so-${idx.toString()}`;
@@ -30,9 +30,10 @@ const getSharedElements = (sharedElements: Array<any>, getInterpolationFunction:
       height: fromItem.metrics.height,
     };
 
-    element = React.createElement(element.type, { ...element.props, key });
+    const props = { ...element.props, __index: toItem.index };
+    const component = React.createElement(element.type, { ...props, key });
     return createAnimatedWrapper({
-      component: element,
+      component,
       nativeStyles: nativeAnimationStyle,
       styles: animationStyle,
       overrideStyles,

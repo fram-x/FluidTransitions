@@ -27,7 +27,8 @@ const getTransitionElements = (transitionElements: Array<TransitionItem>, transi
     );
 
     const style = [transitionStyle, styles.transitionElement];
-    element = React.createElement(element.type, { ...element.props, key });
+    const props = { ...element.props, __index: item.index };
+    element = React.createElement(element.type, { ...props, key });
     const comp = createAnimatedWrapper({component: element, nativeStyles: style});
 
     if (item.delay) {

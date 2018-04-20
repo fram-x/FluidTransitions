@@ -12,7 +12,7 @@ export default class TransitionItem {
   constructor(
     name: string, route: string, reactElement: Object,
     shared: boolean, appear: string, disappear: string,
-    delay: boolean,
+    delay: boolean, index: number,
   ) {
     this.name = name;
     this.route = route;
@@ -21,6 +21,7 @@ export default class TransitionItem {
     this.appear = appear;
     this.disappear = disappear;
     this.delay = delay;
+    this.index = index;
   }
 
   name: string
@@ -34,6 +35,7 @@ export default class TransitionItem {
   layoutReady: boolean
   flattenedStyle: ?any
   boundingBoxMetrics: Metrics
+  index: number
 
   getNodeHandle() {
     return this.reactElement.getNodeHandle();
