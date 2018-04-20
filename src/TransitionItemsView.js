@@ -82,6 +82,9 @@ export default class TransitionItemsView extends React.Component<
 
   updateFromProps(props, prevProps) {
     if (!this._isMounted) return;
+    if(this.state.fromRoute && this.state.toRoute && (!props.fromRoute || !props.toRoute)) {
+      return;
+    }
 
     let { fromRoute, toRoute } = props;
     const direction = props.index > (prevProps ? prevProps.index : Number.MIN_SAFE_INTEGER) ?
@@ -101,6 +104,7 @@ export default class TransitionItemsView extends React.Component<
   render() {
     return (
       <View
+        {...this.props}
         style={[styles.container, this.props.style]}
         ref={(ref) => this._viewRef = ref}
         collapsable={false}
