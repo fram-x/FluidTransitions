@@ -4,3 +4,5 @@ export {
   getInterpolatorTypes
 }
 from './InterpolatorTypes';
+
+export { getSharedElements } from './getSharedElements';

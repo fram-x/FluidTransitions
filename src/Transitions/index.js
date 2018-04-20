@@ -4,3 +4,5 @@ export {
   getTransitionType 
 }
 from './TransitionTypes';
+
+export { getTransitionElements } from './getTransitionElements';

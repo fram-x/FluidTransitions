@@ -29,9 +29,8 @@ type TransitionOverlayViewProps = {
   transitionElements: Array<TransitionItem>
 }
 
-class TransitionOverlayView extends React.Component<TransitionOverlayViewProps> {
-  context: TransitionContext
-  constructor(props: TransitionOverlayViewProps, context: TransitionContext) {
+class TransitionOverlayView extends React.Component<TransitionOverlayViewProps> {  
+  constructor(props: TransitionOverlayViewProps, context) {
     super(props, context);
     this._isMounted = false;
   }

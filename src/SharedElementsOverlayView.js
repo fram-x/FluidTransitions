@@ -11,7 +11,7 @@ import {
   InterpolatorResult,
 } from './Types';
 
-import { initInterpolatorTypes, getInterpolatorTypes } from './Interpolators';
+import { initInterpolatorTypes, getSharedElements } from './Interpolators';
 
 initInterpolatorTypes();
 
@@ -69,41 +69,14 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
 
   render() {
     if (!this.props.sharedElements || !this.getMetricsReady()) {
-      // console.log("RENDER SE empty");
       return <View key="overlay" style={styles.overlay} pointerEvents="none" />;
     }
 
-    // console.log("RENDER SE " + this.props.sharedElements.length);
     this._interpolation = null;
     this._nativeInterpolation = null;
 
     const self = this;
-    const sharedElements = this.props.sharedElements.map((pair, idx) => {
-      const { fromItem, toItem } = pair;
-      let element = React.Children.only(fromItem.reactElement.props.children);
-      const transitionStyles = self.getTransitionStyle(fromItem, toItem);
-
-      const key = `so-${idx.toString()}`;
-      const animationStyle = transitionStyles.styles;
-      const nativeAnimationStyle = [transitionStyles.nativeStyles];
-      const overrideStyles = {
-        position: 'absolute',
-        left: fromItem.metrics.x,
-        top: fromItem.metrics.y,
-        width: fromItem.metrics.width,
-        height: fromItem.metrics.height,
-      };
-
-      element = React.createElement(element.type, { ...element.props, key });
-      return createAnimatedWrapper({
-        component: element,
-        nativeStyles: nativeAnimationStyle,
-        styles: animationStyle,
-        overrideStyles,
-        log: true,
-        logPrefix: 'SE: ' + fromItem.name + '/' + fromItem.route,
-      });
-    });
+    const sharedElements = getSharedElements(this.props.sharedElements, this.getInterpolation);
 
     return (
       <View key="overlay" style={styles.overlay} pointerEvents="none">
@@ -145,53 +118,7 @@ class SharedElementsOverlayView extends React.Component<SharedElementsOverlayVie
     }
     return false;
   }
-
-  getTransitionStyle(fromItem: TransitionItem, toItem: TransitionItem) {
-    const interpolatorInfo: InterpolatorSpecification = {
-      from: {
-        metrics: fromItem.metrics,
-        boundingbox: fromItem.boundingBoxMetrics,
-        style: fromItem.getFlattenedStyle(),
-        rotation: fromItem.rotation,
-      },
-      to: {
-        metrics: toItem.metrics,
-        style: toItem.getFlattenedStyle(),
-        boundingbox: toItem.boundingBoxMetrics,
-        rotation: toItem.rotation,
-      },
-      scaleX: toItem.scaleRelativeTo(fromItem).x,
-      scaleY: toItem.scaleRelativeTo(fromItem).y,
-      getInterpolation: this.getInterpolation,
-      dimensions: Dimensions.get('window'),
-    };
-
-    const nativeStyles = [];
-    const styles = [];
-
-    const self = this;
-    getInterpolatorTypes().forEach(interpolator => {
-      const interpolatorResult = interpolator.interpolatorFunction(interpolatorInfo);
-      if (interpolatorResult) {
-        if (interpolatorResult.nativeAnimationStyles)
-          {nativeStyles.push(interpolatorResult.nativeAnimationStyles);}
-        if (interpolatorResult.animationStyles)
-          {styles.push(interpolatorResult.animationStyles);}
-      }
-    });
-
-    return {
-      nativeStyles: {
-        ...mergeStyles(nativeStyles),
-      },
-      styles: {
-        width: fromItem.metrics.width,
-        height: fromItem.metrics.height,
-        ...mergeStyles(styles),
-      },
-    };
-  }
-
+  
   componentDidMount() {
     this._isMounted = true;
   }
@@ -214,18 +141,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-  },
-  sharedElement: {
-    position: 'absolute',
-    // backgroundColor: '#00FF0022',
-    // borderColor: '#00FF00',
-    // borderWidth: 1,
-    left: 0,
-    top: 0,
-    right: 0,
-    bottom: 0,
-    padding: 0,
-    margin: 0,
   },
 });
 

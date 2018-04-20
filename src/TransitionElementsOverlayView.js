@@ -11,7 +11,7 @@ import {
   TransitionSpecification,
 } from './Types';
 
-import { initTransitionTypes, getTransitionType } from './Transitions';
+import { initTransitionTypes, getTransitionType, getTransitionElements } from './Transitions';
 import * as Constants from './TransitionConstants';
 
 initTransitionTypes();
@@ -23,9 +23,8 @@ type TransitionElementsOverlayViewProps = {
   transitionElements: Array<any>
 }
 
-class TransitionElementsOverlayView extends React.Component<TransitionElementsOverlayViewProps> {
-  context: TransitionContext
-  constructor(props: TransitionElementsOverlayViewProps, context: TransitionContext) {
+class TransitionElementsOverlayView extends React.Component<TransitionElementsOverlayViewProps> {  
+  constructor(props: TransitionElementsOverlayViewProps, context) {
     super(props, context);
     this._isMounted = false;
   }
@@ -58,17 +57,14 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     return true;
   }
 
-  render() {
-    const { getDirectionForRoute, getDirection, getRoutes } = this.context;
-    if (!this.props.transitionElements || !this.getMetricsReady() ||
-      !getDirectionForRoute || !getDirection || !getRoutes) {
-      // console.log("RENDER TE empty");
-      return <View style={styles.overlay} pointerEvents="none" />;
-    }
+  getTransitionContext(transitionElements): TransitionContext {
+    const { getDirectionForRoute, getIndex, getDirection, 
+      getRoutes, getTransitionProgress } = this.context;
 
-    // console.log("RENDER TE " + this.props.transitionElements.length);
-    const transitionElements = this.props.transitionElements
-      .filter(i => i.route === this.props.fromRoute || i.route === this.props.toRoute);
+    if (!transitionElements || !getDirectionForRoute || !getDirection || 
+      !getRoutes || !getIndex || !getTransitionProgress) {
+      return null;
+    }
 
     const delayCountFrom = transitionElements
       .filter(item => getDirectionForRoute(item.name, item.route) === RouteDirection.from)
@@ -84,129 +80,38 @@ class TransitionElementsOverlayView extends React.Component<TransitionElementsOv
     const delayFromFactor = 1;
     const delayToFactor = -1;
 
-    const transitionViews = transitionElements.map((item, idx) => {
-      const routeDirection = getDirectionForRoute(item.name, item.route);
-      let element = React.Children.only(item.reactElement.props.children);
-      const key = `ti-${idx.toString()}`;
-      
-      const transitionStyle = this.getPositionStyle(
-        item, routeDirection === RouteDirection.from ?
-          delayCountFrom + 1 : delayCountTo + 1,
-        routeDirection === RouteDirection.from ?
-          delayIndexFrom : delayIndexTo,
-        navDirection
-      );
+    return {
+      delayCountFrom, 
+      delayCountTo,
+      navDirection, 
+      delayIndexFrom,
+      delayIndexTo,
+      delayToFactor,
+      delayFromFactor,
+      getDirectionForRoute,
+      getIndex,
+      getTransitionProgress,
+      getRoutes,
+    }
+  }
 
-      const style = [transitionStyle, styles.transitionElement];
-      element = React.createElement(element.type, { ...element.props, key });
-      const comp = createAnimatedWrapper({component: element, nativeStyles: style});
+  render() {
+    const transitionElements = this.props.transitionElements ? this.props.transitionElements
+      .filter(i => i.route === this.props.fromRoute || i.route === this.props.toRoute) : [];
 
-      if (item.delay) {
-        if (routeDirection === RouteDirection.from) {
-          delayIndexFrom += delayFromFactor;
-        } else {
-          delayIndexTo += delayToFactor;
-        }
-      }
-      return comp;
-    });
+    const transitionContext = this.getTransitionContext(transitionElements);
+
+    if (!transitionContext || !this.getMetricsReady()) {
+      return <View style={styles.overlay} pointerEvents="none" />;
+    }
+    
+    const transitionViews = getTransitionElements(transitionElements, transitionContext);
 
     return (
       <View style={styles.overlay} pointerEvents="none">
         {transitionViews}
       </View>
     );
-  }
-
-  getPositionStyle(item: TransitionItem, delayCount: number, delayIndex: number, direction: NavigationDirection) {
-    return {
-      left: item.metrics.x,
-      top: item.metrics.y,
-      width: item.metrics.width,
-      height: item.metrics.height,
-      ...this.getTransitionStyle(item, delayCount, delayIndex, direction),
-    };
-  }
-
-  getTransitionStyle(item: TransitionItem, delayCount: number, delayIndex: number, direction: NavigationDirection) {
-    const { getTransitionProgress, getDirectionForRoute,
-      getIndex, getRoutes } = this.context;
-
-    if (!getTransitionProgress || !getDirectionForRoute || !getIndex || !getRoutes) { return {}; }
-
-    const index = getIndex();    
-    const routeDirection = getDirectionForRoute(item.name, item.route);
-    const progress = getTransitionProgress();
-    const routes = getRoutes();
-
-    if (progress) {
-      const transitionFunction = this.getTransitionFunction(item, routeDirection);
-      if (transitionFunction) {
-        // Calculate start/end to handle delayed transitions
-        let start = Constants.TRANSITION_PROGRESS_START;
-        let end = Constants.TRANSITION_PROGRESS_END;
-
-        let distance = routes.length > 1 ? 
-          (1.0 - (Constants.TRANSITION_PROGRESS_START +
-          (1.0 - Constants.TRANSITION_PROGRESS_END))) * 0.5 : 
-          (1.0 - (Constants.TRANSITION_PROGRESS_START +
-          (1.0 - Constants.TRANSITION_PROGRESS_END)));
-
-        if (item.delay) {
-          // Start/stop in delay window
-          const delayStep = distance / delayCount;
-          if (routeDirection === RouteDirection.from) {
-            start += (delayStep * delayIndex);
-          } else {
-            end -= (delayStep * delayIndex);
-          }
-        } else if (routes.length > 1) {
-          // Start/stop first/last half of transition
-          if (routeDirection === RouteDirection.to) {
-            start += distance;
-          } else {
-            end -= distance;
-          }
-        }
-
-        // Create progress interpolation
-        const interpolatedProgress = progress.interpolate({
-          inputRange: direction === NavigationDirection.forward ? [index - 1, index] : [index, index + 1],
-          outputRange: [0, 1],
-        });
-
-        const transitionSpecification: TransitionSpecification = {
-          progress: interpolatedProgress,
-          name: item.name,
-          route: item.route,
-          metrics: item.metrics,
-          boundingbox: item.boundingBoxMetrics,
-          direction: routeDirection,
-          dimensions: Dimensions.get('window'),
-          start,
-          end,
-        };
-
-        return transitionFunction(transitionSpecification);
-      }
-    }
-    return { };
-  }
-
-  getTransitionFunction(item: TransitionItem, routeDirection: RouteDirection) {
-    const getTransition = (transition: string | Function) => {
-      if (transition instanceof Function) { return transition; }
-      return getTransitionType(transition);
-    };
-
-    if (routeDirection === RouteDirection.to && item.appear) {
-      return getTransition(item.appear);
-    } else if (routeDirection === RouteDirection.from && item.disappear) {
-      return getTransition(item.disappear);
-    } else if (item.appear) {
-      return getTransition(item.appear);
-    }
-    return null;
   }
 
   getMetricsReady(): boolean {
@@ -244,21 +149,7 @@ const styles: StyleSheet.NamedStyles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-  },
-  transitionElement: {
-    // borderColor: '#00F',
-    // borderWidth: 1,
-    position: 'absolute',
-    margin: 0,
-    marginVertical: 0,
-    marginHorizontal: 0,
-    marginTop: 0,
-    marginBottom: 0,
-    marginLeft: 0,
-    marginRight: 0,
-    marginStart: 0,
-    marginEnd: 0,
-  },
+  },  
 });
 
 export default TransitionElementsOverlayView;
