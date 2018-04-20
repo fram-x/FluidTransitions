@@ -139,3 +139,6 @@ Some of the concepts in the library builds on ideas from [@lintonye](https://git
 
 ### Contributors
 Christian Falch (@chrfalch), Yuuki Arisawa (@uk-ar), Joe Goodall (@joegoodall1)
+
+### Sponsors
+[Fram X](https://framx.no) - a cross platform app company from Norway. 
