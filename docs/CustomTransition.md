@@ -46,4 +46,4 @@ inputRange: [0, start, end, 1],
 It is also possible to interpolate between 0 and 1, but this will change the appearance of the navigation transition.
 
 #### Notes on progress
-The progress value will animated from 0..1 or 1..0 depending on wether the animation is playing a navigation action going forward or backwards.
+The progress value will animated from 0..1 or 1..0 depending on whether the animation is playing a navigation action going forward or backwards.
