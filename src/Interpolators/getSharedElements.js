@@ -30,7 +30,7 @@ const getSharedElements = (sharedElements: Array<any>, getInterpolationFunction:
       height: fromItem.metrics.height,
     };
 
-    const props = { ...element.props, __index: toItem.index };
+    const props = { ...element.props, __index: fromItem.index };
     const component = React.createElement(element.type, { ...props, key });
     return createAnimatedWrapper({
       component,
