@@ -7,7 +7,7 @@ import { NavigationDirection, TransitionContext, RouteDirection } from './Types'
 import * as Constants from './TransitionConstants';
 
 import { initTransitionTypes, getTransitionElements } from './Transitions';
-import { initInterpolatorTypes, getSharedElements } from './Interpolators';
+import { initInterpolatorTypes, getSharedElements, getAnchoredElements } from './Interpolators';
 
 initTransitionTypes();
 initInterpolatorTypes();
@@ -53,7 +53,9 @@ class TransitionOverlayView extends React.Component<Props> {
 
     const transitionViews = getTransitionElements(transitionElements, transitionContext);
     const sharedElementViews = getSharedElements(sharedElements, this.getInterpolation);
-    const views = [...transitionViews, ...sharedElementViews]
+    const anchoredViews = getAnchoredElements(sharedElements, this.getInterpolation);
+
+    const views = [...transitionViews, ...sharedElementViews, ...anchoredViews]
       .sort((el1, el2) => el1.props.index - el2.props.index);
       
     return (
@@ -88,7 +90,7 @@ class TransitionOverlayView extends React.Component<Props> {
 
     if (this.props.sharedElements) {
       this.props.sharedElements.forEach(pair => {
-        if (!pair.toItem.metrics || !pair.fromItem.metrics) { metricsReady = false; }
+        if (!pair.toItem.metrics || !pair.fromItem.metrics) { metricsReady = false; }        
       });
     }
     return metricsReady;

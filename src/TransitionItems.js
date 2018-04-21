@@ -90,6 +90,15 @@ export default class TransitionItems {
 
   _getItemPairs(fromRoute: string, toRoute: string): Array<TransitionItem> {
     const nameMap = this._getNamePairMap(fromRoute, toRoute);
-    return Array.from(nameMap.values());
+    const pairs = Array.from(nameMap.values());
+    const anchorItems = this._items
+      .filter(e => (e.route === fromRoute || e.route === toRoute) && e.anchor);
+
+    return pairs.map(p => { 
+      const { fromItem, toItem } = p;
+      if(fromItem) fromItem.anchors = anchorItems.filter(e => e.route === p.fromItem.route && e.anchor === p.fromItem.name);
+      if(toItem) toItem.anchors = anchorItems.filter(e => e.route === p.toItem.route && e.anchor === p.toItem.name);
+      return { fromItem, toItem };
+    });
   }
 }

@@ -31,6 +31,7 @@ class Transition extends React.Component<TransitionProps> {
     getIndex: PropTypes.func,
     getIsPartOfSharedTransition: PropTypes.func,    
     getIsPartOfTransition: PropTypes.func,    
+    getIsAnchored: PropTypes.func   
   }
 
   constructor(props: TransitionProps, context: any) {
@@ -54,7 +55,7 @@ class Transition extends React.Component<TransitionProps> {
         this._getName(), this.context.route,
         this, this.props.shared !== undefined, this.props.appear,
         this.props.disappear, this.props.delay !== undefined,
-        zIndex++,
+        zIndex++, this.props.anchor,
       ));
     }
   }
@@ -128,6 +129,10 @@ class Transition extends React.Component<TransitionProps> {
 
     if (isPartOfSharedTransition) {
       return { opacity: visibilityProgress };
+          inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_OUT,
+          outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE_ANIM_OUT,
+        }) 
+      };
     } else if (isPartOfTransition) {
       return { opacity: visibilityProgress };      
     }

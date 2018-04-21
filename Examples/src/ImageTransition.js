@@ -79,7 +79,7 @@ class ImageDetailsScreen extends React.Component {
         <Transition shared={params.url}>
           <Image style={styles.detailsImage} source={{ uri }} />
         </Transition>
-        <Transition appear="bottom">
+        <Transition anchor={params.url}>
           <View style={styles.detailsView}>
             <Text style={styles.text}>{params.url}</Text>
             <View style={styles.buttonContainer}>
