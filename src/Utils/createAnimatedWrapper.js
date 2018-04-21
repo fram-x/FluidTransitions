@@ -214,7 +214,7 @@ const getNativeAnimatableStyles = (styles: Array<StyleSheet.NamedStyles>|StyleSh
   getFilteredStyle(styles, (key) => includePropsForNativeStyles.indexOf(key) > -1);
 
 const getAnimatableStyles = (styles: Array<StyleSheet.NamedStyles>|StyleSheet.NamedStyles) =>
-  getFilteredStyle(styles, (key) => excludePropsForStyles.indexOf(key) === -1);
+  getFilteredStyle(styles, (key) => validStyles.indexOf(key) > -1 && excludePropsForStyles.indexOf(key) === -1);
 
 const getComponentStyles = (styles: Array<StyleSheet.NamedStyles>|StyleSheet.NamedStyles) =>
   getFilteredStyle(styles, (key) => excludePropsForComponent.indexOf(key) === -1);
@@ -386,8 +386,48 @@ const excludePropsForStyles = [
   'scaleY',
   'rotation',
   'translateX',
-  'translateY',
-  'textAlign',
+  'translateY',  
+];
+
+const validStyles = [
+  "display",
+  "width",
+  "height",
+  ...positionStyles,
+  ...marginStyles,
+  ...paddingStyles,
+  ...borderStyles,
+  "position",
+  "flexDirection",
+  "flexWrap",
+  "justifyContent",
+  "alignItems",
+  "alignSelf",
+  "alignContent",
+  "overflow",
+  "flex",
+  "flexGrow",
+  "flexShrink",
+  "flexBasis",
+  "aspectRatio",
+  "zIndex",
+  "direction",
+  "shadowColor",
+  "shadowOffset",
+  "shadowOpacity",
+  "shadowRadius",
+  "transform",
+  "transformMatrix",
+  "decomposedMatrix",
+  "scaleX",
+  "scaleY",
+  "rotation",
+  "translateX",
+  "translateY",
+  "backfaceVisibility",
+  "backgroundColor",  
+  "opacity",
+  "elevation"
 ];
 
 export { createAnimatedWrapper, createAnimated };
