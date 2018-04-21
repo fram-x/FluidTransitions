@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
   buttonRotatedContainer: {
     flex: 1,
     justifyContent: 'flex-end',
-    transform: [{ rotate: '100deg' }],
+    transform: [{ rotate: '180deg' }],
     backgroundColor: '#EDEDED',
     marginBottom: 20,
   },
