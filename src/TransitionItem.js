@@ -88,18 +88,19 @@ export default class TransitionItem {
 
   getRotation() {
     if(!this._rotation) {
-      this._rotation = getRotationFromStyle(this.getFlattenedStyle());
+      const ri = getRotationFromStyle(this.getFlattenedStyle());
       let retVal = { type: 'unknown', value: 0 };
-      if (this._rotation.rotate) {
-        if (this._rotation.rotate.rotate) {
-          const rotation: String = this._rotation.rotate.rotate;
+      if (ri.rotate) {
+        if (ri.rotate.rotate) {
+          const rotation: String = ri.rotate.rotate;
           if (rotation.endsWith('deg')) {
-            this._rotation = { type: 'deg', value: parseInt(rotation.substring(0, rotation.length - 3)) };
+            retVal = { type: 'deg', value: parseInt(rotation.substring(0, rotation.length - 3)) };
           } else if (rotation.endsWith('rad')) {
-            this._rotation = { type: 'rad', value: parseInt(rotation.substring(0, rotation.length - 3)) };
+            retVal = { type: 'rad', value: parseInt(rotation.substring(0, rotation.length - 3)) };
           }
         }
-      }      
+      }
+      this._rotation = retVal;
     }
     return this._rotation;
   }

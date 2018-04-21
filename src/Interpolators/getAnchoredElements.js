@@ -16,8 +16,7 @@ const getAnchoredElements = (sharedElements: Array<any>, getInterpolationFunctio
   const retVal = [];
   sharedElements.forEach(p => {
     if(p.toItem.anchors && p.toItem.anchors.length > 0) {
-      p.toItem.anchors.forEach(a => {
-        // Create view that follows owner (toItem)
+      p.toItem.anchors.forEach(a => {        
         retVal.push(createAnchoredView(a, p.toItem, p.fromItem,
           getInterpolationFunction));
       });

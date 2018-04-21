@@ -84,13 +84,33 @@ class TransitionOverlayView extends React.Component<Props> {
     let metricsReady = true;
     if (this.props.transitionElements) {
       this.props.transitionElements.forEach(item => {
-        if (!item.metrics) { metricsReady = false; }
+        if (!item.metrics) { 
+          metricsReady = false; 
+        }
       });
     }
 
     if (this.props.sharedElements) {
       this.props.sharedElements.forEach(pair => {
-        if (!pair.toItem.metrics || !pair.fromItem.metrics) { metricsReady = false; }        
+        if (!pair.toItem.metrics || !pair.fromItem.metrics) { 
+          metricsReady = false;
+        }
+        if(pair.fromItem && pair.fromItem.anchors) {
+          for(let n = 0; n < pair.fromItem.anchors.length; n++) {
+            if(!pair.fromItem.anchors[n].metrics) {
+              metricsReady = false;
+              break;
+            }
+          }
+        }
+        if(pair.toItem && pair.toItem.anchors) {
+          for(let n = 0; n < pair.toItem.anchors.length; n++) {
+            if(!pair.toItem.anchors[n].metrics) {
+              metricsReady = false;
+              break;
+            }
+          }
+        }
       });
     }
     return metricsReady;
