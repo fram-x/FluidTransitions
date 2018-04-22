@@ -8,8 +8,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   detailsImage: {
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').width,
+    width: Dimensions.get('window').width - 20,
+    height: Dimensions.get('window').width - 20,
   },
   detailsView: {
     padding: 10,
@@ -28,6 +28,25 @@ const styles = StyleSheet.create({
   },
   cell: {
     margin: 2,
+  },
+  header: {
+    height: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#1010FF',
+  },
+  headerText: {
+    fontWeight: 'bold',
+    fontSize: 18,
+    color: '#FFF',
+  },
+  splitter: {
+    flexDirection: 'row',
+  },
+  splitterLeft: {
+    width: 20,
+    height: Dimensions.get('window').width - 20,
+    backgroundColor: '#a0FFa0',
   },
 });
 
@@ -76,9 +95,19 @@ class ImageDetailsScreen extends React.Component {
     const uri = params.url;
     return (
       <View style={styles.container}>
-        <Transition shared={params.url}>
-          <Image style={styles.detailsImage} source={{ uri }} />
+        <Transition anchor={params.url}>
+          <View style={styles.header}>
+            <Text style={styles.headerText}>Header</Text>
+          </View>
         </Transition>
+        <View style={styles.splitter}>
+          <Transition anchor={params.url}>
+            <View style={styles.splitterLeft} />
+          </Transition>
+          <Transition shared={params.url}>
+            <Image style={styles.detailsImage} source={{ uri }} />
+          </Transition>
+        </View>
         <Transition anchor={params.url}>
           <View style={styles.detailsView}>
             <Text style={styles.text}>{params.url}</Text>

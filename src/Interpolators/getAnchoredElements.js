@@ -25,10 +25,10 @@ const getAnchoredElements = (sharedElements: Array<any>, getInterpolationFunctio
   return retVal;
 }
 
-const createAnchoredView = (anchor: TransitionItem, item: TransitionItem,
-  otherItem: TransitionItem, getInterpolationFunction: Function) => {
+const createAnchoredView = (anchor: TransitionItem, to: TransitionItem,
+  from: TransitionItem, getInterpolationFunction: Function) => {
     const interpolator = getInterpolationFunction(true);
-    const scale = otherItem.scaleRelativeTo(item);
+    const scale = from.scaleRelativeTo(to);
     const scaleX = interpolator.interpolate({
       inputRange: [0, 1],
       outputRange: [scale.x, 1],
@@ -39,24 +39,26 @@ const createAnchoredView = (anchor: TransitionItem, item: TransitionItem,
     outputRange: [scale.y, 1],
   });
 
-  const diffX = (otherItem.metrics.x + otherItem.metrics.width * scale.x) - 
-    (item.metrics.x + item.metrics.width / 2);
-
-  const diffY = (otherItem.metrics.y + otherItem.metrics.height * scale.y) - 
-    (item.metrics.y + item.metrics.height);
-
+  const diffaiX = (anchor.metrics.x - to.metrics.x);
+  const diffaiY = (anchor.metrics.y - to.metrics.y); 
+  const diffItemsX = (from.metrics.x - to.metrics.x);
+  const diffItemsY = (from.metrics.y - to.metrics.y);
+  const anchorStartX = diffItemsX - diffaiX - ((anchor.metrics.width) * scale.x) + (anchor.metrics.x * scale.x);
+  const anchorStartY = diffItemsY - diffaiY - ((anchor.metrics.height) * scale.y) + (anchor.metrics.y * scale.y);
+  
   const translateX = interpolator.interpolate({
     inputRange: [0, 1],
-    outputRange: [diffX, 0],
+    outputRange: [anchorStartX, 0],
   });
 
   const translateY = interpolator.interpolate({
     inputRange: [0, 1],
-    outputRange: [diffY, 0],
+    outputRange: [anchorStartY, 0],
   });
 
   const transformStyle =  { transform: 
     [{ translateX }, { translateY }, { scaleX }, { scaleY }]
+    //[{ translateX }, { translateY }]
   };  
 
   const fadeStyle = { opacity: interpolator.interpolate({
@@ -76,7 +78,7 @@ const createAnchoredView = (anchor: TransitionItem, item: TransitionItem,
 
   const element = React.Children.only(anchor.reactElement.props.children);
   const key = "an-" + anchor.name + anchor.route;
-  const props = { ...element.props, __index: item.index };
+  const props = { ...element.props, __index: to.index };
   const component = React.createElement(element.type, { ...props, key });
   const retVal = createAnimatedWrapper({component, nativeStyles});
   return retVal;
