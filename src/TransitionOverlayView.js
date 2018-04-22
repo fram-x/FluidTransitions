@@ -44,7 +44,8 @@ class TransitionOverlayView extends React.Component<Props> {
         (p.toItem.route === from || p.toItem.route === to)) : [];
       
     const transitionContext = this.getTransitionContext(transitionElements);
-    if (!transitionContext || !this.getMetricsReady()) {
+    if (!transitionContext || !this.getMetricsReady() || 
+      (sharedElements.length === 0 && transitionElements.length === 0)) {      
       return <View style={styles.overlay} pointerEvents="none" />;
     }
     
