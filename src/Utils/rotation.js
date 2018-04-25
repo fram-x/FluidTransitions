@@ -33,7 +33,7 @@ export const getOriginalRect = (params: GetOriginalRectParameters): Metrics => {
 
   // Get rotated height/width
   const quad = getQuadrant(theta);
-  const a = 1 / (cos ** 2 - sin ** 2);
+  const a = 1 / (Math.pow(cos, 2) - (Math.pow(sin, 2)));
 
   const aw = (1 * width) * cos;
   const bw = (height * sin);
