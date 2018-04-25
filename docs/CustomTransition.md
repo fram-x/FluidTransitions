@@ -27,6 +27,7 @@ The `transitionInfo` parameter is an object with the following members:
 | ----------  | ------------- | 
 | progress: Animated.Value 	| An animated value that interpolates between 0 and 1 that will drive the animation. | 
 | metrics: Metrics 	| The transition element's position and size (`x`, `y`, `width`, `height`). | 
+| boundingbox: Metrics 	| The transition element's bounding box position and size including rotation (`x`, `y`, `width`, `height`). | 
 | name: string 	| The name of the element as declared in the transition component (if any) | 
 | route: string 	| The name of the route where the element is located | 
 | start: number 	| A value indicating where between 0..1 your animation should start (see notes below) | 
@@ -45,4 +46,4 @@ inputRange: [0, start, end, 1],
 It is also possible to interpolate between 0 and 1, but this will change the appearance of the navigation transition.
 
 #### Notes on progress
-The progress value will animated from 0..1 or 1..0 depending on wether the animation is playing a navigation action going forward or backwards.
+The progress value will animated from 0..1 or 1..0 depending on whether the animation is playing a navigation action going forward or backwards.

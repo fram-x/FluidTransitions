@@ -9,6 +9,7 @@ import { createAnimatedWrapper, createAnimated, getRotationFromStyle } from './U
 
 const uniqueBaseId: string = `tcid-${Date.now()}`;
 let uuidCount: number = 0;
+let zIndex = 0;
 
 const styles = StyleSheet.create({
   transition: {
@@ -36,7 +37,7 @@ class Transition extends React.Component<TransitionProps> {
     getDirectionForRoute: PropTypes.func,
     getDirection: PropTypes.func,
     getIndex: PropTypes.func,
-    getIsPartOfSharedTransition: PropTypes.func,
+    getIsPartOfSharedTransition: PropTypes.func,    
   }
 
   constructor(props: TransitionProps, context: any) {
@@ -60,7 +61,7 @@ class Transition extends React.Component<TransitionProps> {
         this._getName(), this.context.route,
         this, this.props.shared !== undefined, this.props.appear,
         this.props.disappear, this.props.delay !== undefined,
-        this.props.modifiers,
+        zIndex++,
       ));
     }
   }
@@ -97,7 +98,7 @@ class Transition extends React.Component<TransitionProps> {
     if (!this._animatedComponent) { this._animatedComponent = createAnimated(); }
     if (!this._outerAnimatedComponent) { this._outerAnimatedComponent = createAnimated(); }
 
-    const visibilityStyle = this.getVisibilityStyle();    
+    const visibilityStyle = this.getVisibilityStyle();
     const key = `${this._getName()}-${this._route}`;
     
     element = React.createElement(element.type, { ...element.props, key, ref: this.setViewRef });
@@ -153,13 +154,6 @@ class Transition extends React.Component<TransitionProps> {
       }) };
     }
     return {};
-
-
-    return { opacity: visibilityProgress.interpolate({
-      inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_OUT,
-      outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE_ANIM_OUT,
-    }),
-    };
   }
 }
 

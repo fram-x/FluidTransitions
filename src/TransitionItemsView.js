@@ -59,7 +59,9 @@ export default class TransitionItemsView extends React.Component<
     this.getIsPartOfSharedTransition = this.getIsPartOfSharedTransition.bind(this);
     this.getTransitionProgress = this.getTransitionProgress.bind(this);
     this.getRoutes = this.getRoutes.bind(this);
+  
     this._interactionDonePromise = new Promise(resolve => this._interactionDonePromiseDone = resolve);
+    
   }
 
   _viewRef: ?View;
@@ -295,7 +297,7 @@ export default class TransitionItemsView extends React.Component<
     getDirection: PropTypes.func,
     getIndex: PropTypes.func,
     getIsPartOfSharedTransition: PropTypes.func,
-    getRoutes: PropTypes.func,
+    getRoutes: PropTypes.func,    
   }
 
   static contextTypes = {

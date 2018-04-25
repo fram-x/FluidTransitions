@@ -16,7 +16,7 @@ export default class TransitionItems {
   add(item: TransitionItem): boolean {
     if (this._items.findIndex(e => e.name === item.name && e.route === item.route) >= 0) {
       return false;
-    }
+    }    
     this._items = [...this._items, item];
     return true;
   }
