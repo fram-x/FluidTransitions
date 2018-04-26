@@ -53,8 +53,8 @@ export default class TransitionItemsView extends React.Component<
 
     this._transitionItems = new TransitionItems();
     this._transitionProgress = props.progress;
-    props.progress.setValue(-1);
-    // props.progress.addListener(console.log);
+    this._transitionProgress.setValue(-1); // Reset to handle first transition
+    // this._transitionProgress.addListener(console.log);       
 
     this.getIsPartOfSharedTransition = this.getIsPartOfSharedTransition.bind(this);
     this.getTransitionProgress = this.getTransitionProgress.bind(this);
@@ -91,17 +91,15 @@ export default class TransitionItemsView extends React.Component<
       NavigationDirection.forward : NavigationDirection.back;
 
     const index = prevProps ? props.index : 0;
-
-    if (direction === NavigationDirection.back) {
-      const tmp = fromRoute;
-      fromRoute = toRoute;
-      toRoute = tmp;
-    }
-
-    this.setState({ ...this.state, toRoute, fromRoute, direction, index });
+    
+    this.setState({toRoute, 
+      fromRoute, 
+      direction, 
+      index,
+    });
   }
 
-  render() {
+  render() {    
     return (
       <View
         {...this.props}
@@ -109,7 +107,7 @@ export default class TransitionItemsView extends React.Component<
         ref={(ref) => this._viewRef = ref}
         collapsable={false}
       >
-        {this.props.children}
+        {this.props.children}        
         <TransitionOverlayView
           direction={this.state.direction}
           fromRoute={this.state.fromRoute}
@@ -130,8 +128,6 @@ export default class TransitionItemsView extends React.Component<
     } else if (route === this.state.toRoute) {
       return RouteDirection.to;
     }
-
-    // invariant(true, "Route " + route + " is not part of transition!")
     return RouteDirection.unknown;
   }
 
@@ -139,8 +135,7 @@ export default class TransitionItemsView extends React.Component<
     if(useNative) return this._transitionProgress;
 
     if(!this._nonNativeTransitionProgress) {
-      this._nonNativeTransitionProgress = new Animated.Value(-1);
-      this._nonNativeTransitionProgress.dada = 'non native';
+      this._nonNativeTransitionProgress = new Animated.Value(-1);      
       this._transitionProgress.addListener(Animated.event([{
         value: this._nonNativeTransitionProgress }],
         { useNativeDriver: false }));
@@ -214,12 +209,12 @@ export default class TransitionItemsView extends React.Component<
   }
 
   _inUpdate: boolean = false;
-  componentDidUpdate() {
+  componentDidUpdate() {    
     if (this._inUpdate) return;
     if (!this.state.fromRoute && !this.state.toRoute) return;
 
     this._inUpdate = true;
-
+    
     // Wait a little bit to give the layout system some time to reconcile
     let measureAndUpdateFunc = async () => {
       let sharedElements = this._transitionItems.getSharedElements(this.state.fromRoute, this.state.toRoute);
@@ -242,15 +237,14 @@ export default class TransitionItemsView extends React.Component<
           ...this.state,
           sharedElements,
           transitionElements,
-        });
-
-        this.props.onLayout && this.props.onLayout();
-
-        if (this.state.fromRoute === null) {
-          this._runStartAnimation(transitionElements.length);
-        }
-      }
-      this._inUpdate = false;
+        }, ()=> {
+          this.props.onLayout && this.props.onLayout();
+          if (this.state.fromRoute === null) {
+            this._runStartAnimation(transitionElements.length);
+          }
+          this._inUpdate = false;
+        });        
+      }      
     };
 
     measureAndUpdateFunc = measureAndUpdateFunc.bind(this);
@@ -263,7 +257,7 @@ export default class TransitionItemsView extends React.Component<
     const transitionSpec = getTransitionConfig ?
       getTransitionConfig(toRoute, navigation) : {
         timing: Animated.timing,
-        duration: 750,
+        duration: 650,
         easing: Easing.inOut(Easing.poly(4)),
         isInteraction: true,
         useNativeDriver: true,
@@ -327,5 +321,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     overflow: 'hidden',
-  },
+  }
 });
