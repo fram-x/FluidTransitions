@@ -24,6 +24,8 @@ const getSharedElements = (sharedElements: Array<any>, getInterpolationFunction:
     const nativeAnimationStyle = [transitionStyles.nativeStyles];
     const overrideStyles = {
       position: 'absolute',
+      // borderWidth: 1,
+      // borderColor: '#00FF00',
       left: fromItem.metrics.x,
       top: fromItem.metrics.y,
       width: fromItem.metrics.width,

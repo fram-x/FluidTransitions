@@ -44,6 +44,8 @@ const getTransitionElements = (transitionElements: Array<TransitionItem>, transi
 
 const getPositionStyle = (item: TransitionItem, delayCount: number, delayIndex: number, transitionContext: TransitionContext) => {
   return {
+    // borderWidth: 1,
+    // borderColor: '#FF0000',
     left: item.metrics.x,
     top: item.metrics.y,
     width: item.metrics.width,
