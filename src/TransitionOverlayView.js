@@ -34,7 +34,6 @@ class TransitionOverlayView extends React.Component<TransitionOverlayViewProps> 
   _interpolation: any;
 
   render() {
-
     const transitionElements = this.props.transitionElements ? this.props.transitionElements
       .filter(i => i.route === this.props.fromRoute || i.route === this.props.toRoute) : [];
 
@@ -72,6 +71,7 @@ class TransitionOverlayView extends React.Component<TransitionOverlayViewProps> 
     const outputRange = [1, 1, 0, 1, 1];
     const visibility = progress.interpolate({ inputRange, outputRange });
     
+    console.log("[" + (index - 1) + ", " + (index-Constants.OP) + ", " + index + ", " + (index+Constants.OP) + ", " + index + 1 + "] -> " + "[1, 1, 0, 1, 1]");
     return { opacity: visibility };
   }
 
@@ -170,7 +170,7 @@ class TransitionOverlayView extends React.Component<TransitionOverlayViewProps> 
 const styles: StyleSheet.NamedStyles = StyleSheet.create({
   overlay: {
     position: 'absolute', 
-    backgroundColor: '#FF00AE11',   
+    // backgroundColor: '#FF00AE11',   
     top: 0,
     left: 0,
     right: 0,

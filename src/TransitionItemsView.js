@@ -54,14 +54,14 @@ export default class TransitionItemsView extends React.Component<
     this._transitionItems = new TransitionItems();
     this._transitionProgress = props.progress;
     this._transitionProgress.setValue(-1); // Reset to handle first transition
-    // this._transitionProgress.addListener(console.log);       
+    // this._transitionProgress.addListener(console.log);
 
     this.getIsPartOfSharedTransition = this.getIsPartOfSharedTransition.bind(this);
     this.getTransitionProgress = this.getTransitionProgress.bind(this);
     this.getRoutes = this.getRoutes.bind(this);
-  
+
     this._interactionDonePromise = new Promise(resolve => this._interactionDonePromiseDone = resolve);
-    
+
   }
 
   _viewRef: ?View;
@@ -74,10 +74,7 @@ export default class TransitionItemsView extends React.Component<
   _interactionDonePromiseDone: Function;
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.toRoute !== this.props.toRoute ||
-      nextProps.fromRoute !== this.props.fromRoute) {
-      this.updateFromProps(nextProps, this.props);
-    }
+    this.updateFromProps(nextProps, this.props);
   }
 
   updateFromProps(props, prevProps) {
@@ -87,19 +84,26 @@ export default class TransitionItemsView extends React.Component<
     }
 
     let { fromRoute, toRoute } = props;
-    const direction = props.index > (prevProps ? prevProps.index : Number.MIN_SAFE_INTEGER) ?
+    const direction = props.index >= (prevProps ? prevProps.index : Number.MIN_SAFE_INTEGER) ?
       NavigationDirection.forward : NavigationDirection.back;
 
     const index = prevProps ? props.index : 0;
-    
-    this.setState({toRoute, 
-      fromRoute, 
-      direction, 
-      index,
-    });
+
+    if (toRoute !== this.state.toRoute ||
+      fromRoute !== this.state.fromRoute ||
+      index !== this.state.index ||
+      direction !== this.state.direction) {
+      console.log("TIV setState " + fromRoute + " -> " + toRoute + " - index " + index + " (" + this._transitionProgress.__getValue() + ") - direction " + direction);
+      this.setState({
+        toRoute,
+        fromRoute,
+        direction,
+        index,
+      });
+    }
   }
 
-  render() {    
+  render() {
     return (
       <View
         {...this.props}
@@ -107,7 +111,7 @@ export default class TransitionItemsView extends React.Component<
         ref={(ref) => this._viewRef = ref}
         collapsable={false}
       >
-        {this.props.children}        
+        {this.props.children}
         <TransitionOverlayView
           direction={this.state.direction}
           fromRoute={this.state.fromRoute}
@@ -135,7 +139,7 @@ export default class TransitionItemsView extends React.Component<
     if(useNative) return this._transitionProgress;
 
     if(!this._nonNativeTransitionProgress) {
-      this._nonNativeTransitionProgress = new Animated.Value(-1);      
+      this._nonNativeTransitionProgress = new Animated.Value(-1);
       this._transitionProgress.addListener(Animated.event([{
         value: this._nonNativeTransitionProgress }],
         { useNativeDriver: false }));
@@ -209,12 +213,12 @@ export default class TransitionItemsView extends React.Component<
   }
 
   _inUpdate: boolean = false;
-  componentDidUpdate() {    
+  componentDidUpdate() {
     if (this._inUpdate) return;
     if (!this.state.fromRoute && !this.state.toRoute) return;
 
     this._inUpdate = true;
-    
+
     // Wait a little bit to give the layout system some time to reconcile
     let measureAndUpdateFunc = async () => {
       let sharedElements = this._transitionItems.getSharedElements(this.state.fromRoute, this.state.toRoute);
@@ -243,8 +247,8 @@ export default class TransitionItemsView extends React.Component<
             this._runStartAnimation(transitionElements.length);
           }
           this._inUpdate = false;
-        });        
-      }      
+        });
+      }
     };
 
     measureAndUpdateFunc = measureAndUpdateFunc.bind(this);
@@ -295,7 +299,7 @@ export default class TransitionItemsView extends React.Component<
     getDirection: PropTypes.func,
     getIndex: PropTypes.func,
     getIsPartOfSharedTransition: PropTypes.func,
-    getRoutes: PropTypes.func,    
+    getRoutes: PropTypes.func,
   }
 
   static contextTypes = {
