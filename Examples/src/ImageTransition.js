@@ -151,6 +151,10 @@ class ImageGrid extends Component {
 const Navigator = FluidNavigator({
   imageList: { screen: ImageListScreen },
   imageDetails: { screen: ImageDetailsScreen },
+}, {
+  navigationOptions: {
+    gesturesEnabled: true,
+  },
 });
 
 export default () => (

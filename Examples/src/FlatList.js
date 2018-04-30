@@ -141,6 +141,10 @@ const styles = StyleSheet.create({
 const Navigator = FluidNavigator({
   list: { screen: ListScreen },
   details: { screen: DetailsScreen },
+}, {
+  navigationOptions: {
+    gesturesEnabled: true,
+  },
 });
 
 export default () => (

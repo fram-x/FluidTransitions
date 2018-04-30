@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, Easing, I18nManager, Animated, PanResponder } from 'react-native';
+import { StyleSheet, Platform, Easing, I18nManager, Animated, PanResponder } from 'react-native';
 import { addNavigationHelpers, NavigationActions, Transitioner } from 'react-navigation';
 import clamp from 'clamp';
 
@@ -216,9 +216,15 @@ class FluidTransitioner extends React.Component<*> {
   }
 
   getPanResponderHandlers(position, index, scene, layout, navigation, props) {
-    const isVertical = true;
-    const gestureDirectionInverted = false;
-    const gesturesEnabled = true;
+    const { mode } = this.props;
+    const isVertical = mode !== 'card';
+    const { options } = this._getScreenDetails(scene);
+    const gestureDirectionInverted = options.gestureDirection === 'inverted';
+    const gesturesEnabled =
+      typeof options.gesturesEnabled === 'boolean'
+        ? options.gesturesEnabled
+        : Platform.OS === 'ios';
+    
     const responder = !gesturesEnabled
       ? null
       : PanResponder.create({

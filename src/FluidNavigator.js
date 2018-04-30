@@ -7,6 +7,7 @@ export default (routeConfigMap, stackConfig = {}) => {
     initialRouteName,
     initialRouteParams,
     paths,
+    mode,
     transitionConfig,
     onTransitionStart,
     onTransitionEnd,
@@ -28,6 +29,7 @@ export default (routeConfigMap, stackConfig = {}) => {
     <FluidTransitioner
       {...props}
       style={style}
+      mode={mode}
       transitionConfig={transitionConfig}
       onTransitionStart={onTransitionStart}
       onTransitionEnd={() => {
