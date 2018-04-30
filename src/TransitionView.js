@@ -7,7 +7,7 @@ import { RouteDirection, NavigationDirection } from './Types';
 import * as Constants from './TransitionConstants';
 import { createAnimatedWrapper, createAnimated, getRotationFromStyle } from './Utils';
 
-const uniqueBaseId: string = `tcid-${Date.now()}`;
+const uniqueBaseId: string = 'tcid';
 let uuidCount: number = 0;
 let zIndex = 0;
 
@@ -30,6 +30,7 @@ class Transition extends React.Component<TransitionProps> {
     getDirection: PropTypes.func,
     getIndex: PropTypes.func,
     getIsPartOfSharedTransition: PropTypes.func,    
+    getIsPartOfTransition: PropTypes.func,    
   }
 
   constructor(props: TransitionProps, context: any) {
@@ -109,26 +110,28 @@ class Transition extends React.Component<TransitionProps> {
   }
 
   getVisibilityStyle() {
-    const { getTransitionProgress, getIndex, getIsPartOfSharedTransition } = this.context;
-    if (!getTransitionProgress || !getIndex || !getIsPartOfSharedTransition) return {};
-
+    const { getTransitionProgress, getIndex, 
+      getIsPartOfSharedTransition, getIsPartOfTransition } = this.context;
+    if (!getTransitionProgress || !getIndex || 
+      !getIsPartOfSharedTransition || !getIsPartOfTransition) return {};
+      
     const progress = getTransitionProgress();
     const index = getIndex();
-    if (!progress || index === undefined) return { opacity: 0 };
+    if (!progress || index === undefined) return { };
 
-    const inputRange = [index - 1, index-Constants.AP, index, index+Constants.AP, index + 1];
-    const outputRange = [0, 0, 1, 0, 0];
-
+    const inputRange = [index - 1, (index-1) + Constants.OP, index - Constants.OP, index];
+    const outputRange = [1, 0, 0, 1];
+    
+    const isPartOfSharedTransition = getIsPartOfSharedTransition(this._getName(), this._route);        
+    const isPartOfTransition = getIsPartOfTransition(this._getName(), this._route);
     const visibilityProgress = progress.interpolate({ inputRange, outputRange });
 
-    if (this.props.shared && this.props.appear === undefined) {
-      if (getIsPartOfSharedTransition(this._getName(), this._route)) {
-        return { opacity: visibilityProgress };        
-      }
-      return {};
-    } else if (this.props.appear !== undefined || this.props.disappear !== undefined) {
+    if (isPartOfSharedTransition) {
       return { opacity: visibilityProgress };
+    } else if (isPartOfTransition) {
+      return { opacity: visibilityProgress };      
     }
+
     return {};
   }
 }
