@@ -41,6 +41,7 @@ const Navigator = FluidNavigator({
 ```
 
 To change the direction (default is vertical), set the mode to `card` | `modal`:
+
 ```javascript
 const Navigator = FluidNavigator({
   ...
