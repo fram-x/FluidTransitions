@@ -43,44 +43,23 @@ const createAnchoredView = (anchor: TransitionItem, to: TransitionItem,
     outputRange: [scale.y, 1],
   });
 
-  const am = anchor.metrics;
-  const fm = from.metrics;
-  const tm = to.metrics;
-
-  const offsetx = (am.x - tm.x) * scale.x;
-  const offsety = (am.y - tm.y) * scale.y;
-
-  const targetx = fm.x + offsetx;
-  const targety = fm.y + offsety;
-
-  const movex = targetx - am.x;
-  const movey = targety - am.y;
-
-  const scaledmx = movex;
-  const scaledmy = movey;
-
-  console.log("am", am);
-  console.log("fm", fm);
-  console.log("tm", tm);
-  console.log("offsetx", offsetx);
-  console.log("offsety", offsety);
-  console.log("targetx", targetx);
-  console.log("targety", targety);
-  console.log("movex", movex);
-  console.log("movey", movey);
-  console.log("scale moved x", scaledmx);
-  console.log("scale moved y", scaledmy);
-  console.log("scalex", scale.x);
-  console.log("scaley", scale.y);
+  const main0center = { x: from.metrics.x + from.metrics.width / 2, y: from.metrics.y + from.metrics.height / 2 }
+  const main1center = { x: to.metrics.x + to.metrics.width / 2, y: to.metrics.y + to.metrics.height / 2 }
+  const element1center = { x: anchor.metrics.x + anchor.metrics.width / 2, y: anchor.metrics.y + anchor.metrics.height / 2 }
+  
+  const element1offset = { x: element1center.x - main1center.x, y: element1center.y - main1center.y };
+  const element0offset = { x: element1offset.x * scale.x, y: element1offset.y * scale.y };
+  const element0center = { x: main0center.x + element0offset.x, y: main0center.y + element0offset.y };
+  const elementmove = { x: element0center.x - element1center.x, y: element0center.y - element1center.y };
 
   const translateX = interpolator.interpolate({
     inputRange: [0, 1],
-    outputRange: [scaledmx, 0],
+    outputRange: [elementmove.x, 0],
   });
 
   const translateY = interpolator.interpolate({
     inputRange: [0, 1],
-    outputRange: [scaledmy, 0],
+    outputRange: [elementmove.y, 0],
   });
 
   const transformStyle =  { transform:
@@ -109,6 +88,8 @@ const createAnchoredView = (anchor: TransitionItem, to: TransitionItem,
   const retVal = createAnimatedWrapper({component, nativeStyles});
   return retVal;
 }
+
+const ptToString = (p) => "x: " + p.x + " y: " + p.y;
 
 const styles = StyleSheet.create({
   anchorElement: {
