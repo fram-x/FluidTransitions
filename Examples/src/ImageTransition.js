@@ -8,8 +8,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   detailsImage: {
-    width: Dimensions.get('window').width - 20,
-    height: Dimensions.get('window').width - 20,
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').width,
   },
   detailsView: {
     padding: 10,
@@ -30,23 +30,18 @@ const styles = StyleSheet.create({
     margin: 2,
   },
   header: {
-    height: 80,
+    height: 65,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#1010FF',
+    backgroundColor: '#0000FA',
   },
   headerText: {
     fontWeight: 'bold',
     fontSize: 18,
     color: '#FFF',
   },
-  splitter: {
+  imageContainer: {
     flexDirection: 'row',
-  },
-  splitterLeft: {
-    width: 20,
-    height: Dimensions.get('window').width - 20,
-    backgroundColor: '#a0FFa0',
   },
 });
 
@@ -100,10 +95,7 @@ class ImageDetailsScreen extends React.Component {
             <Text style={styles.headerText}>Header</Text>
           </View>
         </Transition>
-        <View style={styles.splitter}>
-          <Transition anchor={params.url}>
-            <View style={styles.splitterLeft} />
-          </Transition>
+        <View style={styles.imageContainer}>
           <Transition shared={params.url}>
             <Image style={styles.detailsImage} source={{ uri }} />
           </Transition>
@@ -131,50 +123,51 @@ class ImageGrid extends Component {
     this.state = { chunkedImages: _.chunk(props.images, this._colCount) };
   }
 
-    _colCount
-    _photoSize
-    _margin
-    _chunkedImages
+  _colCount
+  _photoSize
+  _margin
+  _chunkedImages
 
-    componentWillReceiveProps(nextProps) {
-      this.setState({ ...this.state, chunkedImages: _.chunk(nextProps.images, this._colCount) });
-    }
+  componentWillReceiveProps(nextProps) {
+    this.setState({ ...this.state, chunkedImages: _.chunk(nextProps.images, this._colCount) });
+  }
 
-    render() {
-      return (
-        <FlatList
-          data={this.state.chunkedImages}
-          keyExtractor={this.keyExtractor}
-          renderItem={this.renderItem.bind(this)}
-        />);
-    }
+  render() {
+    return (
+      <FlatList
+        data={this.state.chunkedImages}
+        keyExtractor={this.keyExtractor}
+        renderItem={this.renderItem.bind(this)}
+      />);
+  }
 
-    keyExtractor(item, index) {
-      return `key_${index}`;
-    }
+  keyExtractor(item, index) {
+    return `key_${index}`;
+  }
 
-    renderItem(item) {
-      return (
-        <View style={styles.row}>
-          {item.item.map(this.renderCell.bind(this))}
+  renderItem(item) {
+    return (
+      <View style={styles.row}>
+        {item.item.map(this.renderCell.bind(this))}
+      </View>
+    );
+  }
+
+  renderCell(image) {
+    return (
+      <TouchableOpacity onPress={() => this.props.imageSelected(image)} key={image.url}>
+        <View style={styles.cell}>
+          <Transition shared={image.url}>
+            <Image
+              resizeMode="cover"
+              source={{ uri: image.url }}
+              style={{ width: this._photoSize, height: this._photoSize }}
+            />
+          </Transition>
         </View>
-      );
-    }
-
-    renderCell(image) {
-      return (
-        <TouchableOpacity onPress={() => this.props.imageSelected(image)} key={image.url}>
-          <View style={styles.cell}>
-            <Transition shared={image.url}>
-              <Image
-                source={{ uri: image.url }}
-                style={{ width: this._photoSize, height: this._photoSize }}
-              />
-            </Transition>
-          </View>
-        </TouchableOpacity>
-      );
-    }
+      </TouchableOpacity>
+    );
+  }
 }
 
 const Navigator = FluidNavigator({
