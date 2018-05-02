@@ -17,8 +17,12 @@ const getAnchoredElements = (sharedElements: Array<any>, getInterpolationFunctio
   sharedElements.forEach(p => {
     if(p.toItem.anchors && p.toItem.anchors.length > 0) {
       p.toItem.anchors.forEach(a => {        
+
+        const scale = p.fromItem.scaleRelativeTo(p.toItem);
+        const scaleOp = p.toItem.scaleRelativeTo(p.fromItem);
+
         retVal.push(createAnchoredView(a, p.toItem, p.fromItem,
-          getInterpolationFunction));
+          getInterpolationFunction, scale, scaleOp));
       });
     }
   });
@@ -26,39 +30,43 @@ const getAnchoredElements = (sharedElements: Array<any>, getInterpolationFunctio
 }
 
 const createAnchoredView = (anchor: TransitionItem, to: TransitionItem,
-  from: TransitionItem, getInterpolationFunction: Function) => {
-    const interpolator = getInterpolationFunction(true);
-    const scale = from.scaleRelativeTo(to);
-    const scaleX = interpolator.interpolate({
-      inputRange: [0, 1],
-      outputRange: [scale.x, 1],
-    });
+  from: TransitionItem, getInterpolationFunction: Function, scale: any, scaleOp: any) => {
+  const interpolator = getInterpolationFunction(true);
+  
+  const scaleX = interpolator.interpolate({
+    inputRange: [0, 1],
+    outputRange: [scale.x, 1],
+  });
 
   const scaleY = interpolator.interpolate({
     inputRange: [0, 1],
     outputRange: [scale.y, 1],
-  });
+  });  
 
-  const diffaiX = (anchor.metrics.x - to.metrics.x);
-  const diffaiY = (anchor.metrics.y - to.metrics.y); 
-  const diffItemsX = (from.metrics.x - to.metrics.x);
-  const diffItemsY = (from.metrics.y - to.metrics.y);
-  const anchorStartX = diffItemsX - diffaiX - ((anchor.metrics.width) * scale.x) + (anchor.metrics.x * scale.x);
-  const anchorStartY = diffItemsY - diffaiY - ((anchor.metrics.height) * scale.y) + (anchor.metrics.y * scale.y);
+  const am = anchor.metrics;
+  const fm = from.metrics;
+  const tm = to.metrics;
+
+  const d = (fm.x - tm.x) * scaleOp.x;
+  const a = (fm.y - tm.y) * scaleOp.y;
+  const h = (fm.height - tm.height);
+  const k = (fm.width - tm.width);
   
+  let anchorStart = { x: d, y: a };
+    
   const translateX = interpolator.interpolate({
     inputRange: [0, 1],
-    outputRange: [anchorStartX, 0],
+    outputRange: [(anchorStart.x)* scale.x, 0],
   });
 
   const translateY = interpolator.interpolate({
     inputRange: [0, 1],
-    outputRange: [anchorStartY, 0],
+    outputRange: [(anchorStart.y)* scale.y, 0],
   });
 
   const transformStyle =  { transform: 
     [{ translateX }, { translateY }, { scaleX }, { scaleY }]
-    //[{ translateX }, { translateY }]
+    // [ { scaleX }, { scaleY }, { translateX }, { translateY }]
   };  
 
   const fadeStyle = { opacity: interpolator.interpolate({
@@ -78,7 +86,7 @@ const createAnchoredView = (anchor: TransitionItem, to: TransitionItem,
 
   const element = React.Children.only(anchor.reactElement.props.children);
   const key = "an-" + anchor.name + anchor.route;
-  const props = { ...element.props, __index: to.index };
+  const props = { ...element.props, __index: to.index };  
   const component = React.createElement(element.type, { ...props, key });
   const retVal = createAnimatedWrapper({component, nativeStyles});
   return retVal;
