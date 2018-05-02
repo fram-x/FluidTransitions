@@ -111,9 +111,9 @@ class Transition extends React.Component<TransitionProps> {
   }
 
   getVisibilityStyle() {
-    const { getTransitionProgress, getIndex, 
+    const { getTransitionProgress, getIndex, getIsAnchored,
       getIsPartOfSharedTransition, getIsPartOfTransition } = this.context;
-    if (!getTransitionProgress || !getIndex || 
+    if (!getTransitionProgress || !getIndex || !getIsAnchored ||
       !getIsPartOfSharedTransition || !getIsPartOfTransition) return {};
       
     const progress = getTransitionProgress();
@@ -125,18 +125,12 @@ class Transition extends React.Component<TransitionProps> {
     
     const isPartOfSharedTransition = getIsPartOfSharedTransition(this._getName(), this._route);        
     const isPartOfTransition = getIsPartOfTransition(this._getName(), this._route);
+    const isAnchored = getIsAnchored(this._getName(), this._route);
     const visibilityProgress = progress.interpolate({ inputRange, outputRange });
 
-    if (isPartOfSharedTransition) {
-      return { opacity: visibilityProgress };
-          inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_OUT,
-          outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE_ANIM_OUT,
-        }) 
-      };
-    } else if (isPartOfTransition) {
-      return { opacity: visibilityProgress };      
-    }
-
+    if (isPartOfSharedTransition || isPartOfTransition || isAnchored) {
+      return { opacity: visibilityProgress };          
+    }  
     return {};
   }
 }
