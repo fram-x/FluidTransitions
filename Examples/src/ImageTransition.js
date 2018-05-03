@@ -167,7 +167,7 @@ class ImageGrid extends Component {
   }
 }
 
-const Navigator = FluidNavigator({
+const Navigator = StackNavigator({
   imageList: { screen: ImageListScreen },
   imageDetails: { screen: ImageDetailsScreen },
 }, {
