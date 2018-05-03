@@ -1,5 +1,11 @@
 import React from 'react';
-import { StackRouter, NavigationActions, createNavigationContainer, createNavigator } from 'react-navigation';
+import { 
+  StackRouter, 
+  NavigationActions, 
+  createNavigationContainer, 
+  createNavigator, 
+  StackActions 
+} from 'react-navigation';
 import FluidTransitioner from './FluidTransitioner';
 
 export default (routeConfigMap, stackConfig = {}) => {
@@ -22,22 +28,33 @@ export default (routeConfigMap, stackConfig = {}) => {
     navigationOptions,
   };
 
+  class FluidView extends React.Component {
+    render() {
+      return (
+        <FluidTransitioner
+          navigation={this.props.navigation}
+          descriptors={this.props.descriptors}
+          onTransitionStart={this.props.onTransitionStart}
+          onTransitionEnd={(transition, lastTransition) => {
+            const { onTransitionEnd, navigation } = this.props;
+            if (
+              transition.navigation.state.isTransitioning &&
+              !lastTransition.navigation.state.isTransitioning
+            ) {
+              navigation.dispatch(
+                StackActions.completeTransition({
+                  key: navigation.state.key,
+                })
+              );
+            }
+            onTransitionEnd && onTransitionEnd(transition, lastTransition);
+          }}
+      />
+      );
+    }
+  }
+
   const router = StackRouter(routeConfigMap, stackRouterConfig);
-
-  // Create a navigator with CardStackTransitioner as the view
-  const navigator = createNavigator(router, routeConfigMap, stackConfig)(props => (
-    <FluidTransitioner
-      {...props}
-      style={style}
-      mode={mode}
-      transitionConfig={transitionConfig}
-      onTransitionStart={onTransitionStart}
-      onTransitionEnd={() => {
-        const { dispatch } = props.navigation;
-        dispatch(NavigationActions.completeTransition());
-        if (onTransitionEnd) onTransitionEnd();
-      }}
-    />));
-
-  return createNavigationContainer(navigator);
+  const Navigator = createNavigator(FluidView, router, stackConfig);
+  return createNavigationContainer(Navigator);
 };
