@@ -32,6 +32,7 @@ export default (routeConfigMap, stackConfig = {}) => {
     render() {
       return (
         <FluidTransitioner
+          mode={mode}
           navigation={this.props.navigation}
           descriptors={this.props.descriptors}
           onTransitionStart={this.props.onTransitionStart}
