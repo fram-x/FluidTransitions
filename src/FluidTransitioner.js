@@ -171,8 +171,9 @@ class FluidTransitioner extends React.Component<*> {
   _render(props, prevProps) {
     this._layoutsReady = false;
     
-    const { navigation, position } = props;
+    const { position } = props;    
     const { scene, layout } = props;
+    const { navigation } = scene.descriptor;
     
     this._animatedSubscribeForNativeAnimation(props.position);
     this._updateSceneArray(props.scenes);
@@ -339,7 +340,7 @@ class FluidTransitioner extends React.Component<*> {
   _renderScene(transitionProps) {
     const { scene } = transitionProps;
     const { index } = scene;
-    const { navigation } = this.props;
+    const { navigation } = scene.descriptor;
     const SceneView = scene.descriptor.getComponent();
 
     return (
@@ -383,12 +384,11 @@ class FluidTransitioner extends React.Component<*> {
   }
 
   _getSceneTransitionConfiguration(routeName: string, navigation: any) {
-    const route = navigation.state.routes.find(r => r.routeName === routeName);
+    const route = navigation.state;
     const descriptor = this.props.descriptors;
     const props = { navigation, scene: { route, descriptor } };
     return this._configureTransition(props);
   }
-
 }
 
 const styles = StyleSheet.create({
