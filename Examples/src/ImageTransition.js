@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, Dimensions, Button, TouchableOpacity, FlatList, Image, StyleSheet } from 'react-native';
 import _ from 'lodash';
+import { StackNavigator } from 'react-navigation';
 import { FluidNavigator, Transition } from 'react-navigation-fluid-transitions';
 
 const styles = StyleSheet.create({
@@ -75,10 +76,7 @@ class ImageListScreen extends React.Component {
       <View style={styles.container}>
         <ImageGrid
           images={this.state.items}
-          imageSelected={(image) =>
-            this.props.navigation.navigate('imageDetails', {
-              url: image.url,
-            })}
+          imageSelected={(image) => this.props.navigation.navigate('imageDetails', { url: image.url })}
         />
       </View>);
   }
@@ -86,23 +84,22 @@ class ImageListScreen extends React.Component {
 
 class ImageDetailsScreen extends React.Component {
   render() {
-    const { params } = this.props.navigation.state;
-    const uri = params.url;
+    const uri = this.props.navigation.getParam('url', '');
     return (
       <View style={styles.container}>
-        <Transition anchor={params.url}>
+        <Transition anchor={uri}>
           <View style={styles.header}>
             <Text style={styles.headerText}>Header</Text>
           </View>
         </Transition>
         <View style={styles.imageContainer}>
-          <Transition shared={params.url}>
+          <Transition shared={uri}>
             <Image style={styles.detailsImage} source={{ uri }} />
           </Transition>
         </View>
-        <Transition anchor={params.url}>
+        <Transition anchor={uri}>
           <View style={styles.detailsView}>
-            <Text style={styles.text}>{params.url}</Text>
+            <Text style={styles.text}>{uri}</Text>
             <View style={styles.buttonContainer}>
               <Button title="Back" onPress={() => this.props.navigation.goBack()} />
             </View>
@@ -170,7 +167,7 @@ class ImageGrid extends Component {
   }
 }
 
-const Navigator = FluidNavigator({
+const Navigator = StackNavigator({
   imageList: { screen: ImageListScreen },
   imageDetails: { screen: ImageDetailsScreen },
 }, {
@@ -179,6 +176,13 @@ const Navigator = FluidNavigator({
   },
 });
 
-export default () => (
-  <Navigator />
-);
+class ImageTransitions extends React.Component {
+  static router = Navigator.router;
+  render() {
+    return (
+      <Navigator navigation={this.props.navigation} />
+    );
+  }
+}
+
+export default ImageTransitions;

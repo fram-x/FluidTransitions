@@ -192,6 +192,14 @@ const Navigator = FluidNavigator({
   },
 });
 
-export default () => (
-  <Navigator />
-);
+class ShoeShop extends React.Component {
+  static router = Navigator.router;
+  render() {
+    return (
+      <Navigator navigation={this.props.navigation} />
+    );
+  }
+}
+
+export default ShoeShop;
+

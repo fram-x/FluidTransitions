@@ -183,6 +183,14 @@ const Navigator = FluidNavigator({
   },
 });
 
-export default () => (
-  <Navigator />
-);
+class Onboarding extends React.Component {
+  static router = Navigator.router;
+  render() {
+    return (
+      <Navigator navigation={this.props.navigation} />
+    );
+  }
+}
+
+export default Onboarding;
+

@@ -124,6 +124,13 @@ const Navigator = FluidNavigator({
   screen: { screen: Screen },
 });
 
-export default () => (
-  <Navigator />
-);
+class LayoutTransitions extends React.Component {
+  static router = Navigator.router;
+  render() {
+    return (
+      <Navigator navigation={this.props.navigation} />
+    );
+  }
+}
+
+export default LayoutTransitions;
