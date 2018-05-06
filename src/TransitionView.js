@@ -9,15 +9,14 @@ import { createAnimatedWrapper, createAnimated, getRotationFromStyle } from './U
 
 const uniqueBaseId: string = 'tcid';
 let uuidCount: number = 0;
-let zIndex = 0;
+let zIndex = 1;
 
 type TransitionProps = {
   appear: ?boolean,
   disappear: ?boolean,
   shared: ?string,
   delay: ?boolean,
-  children: Array<any>,
-  modifiers: ?string,
+  children: Array<any>,  
 }
 
 class Transition extends React.Component<TransitionProps> {
@@ -47,7 +46,7 @@ class Transition extends React.Component<TransitionProps> {
   _animatedComponent: any;
   _outerAnimatedComponent: any;
 
-  componentWillMount() {
+  componentDidMount() {
     const { register } = this.context;
     if (register) {
       this._route = this.context.route;
@@ -58,9 +57,6 @@ class Transition extends React.Component<TransitionProps> {
         zIndex++, this.props.anchor,
       ));
     }
-  }
-
-  componentDidMount() {
     this._isMounted = true;
   }
 
@@ -82,6 +78,7 @@ class Transition extends React.Component<TransitionProps> {
 
   _getName(): string {
     if (this.props.shared) { return this.props.shared; }
+    if (this.props.name) { return this.props.name; }
     return this._name;
   }
 

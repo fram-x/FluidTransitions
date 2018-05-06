@@ -20,11 +20,10 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '-20deg' }],
     alignItems: 'flex-start',
     justifyContent: 'flex-end',
-    padding: 10,
-    shadowColor: '#000',
-    shadowRadius: 5,
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.4,
+    // shadowColor: '#000',
+    // shadowRadius: 5,
+    // shadowOffset: { width: 0, height: 5 },
+    // shadowOpacity: 0.4,
     // elevation: 17,
   },
   shoe1: {
@@ -73,10 +72,17 @@ const styles = StyleSheet.create({
     paddingTop: 70,
     padding: 10,
   },
+  price: {
+    color: '#FFF',
+    fontSize: 34,
+    fontFamily: 'Bebas Neue',
+    textAlign: 'center',
+    paddingTop: -55 + Dimensions.get('window').height * 0.5,
+  },
   headerContainer2: {
     padding: 20,
     justifyContent: 'center',
-    paddingTop: Dimensions.get('window').height * 0.52,
+    paddingTop: 50,
   },
   header2: {
     color: '#444',
@@ -139,6 +145,7 @@ const Screen1 = (props) => (
     </TouchableWithoutFeedback>
   </View>
 );
+
 const Screen2 = (props) => (
   <View style={styles.container}>
     <TouchableWithoutFeedback onPress={() => props.navigation.goBack()}>
@@ -148,6 +155,9 @@ const Screen2 = (props) => (
         </Transition>
         <Transition shared="image">
           <Image style={styles.shoe2} source={require('./assets/air-jordan-1.png')} />
+        </Transition>
+        <Transition appear="horizontal" delay>
+          <Text style={styles.price}>$ 299</Text>
         </Transition>
         <View style={styles.smallImageContainer}>
           <Transition appear="horizontal" delay>

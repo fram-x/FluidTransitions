@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
 import PropTypes from 'prop-types';
+import * as _ from 'lodash'
 
 import TransitionItem from './TransitionItem';
 import { NavigationDirection, TransitionContext, RouteDirection } from './Types';
@@ -56,18 +57,17 @@ class TransitionOverlayView extends React.Component<Props> {
     const sharedElementViews = getSharedElements(sharedElements, this.getInterpolation);
     const anchoredViews = getAnchoredElements(sharedElements, this.getInterpolation);
 
-    const views = [...transitionViews, ...sharedElementViews, ...anchoredViews]
-      .sort((el1, el2) => el1.props.index - el2.props.index);
-      
+    let views = [...transitionViews, ...sharedElementViews, ...anchoredViews];
+    views = _.sortBy(views, 'props.index');    
+    
     return (
       <Animated.View style={[styles.overlay, this.getVisibilityStyle()]} pointerEvents="none">
         {views}
       </Animated.View>
     );
   }
-
-  getVisibilityStyle() {
-    const { getTransitionProgress } = this.context;
+  
+  getVisibilityStyle() {const { getTransitionProgress } = this.context;
     const { index } = this.props;
 
     if (!getTransitionProgress) return {};
