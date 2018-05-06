@@ -132,7 +132,7 @@ const Screen1 = (props) => (
         <Transition appear="horizontal">
           <View style={styles.headerContainer1}>
             <Text style={styles.header1}>THE TEN</Text>
-            <Text style={styles.subHeader1}>AIR JORDAN 1</Text>
+            <Text style={styles.subHeader1}>AIR JORDAN I</Text>
           </View>
         </Transition>
       </View>
@@ -164,7 +164,7 @@ const Screen2 = (props) => (
         <Transition appear="horizontal">
           <View style={styles.headerContainer2}>
             <Text style={styles.header2}>THE TEN</Text>
-            <Text style={styles.subHeader2}>AIR JORDAN 1</Text>
+            <Text style={styles.subHeader2}>AIR JORDAN I</Text>
           </View>
         </Transition>
       </View>
