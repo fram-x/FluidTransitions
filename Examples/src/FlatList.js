@@ -127,6 +127,7 @@ const styles = StyleSheet.create({
     height: Dimensions.get('window').width,
   },
   bottomContainer: {
+    backgroundColor: '#ECECEC',
     flex: 1,
     padding: 20,
   },
