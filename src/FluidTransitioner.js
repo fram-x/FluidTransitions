@@ -247,7 +247,7 @@ class FluidTransitioner extends React.Component<*> {
           const currentDragPosition = event.nativeEvent[isVertical ? 'pageY' : 'pageX'];
           const axisLength = isVertical
             ? layout.height.__getValue()
-            : layout.width.__getValue();
+            : layout.width.__getValue(); 
           const axisHasBeenMeasured = !!axisLength;
           // Measure the distance from the touch to the edge of the screen
           // const screenEdgeDistance = gestureDirectionInverted
@@ -277,7 +277,7 @@ class FluidTransitioner extends React.Component<*> {
           const startValue = this._gestureStartValue;
           const axis = isVertical ? 'dy' : 'dx';
           const axisDistance = isVertical
-            ? layout.height.__getValue()
+            ? layout.height.__getValue() * 0.75
             : layout.width.__getValue();
           const currentValue = (I18nManager.isRTL && axis === 'dx') !== gestureDirectionInverted
             ? startValue + gesture[axis] / axisDistance
