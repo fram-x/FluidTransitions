@@ -44,6 +44,8 @@ const getTransitionElements = (transitionElements: Array<TransitionItem>, transi
 
 const getPositionStyle = (item: TransitionItem, delayCount: number, delayIndex: number, transitionContext: TransitionContext) => {
   return {
+    // borderWidth: 1,
+    // borderColor: '#00FFFF',
     left: item.metrics.x,
     top: item.metrics.y,
     width: item.metrics.width,
@@ -90,8 +92,8 @@ const getTransitionStyle = (item: TransitionItem, delayCount: number, delayIndex
 
       // Create progress interpolation
       const interpolatedProgress = progress.interpolate({
-        inputRange: transitionContext.navDirection === NavigationDirection.forward ? [index - 1, index] : [index, index + 1],
-        outputRange: [0, 1],
+        inputRange: [index - 1, index, index + 1],
+        outputRange: [0, 1, 0],
       });
 
       const transitionSpecification: TransitionSpecification = {

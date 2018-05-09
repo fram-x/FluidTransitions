@@ -12,7 +12,7 @@ export default class TransitionItem {
   constructor(
     name: string, route: string, reactElement: Object,
     shared: boolean, appear: string, disappear: string,
-    delay: boolean, index: number,
+    delay: boolean, index: number, anchor: string
   ) {
     this.name = name;
     this.route = route;
@@ -22,6 +22,7 @@ export default class TransitionItem {
     this.disappear = disappear;
     this.delay = delay;
     this.index = index;
+    this.anchor = anchor;
   }
 
   name: string
@@ -36,6 +37,8 @@ export default class TransitionItem {
   flattenedStyle: ?any
   boundingBoxMetrics: Metrics
   index: number
+  anchor: string
+  _rotation: any;
 
   getNodeHandle() {
     return this.reactElement.getNodeHandle();
@@ -84,19 +87,22 @@ export default class TransitionItem {
   }
 
   getRotation() {
-    const ri = getRotationFromStyle(this.getFlattenedStyle());
-    let retVal = { type: 'unknown', value: 0 };
-    if (ri.rotate) {
-      if (ri.rotate.rotate) {
-        const rotation: String = ri.rotate.rotate;
-        if (rotation.endsWith('deg')) {
-          retVal = { type: 'deg', value: parseInt(rotation.substring(0, rotation.length - 3)) };
-        } else if (rotation.endsWith('rad')) {
-          retVal = { type: 'rad', value: parseInt(rotation.substring(0, rotation.length - 3)) };
+    if(!this._rotation) {
+      const ri = getRotationFromStyle(this.getFlattenedStyle());
+      let retVal = { type: 'unknown', value: 0 };
+      if (ri.rotate) {
+        if (ri.rotate.rotate) {
+          const rotation: String = ri.rotate.rotate;
+          if (rotation.endsWith('deg')) {
+            retVal = { type: 'deg', value: parseInt(rotation.substring(0, rotation.length - 3)) };
+          } else if (rotation.endsWith('rad')) {
+            retVal = { type: 'rad', value: parseInt(rotation.substring(0, rotation.length - 3)) };
+          }
         }
       }
+      this._rotation = retVal;
     }
-    return retVal;
+    return this._rotation;
   }
 
   scaleRelativeTo(other: TransitionItem): Size {

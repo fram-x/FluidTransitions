@@ -24,6 +24,8 @@ const getSharedElements = (sharedElements: Array<any>, getInterpolationFunction:
     const nativeAnimationStyle = [transitionStyles.nativeStyles];
     const overrideStyles = {
       position: 'absolute',
+      // borderColor: '#0000FF',
+      // borderWidth: 1, 
       left: fromItem.metrics.x,
       top: fromItem.metrics.y,
       width: fromItem.metrics.width,
@@ -32,6 +34,7 @@ const getSharedElements = (sharedElements: Array<any>, getInterpolationFunction:
 
     const props = { ...element.props, __index: fromItem.index };
     const component = React.createElement(element.type, { ...props, key });
+
     return createAnimatedWrapper({
       component,
       nativeStyles: nativeAnimationStyle,
@@ -49,14 +52,12 @@ const getTransitionStyle = (
     from: {
       metrics: fromItem.metrics,
       boundingbox: fromItem.boundingBoxMetrics,
-      style: fromItem.getFlattenedStyle(),
-      rotation: fromItem.rotation,
+      style: fromItem.getFlattenedStyle()
     },
     to: {
       metrics: toItem.metrics,
       style: toItem.getFlattenedStyle(),
-      boundingbox: toItem.boundingBoxMetrics,
-      rotation: toItem.rotation,
+      boundingbox: toItem.boundingBoxMetrics
     },
     scaleX: toItem.scaleRelativeTo(fromItem).x,
     scaleY: toItem.scaleRelativeTo(fromItem).y,

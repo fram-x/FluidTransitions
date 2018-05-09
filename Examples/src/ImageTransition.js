@@ -29,6 +29,20 @@ const styles = StyleSheet.create({
   cell: {
     margin: 2,
   },
+  header: {
+    height: 65,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#0000FA',
+  },
+  headerText: {
+    fontWeight: 'bold',
+    fontSize: 18,
+    color: '#FFF',
+  },
+  imageContainer: {
+    flexDirection: 'row',
+  },
 });
 
 class ImageListScreen extends React.Component {
@@ -38,14 +52,16 @@ class ImageListScreen extends React.Component {
       items: [],
     };
   }
-  componentDidMount() {
+
+  componentWillMount() {
     const items = [];
     const size = Dimensions.get('window').width;
     const max = 39;
     const randMax = 100;
     for (let i = 0; i < max; i++) {
       let randomNumber = Math.floor((Math.random() * randMax) + 1);
-      while (items.findIndex(e => e.id === randomNumber) > -1) {
+      const idExists = (e) => e.id === randomNumber;
+      while (items.findIndex(idExists) > -1) {
         randomNumber = Math.floor((Math.random() * randMax) + 1);
       }
 
@@ -74,10 +90,17 @@ class ImageDetailsScreen extends React.Component {
     const uri = params.url;
     return (
       <View style={styles.container}>
-        <Transition shared={params.url}>
-          <Image style={styles.detailsImage} source={{ uri }} />
+        <Transition anchor={params.url}>
+          <View style={styles.header}>
+            <Text style={styles.headerText}>Header</Text>
+          </View>
         </Transition>
-        <Transition appear="bottom">
+        <View style={styles.imageContainer}>
+          <Transition shared={params.url}>
+            <Image style={styles.detailsImage} source={{ uri }} />
+          </Transition>
+        </View>
+        <Transition anchor={params.url}>
           <View style={styles.detailsView}>
             <Text style={styles.text}>{params.url}</Text>
             <View style={styles.buttonContainer}>
@@ -100,55 +123,60 @@ class ImageGrid extends Component {
     this.state = { chunkedImages: _.chunk(props.images, this._colCount) };
   }
 
-    _colCount
-    _photoSize
-    _margin
-    _chunkedImages
+  _colCount
+  _photoSize
+  _margin
+  _chunkedImages
 
-    componentWillReceiveProps(nextProps) {
-      this.setState({ ...this.state, chunkedImages: _.chunk(nextProps.images, this._colCount) });
-    }
+  componentWillReceiveProps(nextProps) {
+    this.setState({ ...this.state, chunkedImages: _.chunk(nextProps.images, this._colCount) });
+  }
 
-    render() {
-      return (
-        <FlatList
-          data={this.state.chunkedImages}
-          keyExtractor={this.keyExtractor}
-          renderItem={this.renderItem.bind(this)}
-        />);
-    }
+  render() {
+    return (
+      <FlatList
+        data={this.state.chunkedImages}
+        keyExtractor={this.keyExtractor}
+        renderItem={this.renderItem.bind(this)}
+      />);
+  }
 
-    keyExtractor(item, index) {
-      return `key_${index}`;
-    }
+  keyExtractor(item, index) {
+    return `key_${index}`;
+  }
 
-    renderItem(item) {
-      return (
-        <View style={styles.row}>
-          {item.item.map(this.renderCell.bind(this))}
+  renderItem(item) {
+    return (
+      <View style={styles.row}>
+        {item.item.map(this.renderCell.bind(this))}
+      </View>
+    );
+  }
+
+  renderCell(image) {
+    return (
+      <TouchableOpacity onPress={() => this.props.imageSelected(image)} key={image.url}>
+        <View style={styles.cell}>
+          <Transition shared={image.url}>
+            <Image
+              resizeMode="cover"
+              source={{ uri: image.url }}
+              style={{ width: this._photoSize, height: this._photoSize }}
+            />
+          </Transition>
         </View>
-      );
-    }
-
-    renderCell(image) {
-      return (
-        <TouchableOpacity onPress={() => this.props.imageSelected(image)} key={image.url}>
-          <View style={styles.cell}>
-            <Transition shared={image.url}>
-              <Image
-                source={{ uri: image.url }}
-                style={{ width: this._photoSize, height: this._photoSize }}
-              />
-            </Transition>
-          </View>
-        </TouchableOpacity>
-      );
-    }
+      </TouchableOpacity>
+    );
+  }
 }
 
 const Navigator = FluidNavigator({
   imageList: { screen: ImageListScreen },
   imageDetails: { screen: ImageDetailsScreen },
+}, {
+  navigationOptions: {
+    gesturesEnabled: true,
+  },
 });
 
 export default () => (

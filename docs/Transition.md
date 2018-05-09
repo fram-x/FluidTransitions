@@ -47,3 +47,6 @@ The `disappear` property of the `Transition` element is used (if not set the app
 
 ### Delay
 The `delay` property of the `Transition` element is used to specify that the element should be delayed when in transition. When one or more elements are delayed, their transition will start sequentially to give the impression that the different elements appear at a different time. The delay property is a true/false property.
+
+### Anchor
+The `anchor` property of the `Transition` element can be used to bind the transition to a shared element transition. Say you have an image that is transitioned in a shared transition from a list to a details screen. The details screen has a header and a box with some additional information about the image (see the ImageTransition example). If you want the header and details box to transition together with the image you can accomplish this by setting the `anchor` property to the same value as the `shared` property of the shared element. You can see an example of this in the [Image Transition example](https://github.com/fram-x/FluidTransitions/blob/develop/Examples/src/ImageTransition.js). 
