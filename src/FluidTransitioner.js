@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, Platform, Easing, I18nManager, Animated, PanResponder } from 'react-native';
+import { StyleSheet, Platform, Easing, I18nManager, Animated, PanResponder, InteractionManager } from 'react-native';
 import { NavigationActions, Transitioner } from 'react-navigation';
 import clamp from 'clamp';
 
@@ -39,6 +39,7 @@ class FluidTransitioner extends React.Component<*> {
   _gestureStartValue = 0;
   _isResponding = false;
   _immediateIndex = null;
+  _panResponder = null;
 
   static childContextTypes = {
     route: PropTypes.string,
@@ -225,7 +226,15 @@ class FluidTransitioner extends React.Component<*> {
         ? options.gesturesEnabled
         : Platform.OS === 'ios';
     
-    const responder = !gesturesEnabled
+    // https://github.com/facebook/react-native/issues/8624
+    // https://github.com/react-navigation/react-navigation/issues/4144
+    if(this._panResponder) {
+      const handle = this._panResponder.getInteractionHandle();
+      if(handle)
+        InteractionManager.clearInteractionHandle(handle);
+    }
+    this._panResponder = !gesturesEnabled
+
       ? null
       : PanResponder.create({
         onPanResponderTerminate: () => {
@@ -333,7 +342,7 @@ class FluidTransitioner extends React.Component<*> {
           });
         },
       });
-    const handlers = gesturesEnabled ? responder.panHandlers : {};
+    const handlers = gesturesEnabled ? this._panResponder.panHandlers : {};
     return handlers;
   }
 
