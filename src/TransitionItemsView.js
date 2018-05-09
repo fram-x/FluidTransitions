@@ -60,6 +60,7 @@ export default class TransitionItemsView extends React.Component<
     this.getIsPartOfTransition = this.getIsPartOfTransition.bind(this);    
     this.getTransitionProgress = this.getTransitionProgress.bind(this);
     this.getRoutes = this.getRoutes.bind(this);
+    this.getIsAnchored = this.getIsAnchored.bind(this);
 
     this._interactionDonePromise = new Promise(resolve => this._interactionDonePromiseDone = resolve);
 
@@ -148,6 +149,19 @@ export default class TransitionItemsView extends React.Component<
     return [this.state.fromRoute, this.state.toRoute].filter(r => r !== null);
   }
 
+  getIsAnchored(name: string, route: string, anchor: string) {
+    const item = this._transitionItems.getItemByNameAndRoute(name, route);
+    if (!item) return false;
+
+    const sharedElements = this._transitionItems.getSharedElements(this.state.fromRoute, this.state.toRoute);
+    if(sharedElements && 
+      (sharedElements.find(p => p.fromItem.name === item.anchor && p.fromItem.route === route)) ||
+      sharedElements.find(p => p.toItem.name === item.anchor && p.toItem.route === route)) {
+        return true;
+      }
+    return false;
+  }
+
   getIsPartOfSharedTransition(name: string, route: string) {
     const item = this._transitionItems.getItemByNameAndRoute(name, route);
     if (!item || !item.shared) return false;
@@ -200,6 +214,16 @@ export default class TransitionItemsView extends React.Component<
         const pair = sharedElements[i];
         await this.measureItem(viewMetrics, pair.fromItem);
         await this.measureItem(viewMetrics, pair.toItem);
+        if(pair.fromItem && pair.fromItem.anchors){
+          for(let n = 0; n < pair.fromItem.anchors.length; n++){
+            await this.measureItem(viewMetrics, pair.fromItem.anchors[n]);
+          }
+        }
+        if(pair.toItem && pair.toItem.anchors){
+          for(let n = 0; n < pair.toItem.anchors.length; n++){
+            await this.measureItem(viewMetrics, pair.toItem.anchors[n]);
+          }
+        }
       }
     }
 
@@ -313,6 +337,8 @@ export default class TransitionItemsView extends React.Component<
     getIsPartOfSharedTransition: PropTypes.func,
     getIsPartOfTransition: PropTypes.func,    
     getRoutes: PropTypes.func,
+    getIsAnchored: PropTypes.func,
+    getRoutes: PropTypes.func,    
   }
 
   static contextTypes = {
@@ -330,6 +356,7 @@ export default class TransitionItemsView extends React.Component<
         this.state.direction : NavigationDirection.unknown),
       getIsPartOfSharedTransition: this.getIsPartOfSharedTransition,
       getIsPartOfTransition: this.getIsPartOfTransition,      
+      getIsAnchored: this.getIsAnchored,
       getRoutes: this.getRoutes
     };
   }

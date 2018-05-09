@@ -1,13 +1,14 @@
 import React from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
 import PropTypes from 'prop-types';
+import * as _ from 'lodash'
 
 import TransitionItem from './TransitionItem';
 import { NavigationDirection, TransitionContext, RouteDirection } from './Types';
 import * as Constants from './TransitionConstants';
 
 import { initTransitionTypes, getTransitionElements } from './Transitions';
-import { initInterpolatorTypes, getSharedElements } from './Interpolators';
+import { initInterpolatorTypes, getSharedElements, getAnchoredElements } from './Interpolators';
 
 initTransitionTypes();
 initInterpolatorTypes();
@@ -44,7 +45,8 @@ class TransitionOverlayView extends React.Component<Props> {
         (p.toItem.route === from || p.toItem.route === to)) : [];
       
     const transitionContext = this.getTransitionContext(transitionElements);
-    if (!transitionContext || !this.getMetricsReady()) {
+    if (!transitionContext || !this.getMetricsReady() || 
+      (sharedElements.length === 0 && transitionElements.length === 0)) {      
       return <View style={styles.overlay} pointerEvents="none" />;
     }
     
@@ -53,18 +55,19 @@ class TransitionOverlayView extends React.Component<Props> {
 
     const transitionViews = getTransitionElements(transitionElements, transitionContext);
     const sharedElementViews = getSharedElements(sharedElements, this.getInterpolation);
-    const views = [...transitionViews, ...sharedElementViews]
-      .sort((el1, el2) => el1.props.index - el2.props.index);
-      
+    const anchoredViews = getAnchoredElements(sharedElements, this.getInterpolation);
+
+    let views = [...transitionViews, ...sharedElementViews, ...anchoredViews];
+    views = _.sortBy(views, 'props.index');    
+    
     return (
       <Animated.View style={[styles.overlay, this.getVisibilityStyle()]} pointerEvents="none">
         {views}
       </Animated.View>
     );
   }
-
-  getVisibilityStyle() {
-    const { getTransitionProgress } = this.context;
+  
+  getVisibilityStyle() {const { getTransitionProgress } = this.context;
     const { index } = this.props;
 
     if (!getTransitionProgress) return {};
@@ -82,13 +85,33 @@ class TransitionOverlayView extends React.Component<Props> {
     let metricsReady = true;
     if (this.props.transitionElements) {
       this.props.transitionElements.forEach(item => {
-        if (!item.metrics) { metricsReady = false; }
+        if (!item.metrics) { 
+          metricsReady = false; 
+        }
       });
     }
 
     if (this.props.sharedElements) {
       this.props.sharedElements.forEach(pair => {
-        if (!pair.toItem.metrics || !pair.fromItem.metrics) { metricsReady = false; }
+        if (!pair.toItem.metrics || !pair.fromItem.metrics) { 
+          metricsReady = false;
+        }
+        if(pair.fromItem && pair.fromItem.anchors) {
+          for(let n = 0; n < pair.fromItem.anchors.length; n++) {
+            if(!pair.fromItem.anchors[n].metrics) {
+              metricsReady = false;
+              break;
+            }
+          }
+        }
+        if(pair.toItem && pair.toItem.anchors) {
+          for(let n = 0; n < pair.toItem.anchors.length; n++) {
+            if(!pair.toItem.anchors[n].metrics) {
+              metricsReady = false;
+              break;
+            }
+          }
+        }
       });
     }
     return metricsReady;

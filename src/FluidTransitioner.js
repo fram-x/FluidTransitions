@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, Platform, Easing, I18nManager, Animated, PanResponder } from 'react-native';
+import { StyleSheet, Platform, Easing, I18nManager, Animated, PanResponder, InteractionManager } from 'react-native';
 import { addNavigationHelpers, NavigationActions, Transitioner } from 'react-navigation';
 import clamp from 'clamp';
 
@@ -41,6 +41,7 @@ class FluidTransitioner extends React.Component<*> {
   _gestureStartValue = 0;
   _isResponding = false;
   _immediateIndex = null;
+  _panResponder = null;
 
   static childContextTypes = {
     route: PropTypes.string,
@@ -225,7 +226,14 @@ class FluidTransitioner extends React.Component<*> {
         ? options.gesturesEnabled
         : Platform.OS === 'ios';
     
-    const responder = !gesturesEnabled
+    // https://github.com/facebook/react-native/issues/8624
+    // https://github.com/react-navigation/react-navigation/issues/4144
+    if(this._panResponder) {
+      const handle = this._panResponder.getInteractionHandle();
+      if(handle)
+        InteractionManager.clearInteractionHandle(handle);
+    }
+    this._panResponder = !gesturesEnabled
       ? null
       : PanResponder.create({
         onPanResponderTerminate: () => {
@@ -247,7 +255,7 @@ class FluidTransitioner extends React.Component<*> {
           const currentDragPosition = event.nativeEvent[isVertical ? 'pageY' : 'pageX'];
           const axisLength = isVertical
             ? layout.height.__getValue()
-            : layout.width.__getValue();
+            : layout.width.__getValue(); 
           const axisHasBeenMeasured = !!axisLength;
           // Measure the distance from the touch to the edge of the screen
           // const screenEdgeDistance = gestureDirectionInverted
@@ -277,7 +285,7 @@ class FluidTransitioner extends React.Component<*> {
           const startValue = this._gestureStartValue;
           const axis = isVertical ? 'dy' : 'dx';
           const axisDistance = isVertical
-            ? layout.height.__getValue()
+            ? layout.height.__getValue() * 0.75
             : layout.width.__getValue();
           const currentValue = (I18nManager.isRTL && axis === 'dx') !== gestureDirectionInverted
             ? startValue + gesture[axis] / axisDistance
@@ -333,7 +341,7 @@ class FluidTransitioner extends React.Component<*> {
           });
         },
       });
-    const handlers = gesturesEnabled ? responder.panHandlers : {};
+    const handlers = gesturesEnabled ? this._panResponder.panHandlers : {};
     return handlers;
   }
 

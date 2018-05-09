@@ -9,15 +9,14 @@ import { createAnimatedWrapper, createAnimated, getRotationFromStyle } from './U
 
 const uniqueBaseId: string = 'tcid';
 let uuidCount: number = 0;
-let zIndex = 0;
+let zIndex = 1;
 
 type TransitionProps = {
   appear: ?boolean,
   disappear: ?boolean,
   shared: ?string,
   delay: ?boolean,
-  children: Array<any>,
-  modifiers: ?string,
+  children: Array<any>,  
 }
 
 class Transition extends React.Component<TransitionProps> {
@@ -31,6 +30,7 @@ class Transition extends React.Component<TransitionProps> {
     getIndex: PropTypes.func,
     getIsPartOfSharedTransition: PropTypes.func,    
     getIsPartOfTransition: PropTypes.func,    
+    getIsAnchored: PropTypes.func   
   }
 
   constructor(props: TransitionProps, context: any) {
@@ -46,7 +46,7 @@ class Transition extends React.Component<TransitionProps> {
   _animatedComponent: any;
   _outerAnimatedComponent: any;
 
-  componentWillMount() {
+  componentDidMount() {
     const { register } = this.context;
     if (register) {
       this._route = this.context.route;
@@ -54,12 +54,9 @@ class Transition extends React.Component<TransitionProps> {
         this._getName(), this.context.route,
         this, this.props.shared !== undefined, this.props.appear,
         this.props.disappear, this.props.delay !== undefined,
-        zIndex++,
+        zIndex++, this.props.anchor,
       ));
     }
-  }
-
-  componentDidMount() {
     this._isMounted = true;
   }
 
@@ -81,6 +78,7 @@ class Transition extends React.Component<TransitionProps> {
 
   _getName(): string {
     if (this.props.shared) { return this.props.shared; }
+    if (this.props.name) { return this.props.name; }
     return this._name;
   }
 
@@ -110,9 +108,9 @@ class Transition extends React.Component<TransitionProps> {
   }
 
   getVisibilityStyle() {
-    const { getTransitionProgress, getIndex, 
+    const { getTransitionProgress, getIndex, getIsAnchored,
       getIsPartOfSharedTransition, getIsPartOfTransition } = this.context;
-    if (!getTransitionProgress || !getIndex || 
+    if (!getTransitionProgress || !getIndex || !getIsAnchored ||
       !getIsPartOfSharedTransition || !getIsPartOfTransition) return {};
       
     const progress = getTransitionProgress();
@@ -124,14 +122,12 @@ class Transition extends React.Component<TransitionProps> {
     
     const isPartOfSharedTransition = getIsPartOfSharedTransition(this._getName(), this._route);        
     const isPartOfTransition = getIsPartOfTransition(this._getName(), this._route);
+    const isAnchored = getIsAnchored(this._getName(), this._route);
     const visibilityProgress = progress.interpolate({ inputRange, outputRange });
 
-    if (isPartOfSharedTransition) {
-      return { opacity: visibilityProgress };
-    } else if (isPartOfTransition) {
-      return { opacity: visibilityProgress };      
-    }
-
+    if (isPartOfSharedTransition || isPartOfTransition || isAnchored) {
+      return { opacity: visibilityProgress };          
+    }  
     return {};
   }
 }

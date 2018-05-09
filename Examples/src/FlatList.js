@@ -74,7 +74,7 @@ class DetailsScreen extends React.Component {
             source={{ uri: this.props.navigation.state.params.item.url }}
           />
         </Transition>
-        <Transition appear="bottom">
+        <Transition anchor={`image${this.props.navigation.state.params.index}`}>
           <View style={styles.bottomContainer}>
             <View style={styles.textContainer}>
               <Text style={styles.caption}>Image URI:</Text>
@@ -127,6 +127,7 @@ const styles = StyleSheet.create({
     height: Dimensions.get('window').width,
   },
   bottomContainer: {
+    backgroundColor: '#ECECEC',
     flex: 1,
     padding: 20,
   },

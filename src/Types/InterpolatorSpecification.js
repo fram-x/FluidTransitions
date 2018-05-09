@@ -4,14 +4,12 @@ export type InterpolatorSpecification = {
   from: {
     metrics: Metrics,
     boundingbox: Metrics,
-    style: any,
-    rotation: number,
+    style: any,    
   },
   to: {
     metrics: Metrics,
     boundingbox: Metrics,
     style: any,
-    rotation: number,
   },
   scaleX: number,
   scaleY: number,
