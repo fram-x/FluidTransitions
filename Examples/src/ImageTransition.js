@@ -38,14 +38,16 @@ class ImageListScreen extends React.Component {
       items: [],
     };
   }
-  componentDidMount() {
+
+  componentWillMount() {
     const items = [];
     const size = Dimensions.get('window').width;
     const max = 39;
     const randMax = 100;
     for (let i = 0; i < max; i++) {
       let randomNumber = Math.floor((Math.random() * randMax) + 1);
-      while (items.findIndex(e => e.id === randomNumber) > -1) {
+      const idExists = (e) => e.id === randomNumber;
+      while (items.findIndex(idExists) > -1) {
         randomNumber = Math.floor((Math.random() * randMax) + 1);
       }
 
@@ -149,6 +151,10 @@ class ImageGrid extends Component {
 const Navigator = FluidNavigator({
   imageList: { screen: ImageListScreen },
   imageDetails: { screen: ImageDetailsScreen },
+}, {
+  navigationOptions: {
+    gesturesEnabled: true,
+  },
 });
 
 export default () => (

@@ -26,3 +26,26 @@ const transitionConfig = {
 
 const Navigator = FluidNavigator({ Screens }, { transitionConfig });
 ```
+
+## Gesture Support
+`FluidNavigator` supports gestures. To configure gesture support, add navigation options to the navigator or to individual screens:
+
+```javascript
+const Navigator = FluidNavigator({
+  screen1: { screen: Screen1 },
+  screen2: { screen: Screen2, navigationOptions: { gesturesEnabled: false } },
+  screen3: { screen: Screen3 },
+}, {
+  navigationOptions: { gesturesEnabled: true },
+});
+```
+
+To change the direction (default is vertical), set the mode to `card` | `modal`:
+
+```javascript
+const Navigator = FluidNavigator({
+  ...
+}, {
+  mode: 'card' // Horizontal gestures
+});
+```

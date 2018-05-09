@@ -18,21 +18,24 @@ class ListScreen extends React.Component {
       items: [],
     };
   }
-  componentDidMount() {
+
+  componentWillMount() {
     const items = [];
-    const size = 80;
-    const max = 40;
+    const imageSize = 80;
+    const numberOfImages = 40;
     const randMax = 100;
-    for (let i = 0; i < max; i++) {
+    for (let i = 0; i < numberOfImages; i++) {
       let randomNumber = Math.floor((Math.random() * randMax) + 1);
-      while (items.findIndex(e => e.id === randomNumber) > -1) {
+      const idExists = (e) => e.id === randomNumber;
+      while (items.findIndex(idExists) > -1) {
         randomNumber = Math.floor((Math.random() * randMax) + 1);
       }
 
-      items.push({ url: `https://picsum.photos/${size}/${size}?image=${randomNumber}`, id: randomNumber });
+      items.push({ url: `https://picsum.photos/${imageSize}/${imageSize}?image=${randomNumber}`, id: randomNumber });
     }
     this.setState({ ...this.state, items });
   }
+
   render() {
     return (
       <View style={styles.container}>
@@ -138,6 +141,10 @@ const styles = StyleSheet.create({
 const Navigator = FluidNavigator({
   list: { screen: ListScreen },
   details: { screen: DetailsScreen },
+}, {
+  navigationOptions: {
+    gesturesEnabled: true,
+  },
 });
 
 export default () => (

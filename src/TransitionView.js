@@ -7,17 +7,9 @@ import { RouteDirection, NavigationDirection } from './Types';
 import * as Constants from './TransitionConstants';
 import { createAnimatedWrapper, createAnimated, getRotationFromStyle } from './Utils';
 
-const uniqueBaseId: string = `tcid-${Date.now()}`;
+const uniqueBaseId: string = 'tcid';
 let uuidCount: number = 0;
 let zIndex = 0;
-
-const styles = StyleSheet.create({
-  transition: {
-    // backgroundColor: '#0000EF22',
-    // borderColor: '#FF0000',
-    // borderWidth: 1,
-  },
-});
 
 type TransitionProps = {
   appear: ?boolean,
@@ -38,6 +30,7 @@ class Transition extends React.Component<TransitionProps> {
     getDirection: PropTypes.func,
     getIndex: PropTypes.func,
     getIsPartOfSharedTransition: PropTypes.func,    
+    getIsPartOfTransition: PropTypes.func,    
   }
 
   constructor(props: TransitionProps, context: any) {
@@ -117,44 +110,38 @@ class Transition extends React.Component<TransitionProps> {
   }
 
   getVisibilityStyle() {
-    const { getTransitionProgress, getDirectionForRoute,
-      getIndex, getDirection, getIsPartOfSharedTransition } = this.context;
-
-    if (!getTransitionProgress || !getDirectionForRoute ||
-      !getIndex || !getDirection || !getIsPartOfSharedTransition) return {};
-
+    const { getTransitionProgress, getIndex, 
+      getIsPartOfSharedTransition, getIsPartOfTransition } = this.context;
+    if (!getTransitionProgress || !getIndex || 
+      !getIsPartOfSharedTransition || !getIsPartOfTransition) return {};
+      
     const progress = getTransitionProgress();
     const index = getIndex();
-    const direction = getDirection();
-    if (!progress || index === undefined) return { opacity: 0 };
+    if (!progress || index === undefined) return { };
 
-    const routeDirection = getDirectionForRoute(this._getName(), this._route);
-    if (routeDirection === RouteDirection.unknown) return { opacity: 0 };
-
-    const inputRange = direction === NavigationDirection.forward ?
-      [index - 1, index] : [index, index + 1];
-
-    const outputRange = routeDirection === RouteDirection.to ? [0, 1] : [1, 0];
-
+    const inputRange = [index - 1, (index-1) + Constants.OP, index - Constants.OP, index];
+    const outputRange = [1, 0, 0, 1];
+    
+    const isPartOfSharedTransition = getIsPartOfSharedTransition(this._getName(), this._route);        
+    const isPartOfTransition = getIsPartOfTransition(this._getName(), this._route);
     const visibilityProgress = progress.interpolate({ inputRange, outputRange });
 
-    if (this.props.shared && this.props.appear === undefined) {
-      if (getIsPartOfSharedTransition(this._getName(), this._route)) {
-        return { opacity: visibilityProgress.interpolate({
-          inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_OUT,
-          outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE_ANIM_OUT,
-        }),
-        };
-      }
-      return {};
-    } else if (this.props.appear !== undefined || this.props.disappear !== undefined) {
-      return { opacity: visibilityProgress.interpolate({
-        inputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_INPUT_RANGE_ANIM_OUT,
-        outputRange: Constants.ORIGINAL_VIEWS_VISIBILITY_OUTPUT_RANGE_ANIM_OUT,
-      }) };
+    if (isPartOfSharedTransition) {
+      return { opacity: visibilityProgress };
+    } else if (isPartOfTransition) {
+      return { opacity: visibilityProgress };      
     }
+
     return {};
   }
 }
+
+const styles = StyleSheet.create({
+  transition: {
+    // backgroundColor: '#0000EF22',
+    // borderColor: '#FF0000',
+    // borderWidth: 1,
+  },
+});
 
 export default Transition;

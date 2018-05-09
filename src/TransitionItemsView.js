@@ -53,15 +53,16 @@ export default class TransitionItemsView extends React.Component<
 
     this._transitionItems = new TransitionItems();
     this._transitionProgress = props.progress;
-    props.progress.setValue(-1);
-    // props.progress.addListener(console.log);
+    this._transitionProgress.setValue(-1); // Reset to handle first transition
+    // this._transitionProgress.addListener(console.log);
 
     this.getIsPartOfSharedTransition = this.getIsPartOfSharedTransition.bind(this);
+    this.getIsPartOfTransition = this.getIsPartOfTransition.bind(this);    
     this.getTransitionProgress = this.getTransitionProgress.bind(this);
     this.getRoutes = this.getRoutes.bind(this);
-  
+
     this._interactionDonePromise = new Promise(resolve => this._interactionDonePromiseDone = resolve);
-    
+
   }
 
   _viewRef: ?View;
@@ -74,33 +75,35 @@ export default class TransitionItemsView extends React.Component<
   _interactionDonePromiseDone: Function;
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.toRoute !== this.props.toRoute ||
-      nextProps.fromRoute !== this.props.fromRoute) {
-      this.updateFromProps(nextProps, this.props);
-    }
+    this.updateFromProps(nextProps, this.props);
   }
 
   updateFromProps(props, prevProps) {
     if (!this._isMounted) return;
-
+    
     let { fromRoute, toRoute } = props;
-    const direction = props.index > (prevProps ? prevProps.index : Number.MIN_SAFE_INTEGER) ?
+    const direction = props.index >= (prevProps ? prevProps.index : Number.MIN_SAFE_INTEGER) ?
       NavigationDirection.forward : NavigationDirection.back;
 
     const index = prevProps ? props.index : 0;
-
-    if (direction === NavigationDirection.back) {
-      const tmp = fromRoute;
-      fromRoute = toRoute;
-      toRoute = tmp;
+    
+    if (toRoute !== this.state.toRoute ||
+      fromRoute !== this.state.fromRoute ||
+      index !== this.state.index ||
+      direction !== this.state.direction) {
+      this.setState({
+        toRoute,
+        fromRoute,
+        direction,
+        index,
+      });
     }
-
-    this.setState({ ...this.state, toRoute, fromRoute, direction, index });
   }
 
   render() {
     return (
       <View
+        {...this.props}
         style={[styles.container, this.props.style]}
         ref={(ref) => this._viewRef = ref}
         collapsable={false}
@@ -126,8 +129,6 @@ export default class TransitionItemsView extends React.Component<
     } else if (route === this.state.toRoute) {
       return RouteDirection.to;
     }
-
-    // invariant(true, "Route " + route + " is not part of transition!")
     return RouteDirection.unknown;
   }
 
@@ -136,7 +137,6 @@ export default class TransitionItemsView extends React.Component<
 
     if(!this._nonNativeTransitionProgress) {
       this._nonNativeTransitionProgress = new Animated.Value(-1);
-      this._nonNativeTransitionProgress.dada = 'non native';
       this._transitionProgress.addListener(Animated.event([{
         value: this._nonNativeTransitionProgress }],
         { useNativeDriver: false }));
@@ -153,7 +153,7 @@ export default class TransitionItemsView extends React.Component<
     if (!item || !item.shared) return false;
 
     const sharedElements = this._transitionItems.getSharedElements(this.state.fromRoute, this.state.toRoute);
-
+    
     if (sharedElements.find(pair =>
       (pair.fromItem.name === item.name && pair.fromItem.route === item.route) ||
       (pair.toItem.name === item.name && pair.toItem.route === item.route))) {
@@ -162,6 +162,19 @@ export default class TransitionItemsView extends React.Component<
     return false;
   }
 
+  getIsPartOfTransition(name: string, route: string) {
+    const item = this._transitionItems.getItemByNameAndRoute(name, route);
+    if (!item || !(item.appear || item.disappear)) return false;
+
+    const transitionElements = this._transitionItems.getTransitionElements(this.state.fromRoute, this.state.toRoute);
+
+    if(transitionElements.find(o => 
+      item.name === o.name && item.route === o.route)) {
+      return true;
+    }
+    return false;
+  }
+  
   async getViewMetrics():Metrics {
     const nodeHandle = findNodeHandle(this._viewRef);
     let viewMetrics: Metrics;
@@ -216,6 +229,10 @@ export default class TransitionItemsView extends React.Component<
 
     this._inUpdate = true;
 
+    // Update visibility style based on calculation by re-rendering all transition elements.
+    // Ref, https://github.com/fram-x/FluidTransitions/issues/8        
+    this._transitionItems.getItems().forEach(item => item.reactElement.forceUpdate());
+
     // Wait a little bit to give the layout system some time to reconcile
     let measureAndUpdateFunc = async () => {
       let sharedElements = this._transitionItems.getSharedElements(this.state.fromRoute, this.state.toRoute);
@@ -224,29 +241,26 @@ export default class TransitionItemsView extends React.Component<
       await this._interactionDonePromise;
       await this.measureItems(sharedElements, transitionElements);
 
-      // Update visibility style based on calculation by re-rendering all transition elements.
-      // Ref, https://github.com/fram-x/FluidTransitions/issues/8
-      this._transitionItems.getItems().forEach(item => item.reactElement.forceUpdate());
-
       if (!sharedElements.find(p => !p.fromItem.metrics || !p.toItem.metrics) &&
         !transitionElements.find(i => !i.metrics)) {
+        
         // HACK: Setting state in componentDidUpdate is not nice - but
         // this is the only way we can notify the transitioner that we are
         // ready to move along with the transition and we're trying to be nice
         // by waiting a few milliseconds
+        
         this.setState({
           ...this.state,
           sharedElements,
           transitionElements,
+        }, ()=> {
+          this.props.onLayout && this.props.onLayout();
+          if (this.state.fromRoute === null) {
+            this._runStartAnimation(transitionElements.length);
+          }
+          this._inUpdate = false;
         });
-
-        this.props.onLayout && this.props.onLayout();
-
-        if (this.state.fromRoute === null) {
-          this._runStartAnimation(transitionElements.length);
-        }
       }
-      this._inUpdate = false;
     };
 
     measureAndUpdateFunc = measureAndUpdateFunc.bind(this);
@@ -259,7 +273,7 @@ export default class TransitionItemsView extends React.Component<
     const transitionSpec = getTransitionConfig ?
       getTransitionConfig(toRoute, navigation) : {
         timing: Animated.timing,
-        duration: 750,
+        duration: 650,
         easing: Easing.inOut(Easing.poly(4)),
         isInteraction: true,
         useNativeDriver: true,
@@ -297,7 +311,8 @@ export default class TransitionItemsView extends React.Component<
     getDirection: PropTypes.func,
     getIndex: PropTypes.func,
     getIsPartOfSharedTransition: PropTypes.func,
-    getRoutes: PropTypes.func,    
+    getIsPartOfTransition: PropTypes.func,    
+    getRoutes: PropTypes.func,
   }
 
   static contextTypes = {
@@ -314,6 +329,7 @@ export default class TransitionItemsView extends React.Component<
       getDirection: () => (this.state.direction ?
         this.state.direction : NavigationDirection.unknown),
       getIsPartOfSharedTransition: this.getIsPartOfSharedTransition,
+      getIsPartOfTransition: this.getIsPartOfTransition,      
       getRoutes: this.getRoutes
     };
   }
@@ -323,5 +339,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     overflow: 'hidden',
-  },
+  }
 });
