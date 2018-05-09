@@ -12,7 +12,7 @@
     "react": "16.2.0",
     "react-native": "0.53.3",
     "react-native-vector-icons": "^4.6.0",
-    "react-navigation": "2.0.0-rc.7",
+    "react-navigation": "2.0.1",
     "react-navigation-fluid-transitions": "../"
   },
   "devDependencies": {
