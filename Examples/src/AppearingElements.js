@@ -111,6 +111,14 @@ const Navigator = FluidNavigator({
   screen: { screen: Screen },
 });
 
-export default () => (
-  <Navigator />
-);
+class AppearingElements extends React.Component {
+  static router = Navigator.router;
+  render() {
+    return (
+      <Navigator navigation={this.props.navigation} />
+    );
+  }
+}
+
+export default AppearingElements;
+
