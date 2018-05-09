@@ -173,7 +173,13 @@ const Navigator = FluidNavigator({
   navigationOptions: { gesturesEnabled: true },
 });
 
-export default () => (
-  <Navigator />
-);
+class SharedElements extends React.Component {
+  static router = Navigator.router;
+  render() {
+    return (
+      <Navigator navigation={this.props.navigation} />
+    );
+  }
+}
 
+export default SharedElements;

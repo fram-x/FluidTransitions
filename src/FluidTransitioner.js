@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, Platform, Easing, I18nManager, Animated, PanResponder, InteractionManager } from 'react-native';
-import { addNavigationHelpers, NavigationActions, Transitioner } from 'react-navigation';
+import { NavigationActions, Transitioner } from 'react-navigation';
 import clamp from 'clamp';
 
 import TransitionItemsView from './TransitionItemsView';
@@ -23,7 +23,6 @@ class FluidTransitioner extends React.Component<*> {
     super(props);
 
     this._onTransitionStart = this._onTransitionStart.bind(this);
-
     this._onSceneReady = this._onSceneReady.bind(this);
     this._transitionItemsViewOnLayout = this._transitionItemsViewOnLayout.bind(this);
     this._configureTransition = this._configureTransition.bind(this);
@@ -37,7 +36,6 @@ class FluidTransitioner extends React.Component<*> {
   _scenesReadyResolveFunc: ?Function;
   _scenesReadyPromise: ?Promise<void>;
   _layoutsReady: boolean;
-  _screenDetails: Array<any> = [];
   _gestureStartValue = 0;
   _isResponding = false;
   _immediateIndex = null;
@@ -72,6 +70,7 @@ class FluidTransitioner extends React.Component<*> {
         configureTransition={this._configureTransition}
         render={this._render.bind(this)}
         navigation={this.props.navigation}
+        descriptors={this.props.descriptors}
         onTransitionStart={this._onTransitionStart}
       />
     );
@@ -119,9 +118,9 @@ class FluidTransitioner extends React.Component<*> {
         moveForward = false;
       }
       const { scene } = moveForward ? props : prevProps;
-      const screenDetails = this._getScreenDetails(scene);
-      if (screenDetails && screenDetails.options && screenDetails.options.transitionConfig) {
-        sceneTransitionConfig = screenDetails.options.transitionConfig;
+      const { options } = scene.descriptor;
+      if (options && options.transitionConfig) {
+        sceneTransitionConfig = options.transitionConfig;
       }
     }
     return {
@@ -173,8 +172,9 @@ class FluidTransitioner extends React.Component<*> {
   _render(props, prevProps) {
     this._layoutsReady = false;
     
-    const { navigation, position } = props;
+    const { position } = props;    
     const { scene, layout } = props;
+    const { navigation } = scene.descriptor;
     
     this._animatedSubscribeForNativeAnimation(props.position);
     this._updateSceneArray(props.scenes);
@@ -219,7 +219,7 @@ class FluidTransitioner extends React.Component<*> {
   getPanResponderHandlers(position, index, scene, layout, navigation, props) {
     const { mode } = this.props;
     const isVertical = mode !== 'card';
-    const { options } = this._getScreenDetails(scene);
+    const { options } = scene.descriptor;
     const gestureDirectionInverted = options.gestureDirection === 'inverted';
     const gesturesEnabled =
       typeof options.gesturesEnabled === 'boolean'
@@ -234,6 +234,7 @@ class FluidTransitioner extends React.Component<*> {
         InteractionManager.clearInteractionHandle(handle);
     }
     this._panResponder = !gesturesEnabled
+
       ? null
       : PanResponder.create({
         onPanResponderTerminate: () => {
@@ -348,8 +349,8 @@ class FluidTransitioner extends React.Component<*> {
   _renderScene(transitionProps) {
     const { scene } = transitionProps;
     const { index } = scene;
-    const navigation = this._getChildNavigation(scene);
-    const Scene = this.props.router.getComponentForRouteName(scene.route.routeName);
+    const { navigation } = scene.descriptor;
+    const SceneView = scene.descriptor.getComponent();
 
     return (
       <TransitionRouteView
@@ -358,7 +359,7 @@ class FluidTransitioner extends React.Component<*> {
         route={scene.route.routeName}
         sceneKey={scene.key}
       >
-        <Scene
+        <SceneView
           navigation={navigation}
           screenProps={this.props.screenProps}
         />
@@ -392,41 +393,10 @@ class FluidTransitioner extends React.Component<*> {
   }
 
   _getSceneTransitionConfiguration(routeName: string, navigation: any) {
-    const props = { navigation, scene: { route: { routeName } } };
+    const route = navigation.state;
+    const descriptor = this.props.descriptors;
+    const props = { navigation, scene: { route, descriptor } };
     return this._configureTransition(props);
-  }
-
-  _getScreenDetails = scene => {
-    const { screenProps, navigation, router } = this.props;
-    let screenDetails = this._screenDetails[scene.key];
-    if (!screenDetails || screenDetails.state !== scene.route) {
-      const screenNavigation = addNavigationHelpers({
-        dispatch: navigation.dispatch,
-        state: scene.route,
-      });
-      screenDetails = {
-        state: scene.route,
-        navigation: screenNavigation,
-        options: router.getScreenOptions(screenNavigation, screenProps),
-      };
-
-      this._screenDetails[scene.key] = screenDetails;
-    }
-    return screenDetails;
-  };
-
-  _getChildNavigation = (scene) => {
-    if (!this._childNavigationProps) { this._childNavigationProps = {}; }
-
-    let navigation = this._childNavigationProps[scene.key];
-    if (!navigation || navigation.state !== scene.route) {
-      navigation = this._childNavigationProps[scene.key] = addNavigationHelpers({
-        ...this.props.navigation,
-        state: scene.route,
-      });
-    }
-
-    return navigation;
   }
 }
 
