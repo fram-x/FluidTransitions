@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { StackNavigator } from 'react-navigation';
+import { createStackNavigator } from 'react-navigation';
 
 import HomeScreen from './src/HomeScreen';
 import SharedElements from './src/SharedElements';
@@ -17,7 +17,7 @@ import ShoeShop from './src/ShoeShop';
 import FlatList from './src/FlatList';
 import Playground from './src/Playground';
 
-const ExampleNavigator = StackNavigator({
+const ExampleNavigator = createStackNavigator({
   home: { screen: HomeScreen, navigationOptions: { title: 'Fluid Transitions' } },
   shared: { screen: SharedElements },
   appear: { screen: AppearingElements },
