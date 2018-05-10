@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, Dimensions, Button, TouchableOpacity, FlatList, Image, StyleSheet } from 'react-native';
-import _ from 'lodash';
+import chunk from 'lodash.chunk';
 import { StackNavigator } from 'react-navigation';
 import { FluidNavigator, Transition } from 'react-navigation-fluid-transitions';
 
@@ -117,7 +117,7 @@ class ImageGrid extends Component {
     const { width: windowWidth } = Dimensions.get('window');
     this._margin = 2;
     this._photoSize = (windowWidth - this._margin * this._colCount * 2) / this._colCount;
-    this.state = { chunkedImages: _.chunk(props.images, this._colCount) };
+    this.state = { chunkedImages: chunk(props.images, this._colCount) };
   }
 
   _colCount
@@ -126,7 +126,7 @@ class ImageGrid extends Component {
   _chunkedImages
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ ...this.state, chunkedImages: _.chunk(nextProps.images, this._colCount) });
+    this.setState({ ...this.state, chunkedImages: chunk(nextProps.images, this._colCount) });
   }
 
   render() {
