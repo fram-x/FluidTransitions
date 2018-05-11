@@ -24,9 +24,12 @@
     "url": "https://github.com/fram-x/FluidTransitions/issues"
   },
   "homepage": "https://github.com/fram-x/FluidTransitions#readme",
+  "dependencies": {
+    "lodash.sortby": "*",
+    "lodash.chunk": "*",
+    "prop-types": "*"
+  },
   "peerDependencies": {
-    "lodash": "*",
-    "prop-types": "*",
     "react": "*",
     "react-native": "*",
     "react-navigation": "*"
