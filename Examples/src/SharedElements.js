@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { withNavigation } from 'react-navigation';
 import { Transition, FluidNavigator } from 'react-navigation-fluid-transitions';
 
 const styles = StyleSheet.create({
@@ -57,7 +58,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const Circle = (props) => (
+const Circle = props => (
   <View
     style={{
       justifyContent: 'center',
@@ -69,13 +70,40 @@ const Circle = (props) => (
     }}
   />
 );
+const SCREEN_IDS = ['screen1', 'screen2', 'screen3'];
+const ScreensList = ({ navigation }) => {
+  const activeScreen = navigation.state.routeName;
+  return (
+    <View style={{ height: 50, alignSelf: 'stretch', flexDirection: 'row' }}>
+      {SCREEN_IDS.map(screenID => (
+        <TouchableOpacity
+          key={screenID}
+          style={{ flex: 1, justifyContent: 'center', borderWidth: 1, borderColor: '#FF0000' }}
+          onPress={() => {
+            navigation.navigate(screenID);
+          }}
+        >
+          <Transition shared={screenID}>
+            <Text
+              style={{
+                textAlign: 'center',
+                color: screenID === activeScreen ? 'blue' : 'black',
+                fontSize: screenID === activeScreen ? 32 : 14,
+              }}
+            >
+              {screenID}
+            </Text>
+          </Transition>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+};
 
-const Screen1 = (props) => (
+const Screen1 = props => (
   <View style={styles.container}>
-    <Transition appear="flip">
-      <Text>1.Screen</Text>
-    </Transition>
-    <View style={styles.screen1}>
+    <ScreensList navigation={props.navigation} />
+    {/* <View style={styles.screen1}>
       <Transition shared="circle">
         <View style={styles.circle1} />
       </Transition>
@@ -92,21 +120,22 @@ const Screen1 = (props) => (
       <Transition appear="horizontal" delay>
         <Circle background="#55AA55" size={20} />
       </Transition>
-    </View>
+    </View> */}
     <Transition appear="horizontal">
       <View style={styles.buttons}>
-        <Button title="Next" onPress={() => props.navigation.navigate('screen2')} />
+        <Button
+          title="Next"
+          onPress={() => props.navigation.navigate('screen2')}
+        />
       </View>
     </Transition>
   </View>
 );
 
-const Screen2 = (props) => (
+const Screen2 = props => (
   <View style={styles.container}>
-    <Transition appear="flip">
-      <Text>2.Screen</Text>
-    </Transition>
-    <View style={styles.screen2}>
+    <ScreensList navigation={props.navigation} />
+    {/* <View style={styles.screen2}>
       <Transition shared="circle">
         <View style={styles.circle2} />
       </Transition>
@@ -123,23 +152,24 @@ const Screen2 = (props) => (
       <Transition appear="horizontal" delay>
         <Circle background="#55AA55" size={20} />
       </Transition>
-    </View>
+    </View> */}
     <Transition appear="horizontal">
       <View style={styles.buttons}>
         <Button title="Back" onPress={() => props.navigation.goBack()} />
         <View style={{ width: 20 }} />
-        <Button title="Next" onPress={() => props.navigation.navigate('screen3')} />
+        <Button
+          title="Next"
+          onPress={() => props.navigation.navigate('screen3')}
+        />
       </View>
     </Transition>
   </View>
 );
 
-const Screen3 = (props) => (
+const Screen3 = props => (
   <View style={styles.container}>
-    <Transition appear="flip">
-      <Text>3.Screen</Text>
-    </Transition>
-    <View style={styles.screen3}>
+    <ScreensList navigation={props.navigation} />
+    {/* <View style={styles.screen3}>
       <Transition shared="circle">
         <View style={styles.circle3} />
       </Transition>
@@ -156,7 +186,7 @@ const Screen3 = (props) => (
       <Transition appear="horizontal" delay>
         <Circle background="#55AA55" size={20} />
       </Transition>
-    </View>
+    </View> */}
     <Transition appear="horizontal">
       <View style={styles.buttons}>
         <Button title="Back" onPress={() => props.navigation.goBack()} />
@@ -165,21 +195,15 @@ const Screen3 = (props) => (
   </View>
 );
 
-const Navigator = FluidNavigator({
-  screen1: { screen: Screen1 },
-  screen2: { screen: Screen2 },
-  screen3: { screen: Screen3 },
-}, {
-  navigationOptions: { gesturesEnabled: true },
-});
-
-class SharedElements extends React.Component {
-  static router = Navigator.router;
-  render() {
-    return (
-      <Navigator navigation={this.props.navigation} />
-    );
-  }
-}
+const SharedElements = FluidNavigator(
+  {
+    screen1: { screen: Screen1 },
+    screen2: { screen: Screen2 },
+    screen3: { screen: Screen3 },
+  },
+  {
+    navigationOptions: { gesturesEnabled: true },
+  },
+);
 
 export default SharedElements;

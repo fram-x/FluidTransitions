@@ -3,6 +3,7 @@ import { getScaleInterpolator } from './getScaleInterpolator';
 import { getRotationInterpolator } from './getRotationInterpolator';
 import { getBorderInterpolator } from './getBorderInterpolator';
 import { getBackgroundInterpolator } from './getBackgroundInterpolator';
+import { getTextInterpolator } from './getTextInterpolator';
 
 type InterpolatorEntry = {
   name: string,
@@ -22,6 +23,7 @@ export function initInterpolatorTypes() {
   registerInterpolator('position', getPositionInterpolator);
   registerInterpolator('scale', getScaleInterpolator);
   registerInterpolator('rotation', getRotationInterpolator);
+  registerInterpolator('text', getTextInterpolator);
 }
 
 export function getInterpolatorTypes() : InterpolatorEntry {
