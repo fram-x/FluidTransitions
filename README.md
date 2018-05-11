@@ -140,7 +140,7 @@ Read more about the parameters and functionality for building [custom transition
 Some of the concepts in the library builds on ideas from [@lintonye](https://github.com/lintonye)'s pull request and suggestion found here: [Shared element transition #941](https://github.com/react-navigation/react-navigation/pull/941).
 
 ### Contributors
-Christian Falch (@chrfalch), Yuuki Arisawa (@uk-ar), Joe Goodall (@joegoodall1)
+Christian Falch (@chrfalch), Yuuki Arisawa (@uk-ar), Joe Goodall (@joegoodall1), [sonaye](https://github.com/sonaye)
 
 ### Sponsors
 [Fram X](https://framx.no) - a cross platform app company from Norway. 

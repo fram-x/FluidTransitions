@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
 import PropTypes from 'prop-types';
-import sortBy from 'lodash.sortBy'
+import sortBy from 'lodash.sortby';
 
 import TransitionItem from './TransitionItem';
 import { NavigationDirection, TransitionContext, RouteDirection } from './Types';
