@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Platform } from 'react-native';
+import ShallowRenderer from './Utils/shallowRenderer';
 import { Metrics } from './Types/Metrics';
 import { getRotationFromStyle, getBoundingBox, getOriginalRect } from './Utils';
 
@@ -39,6 +40,7 @@ export default class TransitionItem {
   index: number
   anchor: string
   _rotation: any;
+  _testRenderer: any;
 
   getNodeHandle() {
     return this.reactElement.getNodeHandle();
@@ -48,13 +50,29 @@ export default class TransitionItem {
     return this.reactElement.getViewRef();
   }
 
-  getFlattenedStyle() {
-    if (!this.flattenedStyle) {
-      const child = React.Children.only(this.reactElement.props.children);
-      const { style } = child.props;
-      if (!style) return null;
-      this.flattenedStyle = StyleSheet.flatten(style);
+  getFlattenedStyle(refresh = false) {
+    if (refresh || !this.flattenedStyle) {
+      const element = React.Children.only(this.reactElement.props.children);      
+      if (!element) { return null; }
+      
+      // Shallow renderer should not need to be used for views we know does
+      // not create any magic inner styles. The following test is needed
+      // when running in production mode.
+      const shouldRenderRenderElement = element.type !== 'RCTView';
+      let style = element.props.style;
+
+      if(shouldRenderRenderElement) {
+        if (!this._testRenderer) { 
+          this._testRenderer = ShallowRenderer.createRenderer()        
+        } 
+        const tree = this._testRenderer.render(element);      
+        style = tree.props.style;        
+      } 
+    
+      if (!style) return null;      
+      this.flattenedStyle = StyleSheet.flatten(style);      
     }
+
     return this.flattenedStyle;
   }
 
@@ -84,6 +102,8 @@ export default class TransitionItem {
       this.metrics = { x: x - viewMetrics.x, y: y - viewMetrics.y, width, height };
       this.boundingBoxMetrics = this.metrics;
     }    
+
+    // console.log(this.name  + "/" + this.route + "-" + this.metrics.x + "," + this.metrics.y + " - " + this.metrics.width + "," + this.metrics.height);
   }
 
   getRotation() {
