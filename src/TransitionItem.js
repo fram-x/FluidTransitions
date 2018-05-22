@@ -13,7 +13,8 @@ export default class TransitionItem {
   constructor(
     name: string, route: string, reactElement: Object,
     shared: boolean, appear: string, disappear: string,
-    delay: boolean, index: number, anchor: string
+    delay: boolean, index: number, anchor: string,
+    interpolator: Function
   ) {
     this.name = name;
     this.route = route;
@@ -24,6 +25,7 @@ export default class TransitionItem {
     this.delay = delay;
     this.index = index;
     this.anchor = anchor;
+    this.interpolator = interpolator;
   }
 
   name: string
@@ -39,6 +41,8 @@ export default class TransitionItem {
   boundingBoxMetrics: Metrics
   index: number
   anchor: string
+  interpolator: Function
+  
   _rotation: any;
   _testRenderer: any;
 
