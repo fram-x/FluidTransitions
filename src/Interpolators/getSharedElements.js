@@ -79,6 +79,20 @@ const getTransitionStyle = (
     }
   });
 
+  // Do we have any custom interpolators?
+  let customInterpolator = null;
+  if(fromItem.interpolator) { customInterpolator = fromItem.interpolator; }
+  else if(toItem.interpolator) { customInterpolator = toItem.interpolator; }
+  if(customInterpolator) {
+    const interpolatorResult = customInterpolator(interpolatorInfo);
+    if(interpolatorResult) {
+      if (interpolatorResult.nativeAnimationStyles)
+        {nativeStyles.push(interpolatorResult.nativeAnimationStyles);}
+      if (interpolatorResult.animationStyles)
+        {styles.push(interpolatorResult.animationStyles);}
+    }
+  }
+
   return {
     nativeStyles: {
       ...mergeStyles(nativeStyles),
