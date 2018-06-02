@@ -23,6 +23,7 @@ export function initTransitionTypes() {
   registerTransitionType('horizontal', getHorizontalTransition);
   registerTransitionType('vertical', getVerticalTransition);
   registerTransitionType('flip', getFlipTransition);
+  registerTransitionType('none', ()=> ({}));
 }
 
 export function registerTransitionType(name: string, transitionFunction: Function): TransitionEntry {
