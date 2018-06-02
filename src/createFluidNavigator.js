@@ -36,6 +36,7 @@ export default (routeConfigMap, stackConfig = {}) => {
           mode={mode}
           style={style}
           navigation={this.props.navigation}
+          screenProps={this.props.screenProps}
           descriptors={this.props.descriptors}
           onTransitionStart={this.props.onTransitionStart}
           onTransitionEnd={(transition, lastTransition) => {
