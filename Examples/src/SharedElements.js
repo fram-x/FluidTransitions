@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import { Transition, createFluidNavigator } from 'react-navigation-fluid-transitions';
+import { Transition, FluidNavigator } from 'react-navigation-fluid-transitions';
 
 const styles = StyleSheet.create({
   container: {
@@ -158,7 +158,7 @@ const Screen3 = (props) => (
   </View>
 );
 
-const Navigator = createFluidNavigator({
+const Navigator = FluidNavigator({
   screen1: { screen: Screen1 },
   screen2: { screen: Screen2 },
   screen3: { screen: Screen3 },
