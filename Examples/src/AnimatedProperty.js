@@ -33,8 +33,8 @@ class SpinningCube extends Component {
       });
 
       const background = this.props.progress.interpolate({
-        inputRange: [0, 0.5, 1],
-        outputRange: ['#FF0000', '#0000FF', '#FF0000'],
+        inputRange: [0, 1],
+        outputRange: [this.props.startColor, this.props.endColor],
       });
 
       const border = this.props.progress.interpolate({
@@ -61,7 +61,6 @@ class SpinningCube extends Component {
     return (
       <Animated.View style={[styles.animated,
         {
-          backgroundColor: '#FF0000',
           borderRadius: 0,
         }]}
       />
@@ -69,7 +68,7 @@ class SpinningCube extends Component {
   }
 }
 
-const Description = (props) => (
+const Description = () => (
   <Text style={styles.text}>
     This cube is an animated component that contains a property
     that accepts an interpolation, and will interpolate size,
@@ -84,7 +83,7 @@ class Screen1 extends Component {
       <View style={styles.container}>
         <Description />
         <Transition animated="progress" shared="square">
-          <SpinningCube />
+          <SpinningCube startColor="#FF0000" endColor="#00FF00" />
         </Transition>
         <Transition appear="horizontal">
           <View style={styles.buttonContainer}>
@@ -102,7 +101,7 @@ class Screen2 extends Component {
       <View style={styles.container}>
         <Description />
         <Transition animated="progress" shared="square">
-          <SpinningCube />
+          <SpinningCube startColor="#00FF00" endColor="#0000FF" />
         </Transition>
         <Transition appear="horizontal">
           <View style={styles.buttonContainer}>
@@ -121,7 +120,7 @@ class Screen3 extends Component {
       <View style={styles.container}>
         <Description />
         <Transition animated="progress" shared="square">
-          <SpinningCube />
+          <SpinningCube startColor="#0000FF" endColor="#FF0" />
         </Transition>
         <Transition appear="horizontal">
           <View style={styles.buttonContainer}>
