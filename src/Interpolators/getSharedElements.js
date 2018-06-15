@@ -33,6 +33,10 @@ const getSharedElements = (sharedElements: Array<any>, getInterpolationFunction:
     };
 
     const props = { ...element.props, __index: fromItem.index };
+    if(fromItem.animated) {
+      props[fromItem.animated] = getInterpolationFunction(false)
+    }
+
     const component = React.createElement(element.type, { ...props, key });
 
     return createAnimatedWrapper({
