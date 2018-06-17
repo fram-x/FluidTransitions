@@ -15,6 +15,9 @@ export const getStyleInterpolator = (
 
   const fromValue = fromStyle && fromStyle[key] ? fromStyle[key] : defaultValue;
   let toValue = toStyle && toStyle[key] ? toStyle[key] : defaultValue;
+
+  if(fromValue === toValue) return null;
+
   // Handle scaling of numeric values
   var parsed = parseInt(toValue);
   if (!isNaN(parsed)) { 

@@ -16,6 +16,8 @@ type TransitionProps = {
   disappear: ?boolean,
   shared: ?string,
   delay: ?boolean,
+  animated: ?string,
+  anchor: ?string,
   children: Array<any>,  
 }
 
@@ -54,7 +56,7 @@ class Transition extends React.Component<TransitionProps> {
         this._getName(), this.context.route,
         this, this.props.shared !== undefined, this.props.appear,
         this.props.disappear, this.props.delay !== undefined,
-        zIndex++, this.props.anchor,
+        zIndex++, this.props.anchor, this.props.animated
       ));
     }
     this._isMounted = true;

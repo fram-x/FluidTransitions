@@ -15,6 +15,7 @@ import LayoutTransition from './src/LayoutTransition';
 import Onboarding from './src/Onboarding';
 import ShoeShop from './src/ShoeShop';
 import FlatList from './src/FlatList';
+import AnimatedProperty from './src/AnimatedProperty';
 import Playground from './src/Playground';
 
 const ExampleNavigator = createStackNavigator({
@@ -26,6 +27,7 @@ const ExampleNavigator = createStackNavigator({
   onboarding: { screen: Onboarding },
   shoes: { screen: ShoeShop },
   flatlist: { screen: FlatList },
+  animatedProperty: { screen: AnimatedProperty },
 });
 
 class MyApp extends React.Component<any> {
