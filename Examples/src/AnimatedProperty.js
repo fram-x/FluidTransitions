@@ -7,12 +7,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
   },
   animated: {
     width: 150,
     height: 150,
-    backgroundColor: '#FF0000',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  animatedElement: {
+    width: 150,
+    height: 150,
   },
   buttonContainer: {
     margin: 40,
@@ -48,22 +52,27 @@ class SpinningCube extends Component {
       });
 
       return (
-        <Animated.View style={[styles.animated,
-          {
-            transform: [{ rotate: spin }, { scale }],
-            backgroundColor: background,
-            borderRadius: border,
-          }]}
-        />
+        <View style={styles.animated}>
+          <Animated.View style={[styles.animatedElement,
+            {
+              transform: [{ rotate: spin }, { scale }],
+              backgroundColor: background,
+              borderRadius: border,
+            }]}
+          />
+        </View>
       );
     }
 
     return (
-      <Animated.View style={[styles.animated,
-        {
-          borderRadius: 0,
-        }]}
-      />
+      <View style={styles.animated}>
+        <Animated.View style={[styles.animatedElement,
+          {
+            backgroundColor: this.props.startColor,
+            borderRadius: 0,
+          }]}
+        />
+      </View>
     );
   }
 }
