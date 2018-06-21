@@ -4053,6 +4053,13 @@ promise@^7.1.1:
   dependencies:
     asap "~2.0.3"
 
+prop-types@15.5.10:
+  version "15.5.10"
+  resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.5.10.tgz#2797dfc3126182e3a95e3dfbb2e893ddd7456154"
+  dependencies:
+    fbjs "^0.8.9"
+    loose-envify "^1.3.1"
+
 prop-types@^15.5.10, prop-types@^15.5.8, prop-types@^15.6.0:
   version "15.6.0"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.0.tgz#ceaf083022fc46b4a35f69e13ef75aed0d639856"
@@ -4139,6 +4146,12 @@ react-lifecycles-compat@^1.0.2:
 react-lifecycles-compat@^3:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
+
+react-native-card-stack-swiper@^1.0.8:
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/react-native-card-stack-swiper/-/react-native-card-stack-swiper-1.0.8.tgz#c900817c7872c9a39a4b0029db63bcc2fbcab56e"
+  dependencies:
+    prop-types "15.5.10"
 
 react-native-dismiss-keyboard@1.0.0:
   version "1.0.0"
@@ -4247,9 +4260,8 @@ react-navigation-deprecated-tab-navigator@1.2.0:
   dependencies:
     react-native-tab-view "^0.0.74"
 
-"react-navigation-fluid-transitions@file:../react-navigation-fluid-transitions-0.2.0.tgz":
-  version "0.2.0"
-  resolved "file:../react-navigation-fluid-transitions-0.2.0.tgz#66a2c8ee11914ff5d0b003808d36beaa04419fd5"
+react-navigation-fluid-transitions@../:
+  version "0.2.1"
   dependencies:
     lodash.chunk "*"
     lodash.sortby "*"

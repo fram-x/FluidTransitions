@@ -49,6 +49,8 @@ class TransitionOverlayView extends React.Component<Props> {
       (sharedElements.length === 0 && transitionElements.length === 0)) {      
       return <View style={styles.overlay} pointerEvents="none" />;
     }
+
+    console.log(sharedElements.length);
     
     this._interpolation = null;
     this._nativeInterpolation = null;

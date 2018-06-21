@@ -1,178 +1,106 @@
-import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
-import { Transition, createFluidNavigator } from 'react-navigation-fluid-transitions';
+import React, { Component } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Button,
+  Image,
+} from 'react-native';
+import { FluidNavigator, Transition } from 'react-navigation-fluid-transitions';
+import CardStack, { Card } from 'react-native-card-stack-swiper';
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  screen1: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    alignSelf: 'stretch',
-    padding: 20,
-  },
-  screen2: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    alignSelf: 'stretch',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  screen3: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'stretch',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  buttons: {
-    flexDirection: 'row',
-    padding: 20,
-  },
-});
-
-const Circle = (props) => (
-  <View
-    style={{
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: props.background,
-      width: props.size,
-      height: props.size,
-      borderRadius: props.size / 2,
-    }}
-  />
-);
-
-const Shape = (props) => (
-  <View
-    style={{
-      backgroundColor: props.background || '#EE0000',
-      width: props.size,
-      height: props.size,
-      borderRadius: props.borderRadius || 0,
-    }}
-  />
-);
-
-const Screen1 = (props) => (
-  <View style={styles.container}>
-    <Transition appear="flip">
-      <Text>1.Screen</Text>
-    </Transition>
-    <View style={styles.screen1}>
-      <Transition shared="circle">
-        <Shape size={50} borderRadius={4} background="#EE0000" />
-      </Transition>
-    </View>
-    <View style={{ flexDirection: 'row' }}>
-      <Transition appear="horizontal" delay>
-        <Circle background="#55AA55" size={20} />
-      </Transition>
-      <View style={{ width: 20 }} />
-      <Transition appear="horizontal" delay>
-        <Circle background="#55AA55" size={20} />
-      </Transition>
-      <View style={{ width: 20 }} />
-      <Transition appear="horizontal" delay>
-        <Circle background="#55AA55" size={20} />
-      </Transition>
-    </View>
-    <Transition appear="horizontal">
-      <View style={styles.buttons}>
-        <Button title="Next" onPress={() => props.navigation.navigate('screen2')} />
-      </View>
-    </Transition>
-  </View>
-);
-
-const Screen2 = (props) => (
-  <View style={styles.container}>
-    <Transition appear="flip">
-      <Text>2.Screen</Text>
-    </Transition>
-    <View style={styles.screen2}>
-      <Transition shared="circle">
-        <Shape size={50} borderRadius={25} background="#EE0000" />
-      </Transition>
-    </View>
-    <View style={{ flexDirection: 'row' }}>
-      <Transition appear="horizontal" delay>
-        <Circle background="#55AA55" size={20} />
-      </Transition>
-      <View style={{ width: 20 }} />
-      <Transition appear="horizontal" delay>
-        <Circle background="#55AA55" size={20} />
-      </Transition>
-      <View style={{ width: 20 }} />
-      <Transition appear="horizontal" delay>
-        <Circle background="#55AA55" size={20} />
-      </Transition>
-    </View>
-    <Transition appear="horizontal">
-      <View style={styles.buttons}>
-        <Button title="Back" onPress={() => props.navigation.goBack()} />
-        <View style={{ width: 20 }} />
-        <Button title="Next" onPress={() => props.navigation.navigate('screen3')} />
-      </View>
-    </Transition>
-  </View>
-);
-
-const Screen3 = (props) => (
-  <View style={styles.container}>
-    <Transition appear="flip">
-      <Text>3.Screen</Text>
-    </Transition>
-    <View style={styles.screen3}>
-      <Transition shared="circle">
-        <Shape size={140} borderRadius={4} background="#EE0000" />
-      </Transition>
-    </View>
-    <View style={{ flexDirection: 'row' }}>
-      <Transition appear="horizontal" delay>
-        <Circle background="#55AA55" size={20} />
-      </Transition>
-      <View style={{ width: 20 }} />
-      <Transition appear="horizontal" delay>
-        <Circle background="#55AA55" size={20} />
-      </Transition>
-      <View style={{ width: 20 }} />
-      <Transition appear="horizontal" delay>
-        <Circle background="#55AA55" size={20} />
-      </Transition>
-    </View>
-    <Transition appear="horizontal">
-      <View style={styles.buttons}>
-        <Button title="Back" onPress={() => props.navigation.goBack()} />
-      </View>
-    </Transition>
-  </View>
-);
-
-const Navigator = createFluidNavigator({
-  screen1: { screen: Screen1 },
-  screen2: { screen: Screen2 },
-  screen3: { screen: Screen3 },
-}, {
-  navigationOptions: { gesturesEnabled: true },
-});
-
-class SharedElements extends React.Component {
-  static router = Navigator.router;
+class HomeScreen extends Component<{}> {
   render() {
     return (
-      <Navigator navigation={this.props.navigation} />
+      <View style={{ flex: 1 }}>
+        <CardStack
+          style={styles.content}
+          renderNoMoreCards={() => <Text style={{ fontWeight: '700', fontSize: 18, color: 'gray' }}>No more cards :(</Text>}
+        >
+
+          <Card style={[styles.card, styles.card1]}>
+            <TouchableOpacity onPress={() => this.props.navigation.navigate('Detail', { id: 1 })}>
+              <Transition shared="logo1">
+                <Image source={require('./assets/expo.symbol.white.png')} resizeMode="contain" style={{ height: 300, width: 300 }} />
+              </Transition>
+            </TouchableOpacity>
+          </Card>
+
+          <Card style={[styles.card, styles.card2]}>
+            <TouchableOpacity onPress={() => this.props.navigation.navigate('Detail', { id: 2 })}>
+              <Transition shared="logo2">
+                <Image source={require('./assets/expo.symbol.white.png')} resizeMode="contain" style={{ height: 250, width: 250 }} />
+              </Transition>
+            </TouchableOpacity>
+          </Card>
+
+          <Card style={[styles.card, styles.card3]}>
+            <TouchableOpacity onPress={() => this.props.navigation.navigate('Detail', { id: 3 })}>
+              <Transition shared="logo3">
+                <Image source={require('./assets/expo.symbol.white.png')} resizeMode="contain" style={{ height: 200, width: 200 }} />
+              </Transition>
+            </TouchableOpacity>
+          </Card>
+
+        </CardStack>
+      </View>
     );
   }
 }
 
-export default SharedElements;
+class DetailScreen extends React.Component {
+  render() {
+    const id = this.props.navigation.getParam('id');
+
+    return (
+      <View style={{ backgroundColor: 'black', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Transition shared={`logo${id}`}>
+          <Image source={require('./assets/expo.symbol.white.png')} resizeMode="contain" style={{ height: 300, width: 300 }} />
+        </Transition>
+        <Button title="Back" onPress={() => this.props.navigation.goBack()} />
+      </View>
+    );
+  }
+}
+
+const Navigator = FluidNavigator({
+  Home: { screen: HomeScreen },
+  Detail: { screen: DetailScreen },
+});
+
+export default class App extends React.Component {
+  static router = Navigator.router;
+  render() {
+    return <Navigator navigation={this.props.navigation} />;
+  }
+}
+
+const styles = StyleSheet.create({
+  content: {
+    flex: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  card: {
+    width: 320,
+    height: 470,
+    backgroundColor: '#FE474C',
+    borderRadius: 5,
+    shadowColor: 'rgba(0,0,0,0.5)',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.5,
+  },
+  card1: {
+    backgroundColor: '#FE474C',
+  },
+  card2: {
+    backgroundColor: '#FEB12C',
+  },
+  card3: {
+    backgroundColor: '#AEB12C',
+  },
+});
