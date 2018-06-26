@@ -320,7 +320,15 @@ export default class TransitionItemsView extends React.Component<
   componentDidMount() {
     this._isMounted = true;
     this.updateFromProps({ ...this.props, index: -1 });
-    InteractionManager.runAfterInteractions(this._interactionDonePromiseDone);
+    // check for transition elements - we don't need to wait for transitions
+    // if we dont have any appearing elements
+    const te = this._transitionItems.getTransitionElements(this.props.fromRoute, this.props.toRoute);
+    if(te.length > 0){
+      InteractionManager.runAfterInteractions(this._interactionDonePromiseDone);
+    }
+    else {
+      this._interactionDonePromiseDone();
+    }
   }
 
   componentWillUnmount() {
