@@ -65,7 +65,11 @@ class ShallowRenderer {
         }
         this._mountClassComponent(element.props, context);
       } else {
-        this._rendered = element.type(element.props, context);
+        if (typeof element.type == 'function') {
+          this._rendered = element.type(element.props, context); 
+        } else {
+          this._rendered = element.type.render(element.props, context);
+        }
       }
     }
 
