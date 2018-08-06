@@ -1,8 +1,8 @@
 # Transition API
 
-The `Transition` element is used to wrap regular React elements that should be transitioned either as part of a shared element transition or as a transition when it appears or disappeas.
+The `Transition` element is used to wrap regular React elements that should be transitioned either as part of a shared element transition or as a transition when it appears or disappears.
 
-The element accepts only one child, trying to add multiple children will result in an error. 
+The element accepts only one child, trying to add multiple children or wrap it in `Frament` will result in an error.
 
 ## Shared Element Transition
 A shared element transition happens when two elements in two different screens share the same transition identificator through the `shared` property of the Transition element.
