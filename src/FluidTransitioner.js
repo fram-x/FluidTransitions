@@ -72,6 +72,7 @@ class FluidTransitioner extends React.Component<*> {
         navigation={this.props.navigation}
         descriptors={this.props.descriptors}
         onTransitionStart={this._onTransitionStart}
+        onTransitionEnd={this.props.onTransitionEnd}
       />
     );
   }
@@ -101,8 +102,11 @@ class FluidTransitioner extends React.Component<*> {
   }
 
   _onTransitionStart(): Promise<void> | void {
-    if (this._scenesReadyPromise) { 
-      return this._scenesReadyPromise; 
+    const { onTransitionStart } = this.props;
+    onTransitionStart && onTransitionStart();
+
+    if (this._scenesReadyPromise) {
+      return this._scenesReadyPromise;
     }
   }
 
@@ -143,7 +147,7 @@ class FluidTransitioner extends React.Component<*> {
     }).start();
   }
 
-  _goBack(navigation, position, scenes, backFromIndex, duration) {    
+  _goBack(navigation, position, scenes, backFromIndex, duration) {
     const toValue = Math.max(backFromIndex - 1, 0);
 
     // set temporary index for gesture handler to respect until the action is
@@ -159,44 +163,44 @@ class FluidTransitioner extends React.Component<*> {
       this._immediateIndex = null;
       const backFromScene = scenes.find(s => s.index === toValue + 1);
       if (!this._isResponding && backFromScene) {
-        navigation.dispatch(
-          NavigationActions.back({
+        navigation.dispatch(NavigationActions.back({
             key: backFromScene.route.key,
             immediate: true,
-          })
-        );
+          }),);
       }
     });
   }
 
   _render(props, prevProps) {
     this._layoutsReady = false;
-    
-    const { position } = props;    
+
+    const { position } = props;
     const { scene, layout } = props;
     const { navigation } = scene.descriptor;
-    
+
     this._animatedSubscribeForNativeAnimation(props.position);
     this._updateSceneArray(props.scenes);
-    
+
     let toRoute = props.scene.route.routeName;
     let fromRoute = prevProps ? prevProps.scene.route.routeName : null;
     let { index } = props.scene;
 
-    if(!fromRoute) {      
-      fromRoute = index > 0 ? props.scenes[index-1].route.routeName : null;
+    if (!fromRoute) {
+      fromRoute = index > 0 ? props.scenes[index - 1].route.routeName : null;
     }
 
     // If we are just returning to the previous page keep the same props
-    if(prevProps && index < prevProps.index && fromRoute === prevProps.scene.route.routeName){
-      index = prevProps.index;     
+    if (prevProps && index < prevProps.index && fromRoute === prevProps.scene.route.routeName) {
+      index = prevProps.index;
       const tmp = fromRoute;
       fromRoute = toRoute;
       toRoute = tmp;
     }
-    
-    const handlers = this.getPanResponderHandlers(position, index, 
-      scene, layout, navigation, props);
+
+    const handlers = this.getPanResponderHandlers(
+position, index,
+      scene, layout, navigation, props
+);
 
     const scenes = props.scenes.map(scene => this._renderScene({ ...props, scene }));
 
@@ -225,13 +229,13 @@ class FluidTransitioner extends React.Component<*> {
       typeof options.gesturesEnabled === 'boolean'
         ? options.gesturesEnabled
         : Platform.OS === 'ios';
-    
+
     // https://github.com/facebook/react-native/issues/8624
     // https://github.com/react-navigation/react-navigation/issues/4144
-    if(this._panResponder) {
+    if (this._panResponder) {
       const handle = this._panResponder.getInteractionHandle();
-      if(handle)
-        InteractionManager.clearInteractionHandle(handle);
+      if (handle)
+        {InteractionManager.clearInteractionHandle(handle);}
     }
     this._panResponder = !gesturesEnabled
 
@@ -256,7 +260,7 @@ class FluidTransitioner extends React.Component<*> {
           const currentDragPosition = event.nativeEvent[isVertical ? 'pageY' : 'pageX'];
           const axisLength = isVertical
             ? layout.height.__getValue()
-            : layout.width.__getValue(); 
+            : layout.width.__getValue();
           const axisHasBeenMeasured = !!axisLength;
           // Measure the distance from the touch to the edge of the screen
           // const screenEdgeDistance = gestureDirectionInverted
@@ -291,7 +295,7 @@ class FluidTransitioner extends React.Component<*> {
           const currentValue = (I18nManager.isRTL && axis === 'dx') !== gestureDirectionInverted
             ? startValue + gesture[axis] / axisDistance
             : startValue - gesture[axis] / axisDistance;
-          const value = clamp(index-1, currentValue, index);          
+          const value = clamp(index - 1, currentValue, index);
           position.setValue(value);
         },
         onPanResponderTerminationRequest: () =>
@@ -335,8 +339,7 @@ class FluidTransitioner extends React.Component<*> {
             // and the back will happen.
             if (value <= index - POSITION_THRESHOLD) {
               this._goBack(navigation, position, props.scenes, immediateIndex, goBackDuration);
-            }
-            else {
+            } else {
               this._reset(position, immediateIndex, resetDuration);
             }
           });
