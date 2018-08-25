@@ -1,5 +1,5 @@
 {
-  "name": "examples",
+  "name": "FluidTransitionsExamples",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -7,30 +7,30 @@
     "test": "jest"
   },
   "dependencies": {
-    "react": "16.2.0",
-    "react-native": "0.53.3",
-    "react-native-vector-icons": "^4.6.0",
-    "react-navigation": "2.0.1",
-    "react-navigation-fluid-transitions": "../"
+    "react": "16.4.1",
+    "react-native": "0.56.0",
+    "react-native-vector-icons": "^5.0.0",
+    "react-navigation": "^2.11.2",
+    "react-navigation-fluid-transitions": "^0.2.3"
   },
   "devDependencies": {
-    "babel-eslint": "^8.2.2",
-    "babel-jest": "22.4.1",
+    "babel-eslint": "^8.2.6",
+    "babel-jest": "^23.4.2",
     "babel-preset-flow": "^6.23.0",
-    "babel-preset-react-native": "4.0.0",
-    "concurrently": "^2.2.0",
-    "eslint": "^4.9.0",
-    "eslint-config-airbnb": "^16.1.0",
-    "eslint-plugin-import": "^2.7.0",
-    "eslint-plugin-jsx-a11y": "^6.0.2",
-    "eslint-plugin-react": "^7.4.0",
-    "flow-bin": "^0.66.0",
-    "fs-extra": "^0.30.0",
-    "jest": "22.4.2",
-    "minimatch": "^3.0.2",
-    "node-watch": "^0.4.0",
-    "react-test-renderer": "16.2.0",
-    "rimraf": "^2.5.4"
+    "babel-preset-react-native": "^4.0.0",
+    "concurrently": "^3.6.1",
+    "eslint": "^5.4.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.1",
+    "eslint-plugin-react": "^7.11.1",
+    "flow-bin": "^0.79.1",
+    "fs-extra": "^7.0.0",
+    "jest": "^23.5.0",
+    "minimatch": "^3.0.4",
+    "node-watch": "^0.5.8",
+    "react-test-renderer": "^16.4.2",
+    "rimraf": "^2.6.2"
   },
   "jest": {
     "preset": "react-native"

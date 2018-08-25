@@ -1,4 +1,4 @@
-package com.examples;
+package com.fluidtransitionsexamples;
 
 import android.app.Application;
 
