@@ -42,10 +42,7 @@ export default (routeConfigMap, stackConfig = {}) => {
           onTransitionStart={this.props.onTransitionStart}
           onTransitionEnd={(transition, lastTransition) => {
             const { onTransitionEnd, navigation } = this.props;
-            if (
-              transition.navigation.state.isTransitioning &&
-              !lastTransition.navigation.state.isTransitioning
-            ) {
+            if (transition.navigation.state.isTransitioning) {
               navigation.dispatch(
                 StackActions.completeTransition({
                   key: navigation.state.key,
