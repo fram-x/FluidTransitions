@@ -12,6 +12,8 @@ const emptyFunction = () => {};
 const ANIMATION_DURATION = 500;
 const POSITION_THRESHOLD = 1 / 2;
 const RESPOND_THRESHOLD = 20;
+const GESTURE_RESPONSE_DISTANCE_HORIZONTAL = 25;
+const GESTURE_RESPONSE_DISTANCE_VERTICAL = 150;
 
 type SceneRenderedInfo = {
   key: string,
@@ -198,7 +200,7 @@ class FluidTransitioner extends React.Component<*> {
     }
 
     const handlers = this.getPanResponderHandlers(
-position, index,
+      position, index,
       scene, layout, navigation, props
 );
 
@@ -263,23 +265,23 @@ position, index,
             : layout.width.__getValue();
           const axisHasBeenMeasured = !!axisLength;
           // Measure the distance from the touch to the edge of the screen
-          // const screenEdgeDistance = gestureDirectionInverted
-          //   ? axisLength - (currentDragPosition - currentDragDistance)
-          //   : currentDragPosition - currentDragDistance;
-          // // Compare to the gesture distance relavant to card or modal
-          // const {
-          //   gestureResponseDistance: userGestureResponseDistance = {},
-          // } = this._getScreenDetails(scene).options;
-          // const gestureResponseDistance = isVertical
-          //   ? userGestureResponseDistance.vertical ||
-          //     GESTURE_RESPONSE_DISTANCE_VERTICAL
-          //   : userGestureResponseDistance.horizontal ||
-          //     GESTURE_RESPONSE_DISTANCE_HORIZONTAL;
-          // // GESTURE_RESPONSE_DISTANCE is about 25 or 30. Or 135 for modals
-          // if (screenEdgeDistance > gestureResponseDistance) {
-          //   // Reject touches that started in the middle of the screen
-          //   return false;
-          // }
+          const screenEdgeDistance = gestureDirectionInverted
+            ? axisLength - (currentDragPosition - currentDragDistance)
+            : currentDragPosition - currentDragDistance;
+          // Compare to the gesture distance relavant to card or modal
+          const {
+            gestureResponseDistance: userGestureResponseDistance = {},
+          } = options;
+          const gestureResponseDistance = isVertical
+            ? userGestureResponseDistance.vertical ||
+              GESTURE_RESPONSE_DISTANCE_VERTICAL
+            : userGestureResponseDistance.horizontal ||
+              GESTURE_RESPONSE_DISTANCE_HORIZONTAL;
+          // GESTURE_RESPONSE_DISTANCE is about 25 or 30. Or 135 for modals
+          if (screenEdgeDistance > gestureResponseDistance) {
+            // Reject touches that started in the middle of the screen
+            return false;
+          }
           const hasDraggedEnough = Math.abs(currentDragDistance) > RESPOND_THRESHOLD;
           const isOnFirstCard = immediateIndex === 0;
           const shouldSetResponder = hasDraggedEnough && axisHasBeenMeasured && !isOnFirstCard;

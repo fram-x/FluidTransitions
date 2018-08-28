@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Dimensions, Button, StyleSheet } from 'react-native';
 
 import { FluidNavigator, Transition } from 'react-navigation-fluid-transitions';
 
@@ -180,6 +180,10 @@ const Navigator = FluidNavigator({
   mode: 'card',
   navigationOptions: {
     gesturesEnabled: true,
+    gestureResponseDistance: {
+      horizontal: Dimensions.get('window').width,
+      vertical: Dimensions.get('window').height,
+    },
   },
 });
 

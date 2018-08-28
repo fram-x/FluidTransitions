@@ -28,7 +28,7 @@ To install the library into your project, run yarn or npm:
 
 or
 
-`npm -i react-navigation-fluid-transitions`
+`npm i -S react-navigation-fluid-transitions`
 
 > Note on versions: react-navigation-fluid-transitions@0.2.x is compatible with react-navigation@2.0.x, while react-navigation-fluid-transitions@0.1.x is compatible with react-navigation@1.x. Future improvements and development will be on react-navigation-fluid-transitions@0.2.x.
 
@@ -140,7 +140,7 @@ Read more about the parameters and functionality for building [custom transition
 Some of the concepts in the library builds on ideas from [@lintonye](https://github.com/lintonye)'s pull request and suggestion found here: [Shared element transition #941](https://github.com/react-navigation/react-navigation/pull/941).
 
 ### Contributors
-Christian Falch (@chrfalch), Yuuki Arisawa (@uk-ar), Joe Goodall (@joegoodall1), [sonaye](https://github.com/sonaye), [David Chavez](https://github.com/dcvz), [muhaimincs](https://github.com/muhaimincs), [KingTayTay](https://github.com/KingTayTay),  [pedrobullo](https://github.com/pedrobullo)
+Christian Falch (@chrfalch), Yuuki Arisawa (@uk-ar), Joe Goodall (@joegoodall1), [sonaye](https://github.com/sonaye), [David Chavez](https://github.com/dcvz), [muhaimincs](https://github.com/muhaimincs), [KingTayTay](https://github.com/KingTayTay),  [pedrobullo](https://github.com/pedrobullo), [Nathan James](https://github.com/nsjames), [Filip Engberg](https://github.com/reekris)
 
 ### Sponsors
 [Fram X](https://framx.no) - a cross platform app company from Norway. 
