@@ -1,68 +1,35 @@
 {
-  "name": "react-navigation-fluid-transitions",
-  "version": "0.2.5",
-  "description": "An extension to react-navigation providing transitions and shared element transitions.",
-  "main": "./index.js",
+  "name": "react-native-fluid-transitions",
+  "version": "0.0.1",
+  "private": true,
   "scripts": {
-    "test": "jest --watchAll"
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/fram-x/FluidTransitions.git"
-  },
-  "keywords": [
-    "navigation",
-    "react-native",
-    "navigation",
-    "react",
-    "shared elements",
-    "transitions"
-  ],
-  "author": "Christian Falch",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/fram-x/FluidTransitions/issues"
-  },
-  "homepage": "https://github.com/fram-x/FluidTransitions#readme",
   "dependencies": {
-    "lodash.sortby": "*",
-    "lodash.chunk": "*",
-    "prop-types": "*"
-  },
-  "peerDependencies": {
-    "react": "*",
-    "react-native": "*",
-    "react-navigation": "*"
+    "lodash.chunk": "^4.2.0",
+    "lodash.sortby": "^4.7.0",
+    "prop-types": "^15.6.2",
+    "react": "16.4.1",
+    "react-native": "0.56.0",
+    "react-native-vector-icons": "^5.0.0",
+    "react-navigation": "^2.12.1"
   },
   "devDependencies": {
-    "babel-eslint": "^8.2.2",
-    "babel-jest": "22.4.1",
-    "babel-preset-flow": "^6.23.0",
-    "babel-preset-react-native": "4.0.0",
-    "concurrently": "^2.2.0",
-    "eslint": "^4.18.2",
-    "eslint-config-airbnb": "^16.1.0",
-    "eslint-plugin-import": "^2.7.0",
-    "eslint-plugin-jest": "^21.13.0",
-    "eslint-plugin-jsx-a11y": "^6.0.2",
-    "eslint-plugin-react": "^7.4.0",
-    "flow-bin": "^0.66.0",
-    "fs-extra": "^0.30.0",
-    "jest": "22.4.2",
-    "minimatch": "^3.0.2",
-    "node-watch": "^0.4.0",
-    "prop-types": "^15.6.0",
-    "react": "16.2.0",
-    "react-native": "0.53.3",
-    "react-test-renderer": "16.2.0",
-    "rimraf": "^2.5.4"
+    "@babel/core": "^7.0.0-beta",
+    "babel-eslint": "^9.0.0",
+    "babel-jest": "23.4.2",
+    "babel-preset-react-native": "2.1.0",
+    "eslint": "^5.4.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.1",
+    "eslint-plugin-react": "^7.11.1",
+    "flow-bin": "^0.79.1",
+    "jest": "23.5.0",
+    "react-test-renderer": "^16.4.2"
   },
   "jest": {
-    "preset": "react-native",
-    "modulePathIgnorePatterns": [
-      "Examples/node_modules",
-      ".vscode",
-      "docs"
-    ]
+    "preset": "react-native"
   }
 }

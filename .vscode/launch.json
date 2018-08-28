@@ -5,13 +5,22 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "node",
+      "name": "Debug iOS",
+      "program": "${workspaceRoot}/.vscode/launchReactNative.js",
+      "type": "reactnative",
       "request": "launch",
-      "name": "Jest All",
-      "program": "${workspaceRoot}/node_modules/jest/bin/jest",
-      "args": ["--runInBand"],
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen"
+      "platform": "ios",
+      "sourceMaps": true,
+      "outDir": "${workspaceRoot}/.vscode/.react"
+    },
+    {
+      "name": "Debug Android",
+      "program": "${workspaceRoot}/.vscode/launchReactNative.js",
+      "type": "reactnative",
+      "request": "launch",
+      "platform": "android",
+      "sourceMaps": true,
+      "outDir": "${workspaceRoot}/.vscode/.react"
     },
   ]
 }
