@@ -44,7 +44,7 @@ To start the project run
 `react-native run-ios` or `react-native run-android`
 
 ### Shared Element Transitions
-This example shows how two elements can be set up to automatically transition between each other when navigating between screens. A more detailed edition of this example can be found in the file [SharedElements.js](./Examples/src/SharedElements.js).
+This example shows how two elements can be set up to automatically transition between each other when navigating between screens. A more detailed edition of this example can be found in the file [SharedElements.js](./Examples/SharedElements.js).
 
 > Note that a shared transition happens between two elements that looks the same. The library animates position and scale between the two hence using different styles and content between the two elements will result in strange transitions.
 
