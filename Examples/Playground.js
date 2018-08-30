@@ -91,9 +91,9 @@ export default class Playground extends Component {
       <View style={styles.container}>
         {cw(<Text>Hello World!</Text>)}
         {cw(<View style={styles.buttons}>
-                    <Button title="Button1" onPress={this.animate} />
-                    <Button title="Button2" onPress={this.animate} />
-                            </View>)}
+          <Button title="Button1" onPress={this.animate} />
+          <Button title="Button2" onPress={this.animate} />
+            </View>)}
         {cw(<Shape ref={this.setRef} onLayout={this.onLayout} style={styles.circle1} />, null, this._background)}
         {cw(<View style={styles.roundText}><Text style={styles.innerRoundText}>Text</Text></View>, this._translate)}
         {cw(<Shape style={styles.paper1}><Text>Paper 1</Text></Shape>, this._rotate, this._background)}
@@ -111,8 +111,8 @@ export default class Playground extends Component {
 
 const cw = (
   component: any,
-  nativeStyles: ?StyleSheet.NamedStyles,
-  styles: ?StyleSheet.NamedStyles,
+  nativeStyles: ?StyleSheet.Styles,
+  styles: ?StyleSheet.Styles,
 ) => createAnimatedWrapper({ component,
   nativeStyles: [nativeStyles],
   styles,
