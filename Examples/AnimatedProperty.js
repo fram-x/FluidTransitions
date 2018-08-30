@@ -30,23 +30,24 @@ const styles = StyleSheet.create({
 
 class SpinningCube extends Component {
   render() {
-    if (this.props.progress) {
-      const spin = this.props.progress.interpolate({
+    const { progress, startColor, endColor } = this.props;
+    if (progress) {
+      const spin = progress.interpolate({
         inputRange: [0, 1],
         outputRange: ['0deg', '180deg'],
       });
 
-      const background = this.props.progress.interpolate({
+      const background = progress.interpolate({
         inputRange: [0, 1],
-        outputRange: [this.props.startColor, this.props.endColor],
+        outputRange: [startColor, endColor],
       });
 
-      const border = this.props.progress.interpolate({
+      const border = progress.interpolate({
         inputRange: [0, 0.5, 1],
         outputRange: [0, 75, 0],
       });
 
-      const scale = this.props.progress.interpolate({
+      const scale = progress.interpolate({
         inputRange: [0, 0.1, 0.9, 1],
         outputRange: [1, 0.5, 0.5, 1],
       });
@@ -68,7 +69,7 @@ class SpinningCube extends Component {
       <View style={styles.animated}>
         <Animated.View style={[styles.animatedElement,
           {
-            backgroundColor: this.props.startColor,
+            backgroundColor: startColor,
             borderRadius: 0,
           }]}
         />
@@ -88,6 +89,7 @@ const Description = () => (
 
 class Screen1 extends Component {
   render() {
+    const { navigation } = this.props;
     return (
       <View style={styles.container}>
         <Description />
@@ -96,7 +98,7 @@ class Screen1 extends Component {
         </Transition>
         <Transition appear="horizontal">
           <View style={styles.buttonContainer}>
-            <Button title="Next" onPress={() => this.props.navigation.navigate('screen2')} />
+            <Button title="Next" onPress={() => navigation.navigate('screen2')} />
           </View>
         </Transition>
       </View>
@@ -106,6 +108,7 @@ class Screen1 extends Component {
 
 class Screen2 extends Component {
   render() {
+    const { navigation } = this.props;
     return (
       <View style={styles.container}>
         <Description />
@@ -114,8 +117,8 @@ class Screen2 extends Component {
         </Transition>
         <Transition appear="horizontal">
           <View style={styles.buttonContainer}>
-            <Button title="Back" onPress={() => this.props.navigation.goBack()} />
-            <Button title="Next" onPress={() => this.props.navigation.navigate('screen3')} />
+            <Button title="Back" onPress={() => navigation.goBack()} />
+            <Button title="Next" onPress={() => navigation.navigate('screen3')} />
           </View>
         </Transition>
       </View>
@@ -125,6 +128,7 @@ class Screen2 extends Component {
 
 class Screen3 extends Component {
   render() {
+    const { navigation } = this.props;
     return (
       <View style={styles.container}>
         <Description />
@@ -133,7 +137,7 @@ class Screen3 extends Component {
         </Transition>
         <Transition appear="horizontal">
           <View style={styles.buttonContainer}>
-            <Button title="Back" onPress={() => this.props.navigation.goBack()} />
+            <Button title="Back" onPress={() => navigation.goBack()} />
           </View>
         </Transition>
       </View>
@@ -151,8 +155,9 @@ class AnimatedProperty extends React.Component {
   static router = Navigator.router;
 
   render() {
+    const { navigation } = this.props;
     return (
-      <Navigator navigation={this.props.navigation} />
+      <Navigator navigation={navigation} />
     );
   }
 }

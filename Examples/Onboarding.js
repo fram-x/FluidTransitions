@@ -191,8 +191,9 @@ class Onboarding extends React.Component {
   static router = Navigator.router;
 
   render() {
+    const { navigation } = this.props;
     return (
-      <Navigator navigation={this.props.navigation} />
+      <Navigator navigation={navigation} />
     );
   }
 }

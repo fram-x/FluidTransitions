@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, Dimensions, Button, TouchableOpacity, FlatList, Image, StyleSheet } from 'react-native';
 import chunk from 'lodash.chunk';
-import { StackNavigator } from 'react-navigation';
 import { FluidNavigator, Transition } from '../lib';
 
 const styles = StyleSheet.create({
@@ -183,8 +182,9 @@ class ImageTransitions extends React.Component {
   static router = Navigator.router;
 
   render() {
+    const { navigation } = this.props;
     return (
-      <Navigator navigation={this.props.navigation} />
+      <Navigator navigation={navigation} />
     );
   }
 }
