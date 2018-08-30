@@ -5,6 +5,14 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Attach to packager",
+      "program": "${workspaceRoot}/.vscode/launchReactNative.js",
+      "type": "reactnative",
+      "request": "attach",
+      "sourceMaps": true,
+      "outDir": "${workspaceRoot}/.vscode/.react"
+    },
+    {
       "name": "Debug iOS",
       "program": "${workspaceRoot}/.vscode/launchReactNative.js",
       "type": "reactnative",
