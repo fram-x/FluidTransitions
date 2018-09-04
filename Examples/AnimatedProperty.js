@@ -29,6 +29,10 @@ const styles = StyleSheet.create({
 });
 
 class SpinningCube extends Component {
+  componentDidMount() {
+    console.log(this.props.startColor);
+  }
+
   render() {
     const { progress, startColor, endColor } = this.props;
     if (progress) {
