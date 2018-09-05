@@ -4,7 +4,6 @@
 
 # Xcode
 #
-.vscode/.react
 build/
 *.pbxuser
 !default.pbxuser
@@ -42,6 +41,9 @@ buck-out/
 \.buckd/
 *.keystore
 
+# VSCODE/React
+.vscode/.react/
+
 # fastlane
 #
 # It is recommended to not store the screenshots in the git repo. Instead, use fastlane to re-generate the
@@ -52,3 +54,6 @@ buck-out/
 */fastlane/report.xml
 */fastlane/Preview.html
 */fastlane/screenshots
+
+# Bundle artifact
+*.jsbundle

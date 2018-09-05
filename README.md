@@ -33,9 +33,9 @@ or
 > Note on versions: react-navigation-fluid-transitions@0.2.x is compatible with react-navigation@2.0.x, while react-navigation-fluid-transitions@0.1.x is compatible with react-navigation@1.x. Future improvements and development will be on react-navigation-fluid-transitions@0.2.x.
 
 ## Examples
-Examples are included as a runnable React Native project found in the `Examples`.
+Examples are included in the project and should be runnable from the root of the project folder.
 
-To start the example, navigate to the examples folder and run the following commands from the terminal:
+To start the example run the following commands from the terminal:
 
 `npm i` or `yarn`
 
@@ -44,7 +44,7 @@ To start the project run
 `react-native run-ios` or `react-native run-android`
 
 ### Shared Element Transitions
-This example shows how two elements can be set up to automatically transition between each other when navigating between screens. A more detailed edition of this example can be found in the file [SharedElements.js](./Examples/src/SharedElements.js).
+This example shows how two elements can be set up to automatically transition between each other when navigating between screens. A more detailed edition of this example can be found in the file [SharedElements.js](./Examples/SharedElements.js).
 
 > Note that a shared transition happens between two elements that looks the same. The library animates position and scale between the two hence using different styles and content between the two elements will result in strange transitions.
 

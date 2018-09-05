@@ -8,5 +8,5 @@
 	// For flow
 	"flow.runOnAllFiles": true,
 	"flow.useNPMPackagedFlow": true,
-	"javascript.validate.enable": false	
+	"javascript.validate.enable": false,	
 }
