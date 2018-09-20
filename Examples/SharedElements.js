@@ -40,17 +40,14 @@ const styles = StyleSheet.create({
   text1: {
     fontSize: 12,
     color: 'black',
-    backgroundColor: 'aqua',
   },
   text2: {
     fontSize: 24,
-    color: 'red',
-    backgroundColor: 'yellow',
+    color: '#EE0000',
   },
   text3: {
     fontSize: 12,
-    color: 'green',
-    backgroundColor: 'aqua',
+    color: '#55AA55',
   },
 });
 
