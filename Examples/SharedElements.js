@@ -37,36 +37,45 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 20,
   },
+  text1: {
+    fontSize: 12,
+  },
+  text2: {
+    fontSize: 18,
+  },
+  text3: {
+    fontSize: 14,
+  },
 });
 
-const Circle = (props) => (
+const Circle = ({ background, size }) => (
   <View
     style={{
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: props.background,
-      width: props.size,
-      height: props.size,
-      borderRadius: props.size / 2,
+      backgroundColor: background,
+      width: size,
+      height: size,
+      borderRadius: size / 2,
     }}
   />
 );
 
-const Shape = (props) => (
+const Shape = ({ background, size, borderRadius }) => (
   <View
     style={{
-      backgroundColor: props.background || '#EE0000',
-      width: props.size,
-      height: props.size,
-      borderRadius: props.borderRadius || 0,
+      backgroundColor: background || '#EE0000',
+      width: size,
+      height: size,
+      borderRadius: borderRadius || 0,
     }}
   />
 );
 
 const Screen1 = (props) => (
   <View style={styles.container}>
-    <Transition appear="flip">
-      <Text>1.Screen</Text>
+    <Transition shared="text">
+      <Text style={styles.text1}>Welcome!</Text>
     </Transition>
     <View style={styles.screen1}>
       <Transition shared="circle">
@@ -96,8 +105,8 @@ const Screen1 = (props) => (
 
 const Screen2 = (props) => (
   <View style={styles.container}>
-    <Transition appear="flip">
-      <Text>2.Screen</Text>
+    <Transition shared="text">
+      <Text style={styles.text2}>Welcome!</Text>
     </Transition>
     <View style={styles.screen2}>
       <Transition shared="circle">
@@ -129,8 +138,8 @@ const Screen2 = (props) => (
 
 const Screen3 = (props) => (
   <View style={styles.container}>
-    <Transition appear="flip">
-      <Text>3.Screen</Text>
+    <Transition shared="text">
+      <Text style={styles.text3}>Welcome!</Text>
     </Transition>
     <View style={styles.screen3}>
       <Transition shared="circle">
