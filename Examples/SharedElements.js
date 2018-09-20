@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Animated, Button, StyleSheet } from 'react-native';
 import { Transition, createFluidNavigator } from '../lib';
 
 const styles = StyleSheet.create({
@@ -39,12 +39,18 @@ const styles = StyleSheet.create({
   },
   text1: {
     fontSize: 12,
+    color: 'black',
+    backgroundColor: 'aqua',
   },
   text2: {
-    fontSize: 18,
+    fontSize: 24,
+    color: 'red',
+    backgroundColor: 'yellow',
   },
   text3: {
-    fontSize: 14,
+    fontSize: 12,
+    color: 'green',
+    backgroundColor: 'aqua',
   },
 });
 
@@ -75,8 +81,9 @@ const Shape = ({ background, size, borderRadius }) => (
 const Screen1 = (props) => (
   <View style={styles.container}>
     <Transition shared="text">
-      <Text style={styles.text1}>Welcome!</Text>
+      <Text style={styles.text1}>Fluid Transitions</Text>
     </Transition>
+    <Animated.Text></Animated.Text>
     <View style={styles.screen1}>
       <Transition shared="circle">
         <Shape size={50} borderRadius={4} background="#EE0000" />
@@ -106,7 +113,7 @@ const Screen1 = (props) => (
 const Screen2 = (props) => (
   <View style={styles.container}>
     <Transition shared="text">
-      <Text style={styles.text2}>Welcome!</Text>
+      <Text style={styles.text2}>Fluid Transitions</Text>
     </Transition>
     <View style={styles.screen2}>
       <Transition shared="circle">
@@ -139,7 +146,7 @@ const Screen2 = (props) => (
 const Screen3 = (props) => (
   <View style={styles.container}>
     <Transition shared="text">
-      <Text style={styles.text3}>Welcome!</Text>
+      <Text style={styles.text3}>Fluid Transitions</Text>
     </Transition>
     <View style={styles.screen3}>
       <Transition shared="circle">
