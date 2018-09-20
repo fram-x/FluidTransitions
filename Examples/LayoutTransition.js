@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
   },
   smallImage: {
     width: (Dimensions.get('window').width - 45) * 0.5,
-    height: ((Dimensions.get('window').width - 45) * 0.5) * 0.5,
+    height: (Dimensions.get('window').width - 45) * 0.5,
   },
   imageContainer: {
     flexDirection: 'row',
