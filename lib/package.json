@@ -32,6 +32,7 @@
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
-    "react-navigation": "*"
+    "react-navigation": "*",
+    "react-native-screens": "*"
   }
 }
