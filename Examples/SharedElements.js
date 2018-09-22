@@ -39,26 +39,26 @@ const styles = StyleSheet.create({
   },
 });
 
-const Circle = (props) => (
+const Circle = ({ background, size }) => (
   <View
     style={{
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: props.background,
-      width: props.size,
-      height: props.size,
-      borderRadius: props.size / 2,
+      backgroundColor: background,
+      width: size,
+      height: size,
+      borderRadius: size / 2,
     }}
   />
 );
 
-const Shape = (props) => (
+const Shape = ({ background, size, borderRadius }) => (
   <View
     style={{
-      backgroundColor: props.background || '#EE0000',
-      width: props.size,
-      height: props.size,
-      borderRadius: props.borderRadius || 0,
+      backgroundColor: background || '#EE0000',
+      width: size,
+      height: size,
+      borderRadius: borderRadius || 0,
     }}
   />
 );
@@ -170,8 +170,9 @@ class SharedElements extends React.Component {
   static router = Navigator.router;
 
   render() {
+    const { navigation } = this.props;
     return (
-      <Navigator navigation={this.props.navigation} />
+      <Navigator navigation={navigation} />
     );
   }
 }

@@ -6,6 +6,7 @@
 
 import React from 'react';
 import { createStackNavigator } from 'react-navigation';
+import { useScreens } from 'react-native-screens';
 
 import HomeScreen from './Examples/HomeScreen';
 import SharedElements from './Examples/SharedElements';
@@ -17,6 +18,8 @@ import ShoeShop from './Examples/ShoeShop';
 import FlatList from './Examples/FlatList';
 import AnimatedProperty from './Examples/AnimatedProperty';
 import Playground from './Examples/Playground';
+
+useScreens();
 
 const ExampleNavigator = createStackNavigator({
   home: { screen: HomeScreen, navigationOptions: { title: 'Fluid Transitions' } },
