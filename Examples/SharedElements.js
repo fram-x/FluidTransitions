@@ -1,37 +1,30 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Button, StyleSheet } from 'react-native';
+import { withNavigation } from 'react-navigation';
 import { Transition, createFluidNavigator } from '../lib';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  card: {
+    backgroundColor: '#ECEEFA',
+    margin: 20,
+    marginTop: 10,
+    marginBottom: 10,
+    padding: 20,
+    borderColor: '#AAA',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 10,
+    shadowOpacity: 0.5,
+    shadowColor: '#AAA',
+    shadowOffset: { width: 2, height: 5 },
+  },
+  bigCard: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: '#FFF',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
-  },
-  screen1: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    alignSelf: 'stretch',
-    padding: 20,
-  },
-  screen2: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    alignSelf: 'stretch',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  screen3: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'stretch',
-    justifyContent: 'center',
-    padding: 20,
   },
   buttons: {
     flexDirection: 'row',
@@ -39,89 +32,45 @@ const styles = StyleSheet.create({
   },
 });
 
-const Circle = ({ background, size }) => (
-  <View
-    style={{
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: background,
-      width: size,
-      height: size,
-      borderRadius: size / 2,
-    }}
-  />
+const Card = ({ navigation, id }) => (
+  <Transition shared={`card${id}`} top appear="horizontal" delay>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => navigation.navigate('screen2', { id })}
+      hitSlop={{ left: 20, top: 20, right: 20, bottom: 20 }}
+    >
+      <Transition shared={`text${id}`}>
+        <Text>{`Card ${id}`}</Text>
+      </Transition>
+    </TouchableOpacity>
+  </Transition>
 );
 
-const Shape = ({ background, size, borderRadius }) => (
-  <View
-    style={{
-      backgroundColor: background || '#EE0000',
-      width: size,
-      height: size,
-      borderRadius: borderRadius || 0,
-    }}
-  />
-);
+const NavCard = withNavigation(Card);
 
 const Screen1 = (props) => (
   <View style={styles.container}>
-    <Transition appear="flip">
-      <Text>1.Screen</Text>
-    </Transition>
-    <View style={styles.screen1}>
-      <Transition shared="circle">
-        <Shape size={50} borderRadius={4} background="#EE0000" />
-      </Transition>
-    </View>
-    <View style={{ flexDirection: 'row' }}>
-      <Transition appear="horizontal" delay>
-        <Circle background="#55AA55" size={20} />
-      </Transition>
-      <View style={{ width: 20 }} />
-      <Transition appear="horizontal" delay>
-        <Circle background="#55AA55" size={20} />
-      </Transition>
-      <View style={{ width: 20 }} />
-      <Transition appear="horizontal" delay>
-        <Circle background="#55AA55" size={20} />
-      </Transition>
-    </View>
-    <Transition appear="horizontal">
-      <View style={styles.buttons}>
-        <Button title="Next" onPress={() => props.navigation.navigate('screen2')} />
-      </View>
-    </Transition>
+    <NavCard id={1} />
+    <NavCard id={2} />
+    <NavCard id={3} />
+    <NavCard id={4} />
   </View>
 );
 
-const Screen2 = (props) => (
+const Screen2 = ({ navigation }) => (
   <View style={styles.container}>
-    <Transition appear="flip">
-      <Text>2.Screen</Text>
+    <Transition shared={`card${navigation.getParam('id')}`}>
+      <View style={styles.bigCard}>
+        <Transition shared={`text${navigation.getParam('id')}`}>
+          <Text>{`Card ${navigation.getParam('id')}`}</Text>
+        </Transition>
+      </View>
     </Transition>
-    <View style={styles.screen2}>
-      <Transition shared="circle">
-        <Shape size={50} borderRadius={25} background="#EE0000" />
-      </Transition>
-    </View>
-    <View style={{ flexDirection: 'row' }}>
-      <Transition appear="horizontal" delay>
-        <Circle background="#55AA55" size={20} />
-      </Transition>
-      <View style={{ width: 20 }} />
-      <Transition appear="horizontal" delay>
-        <Circle background="#55AA55" size={20} />
-      </Transition>
-      <View style={{ width: 20 }} />
-      <Transition appear="horizontal" delay>
-        <Circle background="#55AA55" size={20} />
-      </Transition>
-    </View>
     <Transition appear="horizontal">
       <View style={styles.buttons}>
-        <Button title="Back" onPress={() => props.navigation.goBack()} />
+        <Button title="Back" onPress={() => navigation.goBack()} />
         <View style={{ width: 20 }} />
-        <Button title="Next" onPress={() => props.navigation.navigate('screen3')} />
+        <Button title="Next" onPress={() => navigation.navigate('screen3')} />
       </View>
     </Transition>
   </View>
@@ -129,27 +78,6 @@ const Screen2 = (props) => (
 
 const Screen3 = (props) => (
   <View style={styles.container}>
-    <Transition appear="flip">
-      <Text>3.Screen</Text>
-    </Transition>
-    <View style={styles.screen3}>
-      <Transition shared="circle">
-        <Shape size={140} borderRadius={70} background="#EE0000" />
-      </Transition>
-    </View>
-    <View style={{ flexDirection: 'row' }}>
-      <Transition appear="horizontal" delay>
-        <Circle background="#55AA55" size={20} />
-      </Transition>
-      <View style={{ width: 20 }} />
-      <Transition appear="horizontal" delay>
-        <Circle background="#55AA55" size={20} />
-      </Transition>
-      <View style={{ width: 20 }} />
-      <Transition appear="horizontal" delay>
-        <Circle background="#55AA55" size={20} />
-      </Transition>
-    </View>
     <Transition appear="horizontal">
       <View style={styles.buttons}>
         <Button title="Back" onPress={() => props.navigation.goBack()} />
