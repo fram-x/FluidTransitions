@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Button, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Image, Dimensions, TouchableOpacity, StyleSheet } from 'react-native';
 import { withNavigation } from 'react-navigation';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Transition, createFluidNavigator } from '../lib';
 
 const styles = StyleSheet.create({
@@ -9,22 +10,34 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: '#ECEEFA',
+    flexDirection: 'column',
+    justifyContent: 'center',
     margin: 20,
     marginTop: 10,
     marginBottom: 10,
-    padding: 20,
-    borderColor: '#AAA',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 10,
+    borderRadius: 4,
     shadowOpacity: 0.5,
     shadowColor: '#AAA',
     shadowOffset: { width: 2, height: 5 },
   },
+  smallImage: {
+    width: Dimensions.get('window').width - 40,
+    height: Dimensions.get('window').width - 60,
+  },
+  smallTitle: {
+    margin: 10,
+  },
   bigCard: {
     ...StyleSheet.absoluteFill,
     backgroundColor: '#FFF',
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  bigImage: {
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').width,
+  },
+  bigTitle: {
+    margin: 20,
   },
   buttons: {
     flexDirection: 'row',
@@ -32,15 +45,19 @@ const styles = StyleSheet.create({
   },
 });
 
-const Card = ({ navigation, id }) => (
-  <Transition shared={`card${id}`} top appear="horizontal" delay>
+const Card = ({ navigation, source, id }) => (
+  <Transition shared={`card${id}`} top appear="horizontal" disappear="fade" delay>
     <TouchableOpacity
+      activeOpacity={0.8}
       style={styles.card}
-      onPress={() => navigation.navigate('screen2', { id })}
+      onPress={() => navigation.navigate('screen2', { id, source })}
       hitSlop={{ left: 20, top: 20, right: 20, bottom: 20 }}
     >
+      <Transition shared={`image${id}`}>
+        <Image style={styles.smallImage} source={source} />
+      </Transition>
       <Transition shared={`text${id}`}>
-        <Text>{`Card ${id}`}</Text>
+        <Text style={styles.smallTitle}>{`Card ${id}`}</Text>
       </Transition>
     </TouchableOpacity>
   </Transition>
@@ -48,39 +65,55 @@ const Card = ({ navigation, id }) => (
 
 const NavCard = withNavigation(Card);
 
-const Screen1 = (props) => (
-  <View style={styles.container}>
-    <NavCard id={1} />
-    <NavCard id={2} />
-    <NavCard id={3} />
-    <NavCard id={4} />
-  </View>
-);
+class Screen1 extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { item: [] };
+  }
+
+  componentWillMount() {
+    const items = [];
+    const size = Dimensions.get('window').width;
+    const max = 10;
+    const randMax = 100;
+    for (let i = 0; i < max; i++) {
+      let randomNumber = Math.floor((Math.random() * randMax) + 1);
+      const idExists = (e) => e.id === randomNumber;
+      while (items.findIndex(idExists) > -1) {
+        randomNumber = Math.floor((Math.random() * randMax) + 1);
+      }
+
+      items.push({ url: `https://picsum.photos/${size}/${size}?image=${randomNumber}`, id: randomNumber });
+    }
+    this.setState((prevState) => ({ ...prevState, items }));
+  }
+
+  render() {
+    const { items } = this.state;
+    return (
+      <ScrollView style={styles.container}>
+        {items.map((source, index) => (<NavCard key={index} id={index} source={source} />))}
+      </ScrollView>);
+  }
+}
 
 const Screen2 = ({ navigation }) => (
   <View style={styles.container}>
     <Transition shared={`card${navigation.getParam('id')}`}>
       <View style={styles.bigCard}>
+        <Transition shared={`image${navigation.getParam('id')}`}>
+          <Image style={styles.bigImage} source={navigation.getParam('source')} />
+        </Transition>
         <Transition shared={`text${navigation.getParam('id')}`}>
-          <Text>{`Card ${navigation.getParam('id')}`}</Text>
+          <Text style={styles.bigTitle}>{`Card ${navigation.getParam('id')}`}</Text>
         </Transition>
       </View>
     </Transition>
-    <Transition appear="horizontal">
+    <Transition anchor={`image${navigation.getParam('id')}`}>
       <View style={styles.buttons}>
-        <Button title="Back" onPress={() => navigation.goBack()} />
-        <View style={{ width: 20 }} />
-        <Button title="Next" onPress={() => navigation.navigate('screen3')} />
-      </View>
-    </Transition>
-  </View>
-);
-
-const Screen3 = (props) => (
-  <View style={styles.container}>
-    <Transition appear="horizontal">
-      <View style={styles.buttons}>
-        <Button title="Back" onPress={() => props.navigation.goBack()} />
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="arrow-left" size={24} color="#FFF" />
+        </TouchableOpacity>
       </View>
     </Transition>
   </View>
@@ -89,7 +122,6 @@ const Screen3 = (props) => (
 const Navigator = createFluidNavigator({
   screen1: { screen: Screen1 },
   screen2: { screen: Screen2 },
-  screen3: { screen: Screen3 },
 }, {
   navigationOptions: { gesturesEnabled: true },
 });
