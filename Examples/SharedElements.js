@@ -24,8 +24,23 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width - 40,
     height: Dimensions.get('window').width - 60,
   },
+  imageHeader: {
+    padding: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  avatarImage: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+  },
+  avatarText: {
+    fontSize: 11,
+    marginLeft: 8,
+  },
   smallTitle: {
     margin: 10,
+    marginBottom: 20,
   },
   bigCard: {
     ...StyleSheet.absoluteFill,
@@ -39,22 +54,40 @@ const styles = StyleSheet.create({
   bigTitle: {
     margin: 20,
   },
+  detailsContainer: {
+    padding: 20,
+  },
   buttons: {
     flexDirection: 'row',
     padding: 20,
   },
 });
 
-const Card = ({ navigation, source, id }) => (
+const Card = ({ navigation, avatar, imageSource, id }) => (
   <Transition shared={`card${id}`} top appear="horizontal" disappear="fade" delay>
     <TouchableOpacity
       activeOpacity={0.8}
       style={styles.card}
-      onPress={() => navigation.navigate('screen2', { id, source })}
+      onPress={() => navigation.navigate('screen2', { id, source: imageSource })}
       hitSlop={{ left: 20, top: 20, right: 20, bottom: 20 }}
     >
+      <Transition appear="fade">
+        <View style={styles.imageHeader}>
+          <Image source={avatar.source} style={styles.avatarImage} />
+          <Text style={styles.avatarText}>{avatar.name}</Text>
+        </View>
+      </Transition>
       <Transition shared={`image${id}`}>
-        <Image style={styles.smallImage} source={source} />
+        <Image style={styles.smallImage} source={imageSource} />
+      </Transition>
+      <Transition appear="fade">
+        <View style={styles.imageHeader}>
+          <Icon name="heart-outline" size={22} />
+          <View style={{ width: 10 }} />
+          <Icon name="comment-outline" size={22} />
+          <View style={{ width: 10 }} />
+          <Icon name="paperclip" size={22} />
+        </View>
       </Transition>
       <Transition shared={`text${id}`}>
         <Text style={styles.smallTitle}>{`Card ${id}`}</Text>
@@ -68,34 +101,48 @@ const NavCard = withNavigation(Card);
 class Screen1 extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { item: [] };
+    this.state = { items: [], users: [] };
   }
 
   componentWillMount() {
-    const items = [];
-    const size = Dimensions.get('window').width;
-    const max = 10;
-    const randMax = 100;
-    for (let i = 0; i < max; i++) {
-      let randomNumber = Math.floor((Math.random() * randMax) + 1);
-      const idExists = (e) => e.id === randomNumber;
-      while (items.findIndex(idExists) > -1) {
-        randomNumber = Math.floor((Math.random() * randMax) + 1);
-      }
-
-      items.push({ url: `https://picsum.photos/${size}/${size}?image=${randomNumber}`, id: randomNumber });
-    }
-    this.setState((prevState) => ({ ...prevState, items }));
+    const items = getRandomImages(10, Dimensions.get('window').width);
+    const users = getRandomImages(10, 30).map(img => ({
+      source: img,
+      name: 'User name',
+    }));
+    this.setState((prevState) => ({ ...prevState, items, users }));
   }
 
   render() {
-    const { items } = this.state;
+    const { items, users } = this.state;
     return (
       <ScrollView style={styles.container}>
-        {items.map((source, index) => (<NavCard key={index} id={index} source={source} />))}
+        {items.map((source, index) => (
+          <NavCard
+            key={index}
+            id={index}
+            imageSource={source}
+            avatar={users[index]}
+          />
+        ))}
       </ScrollView>);
   }
 }
+
+const getRandomImages = (count: number, size: number) => {
+  const items = [];
+  const randMax = 100;
+  for (let i = 0; i < count; i++) {
+    let randomNumber = Math.floor((Math.random() * randMax) + 1);
+    const idExists = (e) => e.id === randomNumber;
+    while (items.findIndex(idExists) > -1) {
+      randomNumber = Math.floor((Math.random() * randMax) + 1);
+    }
+
+    items.push({ url: `https://picsum.photos/${size}/${size}?image=${randomNumber}`, id: randomNumber });
+  }
+  return items;
+};
 
 const Screen2 = ({ navigation }) => (
   <View style={styles.container}>
@@ -106,6 +153,11 @@ const Screen2 = ({ navigation }) => (
         </Transition>
         <Transition shared={`text${navigation.getParam('id')}`}>
           <Text style={styles.bigTitle}>{`Card ${navigation.getParam('id')}`}</Text>
+        </Transition>
+        <Transition>
+          <View style={styles.detailsContainer}>
+            <Text>Image details</Text>
+          </View>
         </Transition>
       </View>
     </Transition>
