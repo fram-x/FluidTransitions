@@ -134,7 +134,7 @@ const Screen3 = (props) => (
     </Transition>
     <View style={styles.screen3}>
       <Transition shared="circle">
-        <Shape size={140} borderRadius={4} background="#EE0000" />
+        <Shape size={140} borderRadius={70} background="#EE0000" />
       </Transition>
     </View>
     <View style={{ flexDirection: 'row' }}>
