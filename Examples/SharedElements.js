@@ -64,14 +64,14 @@ const styles = StyleSheet.create({
 });
 
 const Card = ({ navigation, avatar, imageSource, id }) => (
-  <Transition shared={`card${id}`} top appear="horizontal" disappear="fade" delay>
+  <Transition shared={`card${id}`} top appear="horizontal" disappear="fade">
     <TouchableOpacity
       activeOpacity={0.8}
       style={styles.card}
       onPress={() => navigation.navigate('screen2', { id, source: imageSource })}
       hitSlop={{ left: 20, top: 20, right: 20, bottom: 20 }}
     >
-      <Transition appear="fade">
+      <Transition appear="horizontal" disappear="fade">
         <View style={styles.imageHeader}>
           <Image source={avatar.source} style={styles.avatarImage} />
           <Text style={styles.avatarText}>{avatar.name}</Text>
@@ -80,7 +80,7 @@ const Card = ({ navigation, avatar, imageSource, id }) => (
       <Transition shared={`image${id}`}>
         <Image style={styles.smallImage} source={imageSource} />
       </Transition>
-      <Transition appear="fade">
+      <Transition appear="horizontal" disappear="fade">
         <View style={styles.imageHeader}>
           <Icon name="heart-outline" size={22} />
           <View style={{ width: 10 }} />
@@ -105,8 +105,8 @@ class Screen1 extends React.Component {
   }
 
   componentWillMount() {
-    const items = getRandomImages(1, Dimensions.get('window').width);
-    const users = getRandomImages(10, 30).map(img => ({
+    const items = getRandomImages(20, Dimensions.get('window').width);
+    const users = getRandomImages(20, 30).map(img => ({
       source: img,
       name: 'User name',
     }));
@@ -154,7 +154,7 @@ const Screen2 = ({ navigation }) => (
         <Transition shared={`text${navigation.getParam('id')}`}>
           <Text style={styles.bigTitle}>{`Card ${navigation.getParam('id')}`}</Text>
         </Transition>
-        <Transition>
+        <Transition appear="fade">
           <View style={styles.detailsContainer}>
             <Text>Image details</Text>
           </View>
