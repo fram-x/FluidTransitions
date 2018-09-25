@@ -16,9 +16,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 10,
     borderRadius: 4,
-    shadowOpacity: 0.5,
+    shadowOpacity: 0.3,
     shadowColor: '#AAA',
-    shadowOffset: { width: 2, height: 5 },
+    shadowOffset: { width: 0, height: 4 },
   },
   smallImage: {
     width: Dimensions.get('window').width - 40,
@@ -105,7 +105,7 @@ class Screen1 extends React.Component {
   }
 
   componentWillMount() {
-    const items = getRandomImages(10, Dimensions.get('window').width);
+    const items = getRandomImages(1, Dimensions.get('window').width);
     const users = getRandomImages(10, 30).map(img => ({
       source: img,
       name: 'User name',
@@ -175,7 +175,13 @@ const Navigator = createFluidNavigator({
   screen1: { screen: Screen1 },
   screen2: { screen: Screen2 },
 }, {
-  navigationOptions: { gesturesEnabled: true },
+  navigationOptions: {
+    gesturesEnabled: true,
+    gestureResponseDistance: {
+      horizontal: Dimensions.get('window').width,
+      vertical: Dimensions.get('window').height,
+    },
+  },
 });
 
 class SharedElements extends React.Component {

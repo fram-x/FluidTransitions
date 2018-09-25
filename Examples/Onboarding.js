@@ -42,21 +42,21 @@ const styles = StyleSheet.create({
   },
 });
 
-const Circle = (props) => (
+const Circle = ({ background, size }) => (
   <View style={{
-    backgroundColor: props.background,
-    width: props.size,
-    height: props.size,
-    borderRadius: props.size / 2,
+    backgroundColor: background,
+    width: size,
+    height: size,
+    borderRadius: size / 2,
     margin: 14 }}
   />
 );
 
-const Square = (props) => (
+const Square = ({ background, size }) => (
   <View style={{
-    backgroundColor: props.background,
-    width: props.size,
-    height: props.size,
+    backgroundColor: background,
+    width: size,
+    height: size,
     margin: 14 }}
   />
 );
