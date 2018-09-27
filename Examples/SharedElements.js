@@ -105,8 +105,8 @@ class Screen1 extends React.Component {
   }
 
   componentWillMount() {
-    const items = getRandomImages(5, Dimensions.get('window').width);
-    const users = getRandomImages(5, 30).map(img => ({
+    const items = getRandomImages(15, Dimensions.get('window').width);
+    const users = getRandomImages(15, 30).map(img => ({
       source: img,
       name: 'User name',
     }));
