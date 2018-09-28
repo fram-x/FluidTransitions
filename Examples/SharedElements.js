@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   card: {
-    backgroundColor: '#ECEEFA',
+    backgroundColor: '#FFF',
     flexDirection: 'column',
     justifyContent: 'center',
     margin: 20,
@@ -66,6 +66,23 @@ const styles = StyleSheet.create({
   },
 });
 
+const ImageHeader = () => (
+  <View style={styles.imageHeader}>
+    <Icon name="heart-outline" size={22} />
+    <View style={{ width: 10 }} />
+    <Icon name="comment-outline" size={22} />
+    <View style={{ width: 10 }} />
+    <Icon name="paperclip" size={22} />
+  </View>
+);
+
+const Avatar = ({ avatar }) => (
+  <View style={styles.imageHeader}>
+    <Image source={avatar.source} style={styles.avatarImage} />
+    <Text style={styles.avatarText}>{avatar.name}</Text>
+  </View>
+);
+
 const Card = ({ navigation, avatar, imageSource, id }) => (
   <Transition shared={`card${id}`} top appear="horizontal" disappear="fade">
     <TouchableOpacity
@@ -75,25 +92,13 @@ const Card = ({ navigation, avatar, imageSource, id }) => (
       hitSlop={{ left: 20, top: 20, right: 20, bottom: 20 }}
     >
       <Transition appear="horizontal" disappear="fade">
-        <View style={styles.imageHeader}>
-          <Image source={avatar.source} style={styles.avatarImage} />
-          <Text style={styles.avatarText}>{avatar.name}</Text>
-        </View>
+        <Avatar avatar={avatar} />
       </Transition>
       <Transition shared={`image${id}`}>
         <Image style={styles.smallImage} source={imageSource} />
       </Transition>
-      <Transition appear="horizontal" disappear="fade">
-        <View style={styles.imageHeader}>
-          <Icon name="heart-outline" size={22} />
-          <View style={{ width: 10 }} />
-          <Icon name="comment-outline" size={22} />
-          <View style={{ width: 10 }} />
-          <Icon name="paperclip" size={22} />
-        </View>
-      </Transition>
-      <Transition appear="horizontal" disappear="fade">
-        <Text style={styles.smallTitle}>{`Card ${id}`}</Text>
+      <Transition shared={`imageHeader${id}`}>
+        <ImageHeader />
       </Transition>
     </TouchableOpacity>
   </Transition>
@@ -154,16 +159,13 @@ const Screen2 = ({ navigation }) => (
         <Transition shared={`image${navigation.getParam('id')}`}>
           <Image style={styles.bigImage} source={navigation.getParam('source')} />
         </Transition>
-        <Transition appear="fade">
-          <View style={styles.imageHeader}>
-            <Image source={navigation.getParam('avatar').source} style={styles.avatarImage} />
-            <Text style={styles.avatarText}>{navigation.getParam('avatar').name}</Text>
-          </View>
+        <Transition shared={`imageHeader${navigation.getParam('id')}`}>
+          <ImageHeader />
         </Transition>
-        <Transition appear="fade">
-          <Text style={styles.bigTitle}>{`Card ${navigation.getParam('id')}`}</Text>
+        <Transition anchor={`image${navigation.getParam('id')}`}>
+          <Avatar avatar={navigation.getParam('avatar')} />
         </Transition>
-        <Transition appear="fade">
+        <Transition anchor={`image${navigation.getParam('id')}`}>
           <ScrollView style={styles.commentsContainer}>
             <Text style={styles.comment}>Comment 1</Text>
             <Text style={styles.comment}>Comment 2</Text>
