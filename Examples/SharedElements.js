@@ -34,13 +34,14 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
   },
+  avatarSmallImage: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
   avatarText: {
     fontSize: 11,
     marginLeft: 8,
-  },
-  smallTitle: {
-    margin: 10,
-    marginBottom: 20,
   },
   bigCard: {
     ...StyleSheet.absoluteFill,
@@ -51,14 +52,17 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').width,
   },
-  bigTitle: {
-    paddingHorizontal: 10,
-  },
   commentsContainer: {
+  },
+  commentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 10,
+    paddingVertical: 6,
   },
   comment: {
     fontSize: 11,
+    paddingLeft: 6,
   },
   buttons: {
     flexDirection: 'row',
@@ -76,26 +80,35 @@ const ImageHeader = () => (
   </View>
 );
 
+const AvatarImage = ({ source }) => (
+  <Image source={source} style={styles.avatarImage} />
+);
+
+const SmallAvatarImage = ({ source }) => (
+  <Image source={source} style={styles.avatarSmallImage} />
+);
+
+
 const Avatar = ({ avatar }) => (
   <View style={styles.imageHeader}>
-    <Image source={avatar.source} style={styles.avatarImage} />
+    <AvatarImage source={avatar.source} />
     <Text style={styles.avatarText}>{avatar.name}</Text>
   </View>
 );
 
-const Card = ({ navigation, avatar, imageSource, id }) => (
+const Card = ({ navigation, item, id }) => (
   <Transition shared={`card${id}`} top appear="horizontal" disappear="fade">
     <TouchableOpacity
       activeOpacity={0.8}
       style={styles.card}
-      onPress={() => navigation.navigate('screen2', { id, source: imageSource, avatar })}
+      onPress={() => navigation.navigate('screen2', { id, item })}
       hitSlop={{ left: 20, top: 20, right: 20, bottom: 20 }}
     >
       <Transition appear="horizontal" disappear="fade">
-        <Avatar avatar={avatar} />
+        <Avatar avatar={item.avatar} />
       </Transition>
       <Transition shared={`image${id}`}>
-        <Image style={styles.smallImage} source={imageSource} />
+        <Image style={styles.smallImage} source={item.source} />
       </Transition>
       <Transition shared={`imageHeader${id}`}>
         <ImageHeader />
@@ -109,70 +122,53 @@ const NavCard = withNavigation(Card);
 class Screen1 extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { items: [], users: [] };
+    this.state = { items: [] };
   }
 
   componentWillMount() {
-    const items = getRandomImages(15, Dimensions.get('window').width);
-    const users = getRandomImages(15, 30).map(img => ({
-      source: img,
-      name: 'User name',
-    }));
-    this.setState((prevState) => ({ ...prevState, items, users }));
+    this.setState((prevState) => ({ ...prevState, items: createItemsData() }));
   }
 
   render() {
-    const { items, users } = this.state;
+    const { items } = this.state;
     return (
       <ScrollView style={styles.container}>
-        {items.map((source, index) => (
+        {items.map((item, index) => (
           <NavCard
             key={index}
             id={index}
-            imageSource={source}
-            avatar={users[index]}
+            item={item}
           />
         ))}
       </ScrollView>);
   }
 }
 
-const getRandomImages = (count: number, size: number) => {
-  const items = [];
-  const randMax = 100;
-  for (let i = 0; i < count; i++) {
-    let randomNumber = Math.floor((Math.random() * randMax) + 1);
-    const idExists = (e) => e.id === randomNumber;
-    while (items.findIndex(idExists) > -1) {
-      randomNumber = Math.floor((Math.random() * randMax) + 1);
-    }
-
-    items.push({ url: `https://picsum.photos/${size}/${size}?image=${randomNumber}`, id: randomNumber });
-  }
-  return items;
-};
+const Comment = ({ comment }) => (
+  <View style={styles.commentRow}>
+    <SmallAvatarImage source={comment.avatar.source} />
+    <Text style={styles.comment}>{comment.text}</Text>
+  </View>
+);
 
 const Screen2 = ({ navigation }) => (
   <View style={styles.container}>
     <Transition shared={`card${navigation.getParam('id')}`}>
       <View style={styles.bigCard}>
         <Transition shared={`image${navigation.getParam('id')}`}>
-          <Image style={styles.bigImage} source={navigation.getParam('source')} />
+          <Image style={styles.bigImage} source={navigation.getParam('item').source} />
         </Transition>
         <Transition shared={`imageHeader${navigation.getParam('id')}`}>
           <ImageHeader />
         </Transition>
         <Transition anchor={`image${navigation.getParam('id')}`}>
-          <Avatar avatar={navigation.getParam('avatar')} />
+          <Avatar avatar={navigation.getParam('item').avatar} />
         </Transition>
         <Transition anchor={`image${navigation.getParam('id')}`}>
           <ScrollView style={styles.commentsContainer}>
-            <Text style={styles.comment}>Comment 1</Text>
-            <Text style={styles.comment}>Comment 2</Text>
-            <Text style={styles.comment}>Comment 3</Text>
-            <Text style={styles.comment}>Comment 4</Text>
-            <Text style={styles.comment}>Comment 5</Text>
-            <Text style={styles.comment}>Comment 6</Text>
+            {navigation.getParam('item').comments.map((comment, index) => (
+              <Comment key={index} comment={comment} />
+            ))}
           </ScrollView>
         </Transition>
       </View>
@@ -213,5 +209,43 @@ class SharedElements extends React.Component {
     );
   }
 }
+
+const createItemsData = () => {
+  const users = getRandomImages(15, 30).map(img => ({
+    source: img,
+    name: 'Christian Falch',
+  }));
+
+  const createComments = () => {
+    const comments = [];
+    for (let i = 0; i < Math.floor((Math.random() * 6) + 4); i++) {
+      comments.push({
+        text: ['Great picture! Thanks', 'I like it!', 'Wow! Great', 'Cool!', 'Thanks :-)', ':-)'][Math.floor((Math.random() * 6))],
+        avatar: users[Math.floor((Math.random() * 15))],
+      });
+    }
+    return comments;
+  };
+  const items = getRandomImages(15, Dimensions.get('window').width).map(img => ({
+    source: img,
+    comments: createComments(),
+    avatar: users[Math.floor((Math.random() * 15))],
+  }));
+  return items;
+};
+const getRandomImages = (count: number, size: number) => {
+  const items = [];
+  const randMax = 100;
+  for (let i = 0; i < count; i++) {
+    let randomNumber = Math.floor((Math.random() * randMax) + 1);
+    const idExists = (e) => e.id === randomNumber;
+    while (items.findIndex(idExists) > -1) {
+      randomNumber = Math.floor((Math.random() * randMax) + 1);
+    }
+
+    items.push({ url: `https://picsum.photos/${size}/${size}?image=${randomNumber}`, id: randomNumber });
+  }
+  return items;
+};
 
 export default SharedElements;
