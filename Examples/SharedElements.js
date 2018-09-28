@@ -154,16 +154,16 @@ const Screen2 = ({ navigation }) => (
         <Transition shared={`image${navigation.getParam('id')}`}>
           <Image style={styles.bigImage} source={navigation.getParam('source')} />
         </Transition>
-        <Transition anchor={`image${navigation.getParam('id')}`}>
+        <Transition appear="fade">
           <View style={styles.imageHeader}>
             <Image source={navigation.getParam('avatar').source} style={styles.avatarImage} />
             <Text style={styles.avatarText}>{navigation.getParam('avatar').name}</Text>
           </View>
         </Transition>
-        <Transition anchor={`image${navigation.getParam('id')}`}>
+        <Transition appear="fade">
           <Text style={styles.bigTitle}>{`Card ${navigation.getParam('id')}`}</Text>
         </Transition>
-        <Transition appear="horizontal" anchor={`image${navigation.getParam('id')}`}>
+        <Transition appear="fade">
           <ScrollView style={styles.commentsContainer}>
             <Text style={styles.comment}>Comment 1</Text>
             <Text style={styles.comment}>Comment 2</Text>
