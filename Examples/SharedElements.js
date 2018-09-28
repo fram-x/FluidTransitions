@@ -163,7 +163,7 @@ const Screen2 = ({ navigation }) => (
         <Transition anchor={`image${navigation.getParam('id')}`}>
           <Text style={styles.bigTitle}>{`Card ${navigation.getParam('id')}`}</Text>
         </Transition>
-        <Transition anchor={`image${navigation.getParam('id')}`}>
+        <Transition appear="horizontal" anchor={`image${navigation.getParam('id')}`}>
           <ScrollView style={styles.commentsContainer}>
             <Text style={styles.comment}>Comment 1</Text>
             <Text style={styles.comment}>Comment 2</Text>
@@ -177,7 +177,10 @@ const Screen2 = ({ navigation }) => (
     </Transition>
     <Transition anchor={`image${navigation.getParam('id')}`}>
       <View style={styles.buttons}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          hitSlop={{ left: 20, top: 20, right: 20, bottom: 20 }}
+        >
           <Icon name="arrow-left" size={24} color="#FFF" />
         </TouchableOpacity>
       </View>
