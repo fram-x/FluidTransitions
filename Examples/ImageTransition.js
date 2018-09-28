@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
   },
   detailsImage: {
     width: Dimensions.get('window').width,
-    height: Dimensions.get('window').width,
+    height: Dimensions.get('window').width * 0.5,
   },
   detailsView: {
     padding: 10,
@@ -83,7 +83,8 @@ class ImageListScreen extends React.Component {
 
 class ImageDetailsScreen extends React.Component {
   render() {
-    const uri = this.props.navigation.getParam('url', '');
+    const { navigation } = this.props;
+    const uri = navigation.getParam('url', '');
     return (
       <View style={styles.container}>
         <Transition anchor={uri}>
@@ -100,7 +101,7 @@ class ImageDetailsScreen extends React.Component {
           <View style={styles.detailsView}>
             <Text style={styles.text}>{uri}</Text>
             <View style={styles.buttonContainer}>
-              <Button title="Back" onPress={() => this.props.navigation.goBack()} />
+              <Button title="Back" onPress={() => navigation.goBack()} />
             </View>
           </View>
         </Transition>
