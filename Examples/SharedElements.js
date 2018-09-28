@@ -52,10 +52,13 @@ const styles = StyleSheet.create({
     height: Dimensions.get('window').width,
   },
   bigTitle: {
-    margin: 20,
+    paddingHorizontal: 10,
   },
-  detailsContainer: {
-    padding: 20,
+  commentsContainer: {
+    padding: 10,
+  },
+  comment: {
+    fontSize: 11,
   },
   buttons: {
     flexDirection: 'row',
@@ -68,7 +71,7 @@ const Card = ({ navigation, avatar, imageSource, id }) => (
     <TouchableOpacity
       activeOpacity={0.8}
       style={styles.card}
-      onPress={() => navigation.navigate('screen2', { id, source: imageSource })}
+      onPress={() => navigation.navigate('screen2', { id, source: imageSource, avatar })}
       hitSlop={{ left: 20, top: 20, right: 20, bottom: 20 }}
     >
       <Transition appear="horizontal" disappear="fade">
@@ -89,7 +92,7 @@ const Card = ({ navigation, avatar, imageSource, id }) => (
           <Icon name="paperclip" size={22} />
         </View>
       </Transition>
-      <Transition shared={`text${id}`}>
+      <Transition appear="horizontal" disappear="fade">
         <Text style={styles.smallTitle}>{`Card ${id}`}</Text>
       </Transition>
     </TouchableOpacity>
@@ -151,13 +154,24 @@ const Screen2 = ({ navigation }) => (
         <Transition shared={`image${navigation.getParam('id')}`}>
           <Image style={styles.bigImage} source={navigation.getParam('source')} />
         </Transition>
-        <Transition shared={`text${navigation.getParam('id')}`}>
+        <Transition anchor={`image${navigation.getParam('id')}`}>
+          <View style={styles.imageHeader}>
+            <Image source={navigation.getParam('avatar').source} style={styles.avatarImage} />
+            <Text style={styles.avatarText}>{navigation.getParam('avatar').name}</Text>
+          </View>
+        </Transition>
+        <Transition anchor={`image${navigation.getParam('id')}`}>
           <Text style={styles.bigTitle}>{`Card ${navigation.getParam('id')}`}</Text>
         </Transition>
-        <Transition appear="fade">
-          <View style={styles.detailsContainer}>
-            <Text>Image details</Text>
-          </View>
+        <Transition anchor={`image${navigation.getParam('id')}`}>
+          <ScrollView style={styles.commentsContainer}>
+            <Text style={styles.comment}>Comment 1</Text>
+            <Text style={styles.comment}>Comment 2</Text>
+            <Text style={styles.comment}>Comment 3</Text>
+            <Text style={styles.comment}>Comment 4</Text>
+            <Text style={styles.comment}>Comment 5</Text>
+            <Text style={styles.comment}>Comment 6</Text>
+          </ScrollView>
         </Transition>
       </View>
     </Transition>
