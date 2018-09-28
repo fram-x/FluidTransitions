@@ -129,7 +129,7 @@ const Screen1 = (props) => (
   <View style={styles.container}>
     <TouchableWithoutFeedback onPress={() => props.navigation.navigate('screen2')}>
       <View style={styles.top1}>
-        <Transition appear="left" shared="paper">
+        <Transition appear="left" shared="paper" flat>
           <View style={styles.paper1} />
         </Transition>
         <Transition appear="right" shared="image">

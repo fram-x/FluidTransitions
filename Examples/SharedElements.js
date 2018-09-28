@@ -67,6 +67,7 @@ const styles = StyleSheet.create({
   buttons: {
     flexDirection: 'row',
     padding: 10,
+    paddingTop: 50,
   },
 });
 
@@ -88,7 +89,6 @@ const SmallAvatarImage = ({ source }) => (
   <Image source={source} style={styles.avatarSmallImage} />
 );
 
-
 const Avatar = ({ avatar }) => (
   <View style={styles.imageHeader}>
     <AvatarImage source={avatar.source} />
@@ -97,14 +97,14 @@ const Avatar = ({ avatar }) => (
 );
 
 const Card = ({ navigation, item, id }) => (
-  <Transition shared={`card${id}`} top appear="horizontal" disappear="fade">
+  <Transition shared={`card${id}`} appear="horizontal" disappear="fade">
     <TouchableOpacity
       activeOpacity={0.8}
       style={styles.card}
       onPress={() => navigation.navigate('screen2', { id, item })}
       hitSlop={{ left: 20, top: 20, right: 20, bottom: 20 }}
     >
-      <Transition appear="horizontal" disappear="fade">
+      <Transition shared={`avatar${id}`}>
         <Avatar avatar={item.avatar} />
       </Transition>
       <Transition shared={`image${id}`}>
@@ -155,16 +155,16 @@ const Screen2 = ({ navigation }) => (
   <View style={styles.container}>
     <Transition shared={`card${navigation.getParam('id')}`}>
       <View style={styles.bigCard}>
+        <Transition shared={`avatar${navigation.getParam('id')}`}>
+          <Avatar avatar={navigation.getParam('item').avatar} />
+        </Transition>
         <Transition shared={`image${navigation.getParam('id')}`}>
           <Image style={styles.bigImage} source={navigation.getParam('item').source} />
         </Transition>
         <Transition shared={`imageHeader${navigation.getParam('id')}`}>
           <ImageHeader />
         </Transition>
-        <Transition anchor={`image${navigation.getParam('id')}`}>
-          <Avatar avatar={navigation.getParam('item').avatar} />
-        </Transition>
-        <Transition anchor={`image${navigation.getParam('id')}`}>
+        <Transition anchor={`image${navigation.getParam('id')}`} appear="horizontal">
           <ScrollView style={styles.commentsContainer}>
             {navigation.getParam('item').comments.map((comment, index) => (
               <Comment key={index} comment={comment} />
@@ -213,7 +213,12 @@ class SharedElements extends React.Component {
 const createItemsData = () => {
   const users = getRandomImages(15, 30).map(img => ({
     source: img,
-    name: 'Christian Falch',
+    name: ['Marge Manns',
+      'Wallace Doe',
+      'Cheryle Hodnett',
+      'Jared Muszynski',
+      'Jayme Poyer',
+      'Gina Dennett'][Math.floor((Math.random() * 6))],
   }));
 
   const createComments = () => {
