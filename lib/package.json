@@ -27,6 +27,7 @@
   "dependencies": {
     "lodash.sortby": "*",
     "lodash.chunk": "*",
+    "lodash.clamp": "*",
     "prop-types": "*"
   },
   "peerDependencies": {
