@@ -65,14 +65,6 @@ const Shape = ({ background, size, borderRadius }) => (
 
 const Screen1 = (props) => (
   <View style={styles.container}>
-    <Transition appear="flip">
-      <Text>1.Screen</Text>
-    </Transition>
-    <View style={styles.screen1}>
-      <Transition shared="circle">
-        <Shape size={50} borderRadius={4} background="#EE0000" />
-      </Transition>
-    </View>
     <View style={{ flexDirection: 'row' }}>
       <Transition appear="horizontal" delay>
         <Circle background="#55AA55" size={20} />
@@ -86,24 +78,15 @@ const Screen1 = (props) => (
         <Circle background="#55AA55" size={20} />
       </Transition>
     </View>
-    <Transition appear="horizontal">
-      <View style={styles.buttons}>
-        <Button title="Next" onPress={() => props.navigation.navigate('screen2')} />
-      </View>
-    </Transition>
+    <View style={styles.buttons}>
+      <Button title="Next" onPress={() => props.navigation.navigate('screen2')} />
+    </View>
+
   </View>
 );
 
 const Screen2 = (props) => (
   <View style={styles.container}>
-    <Transition appear="flip">
-      <Text>2.Screen</Text>
-    </Transition>
-    <View style={styles.screen2}>
-      <Transition shared="circle">
-        <Shape size={50} borderRadius={25} background="#EE0000" />
-      </Transition>
-    </View>
     <View style={{ flexDirection: 'row' }}>
       <Transition appear="horizontal" delay>
         <Circle background="#55AA55" size={20} />
@@ -117,13 +100,12 @@ const Screen2 = (props) => (
         <Circle background="#55AA55" size={20} />
       </Transition>
     </View>
-    <Transition appear="horizontal">
-      <View style={styles.buttons}>
-        <Button title="Back" onPress={() => props.navigation.goBack()} />
-        <View style={{ width: 20 }} />
-        <Button title="Next" onPress={() => props.navigation.navigate('screen3')} />
-      </View>
-    </Transition>
+    <View style={styles.buttons}>
+      <Button title="Back" onPress={() => props.navigation.goBack()} />
+      <View style={{ width: 20 }} />
+      <Button title="Next" onPress={() => props.navigation.navigate('screen3')} />
+    </View>
+
   </View>
 );
 
