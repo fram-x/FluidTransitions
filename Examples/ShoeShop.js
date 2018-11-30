@@ -156,22 +156,22 @@ const Screen2 = (props) => (
         <Transition shared="image">
           <Image style={styles.shoe2} source={require('./assets/air-jordan-1.png')} />
         </Transition>
-        <Transition appear="horizontal" transitionInSharedLayer delay>
+        <Transition appear="horizontal" delay>
           <Text style={styles.price}>$ 299</Text>
         </Transition>
         <View style={styles.smallImageContainer}>
-          <Transition appear="horizontal" transitionInSharedLayer delay>
+          <Transition appear="horizontal" delay>
             <View style={styles.smallImageWrapper}>
               <Image style={styles.smallImage} source={require('./assets/air-jordan-1.png')} />
             </View>
           </Transition>
-          <Transition appear="horizontal" transitionInSharedLayer delay>
+          <Transition appear="horizontal" delay>
             <View style={styles.smallImageWrapper}>
               <Image style={styles.smallImage} source={require('./assets/air-jordan-1.png')} />
             </View>
           </Transition>
         </View>
-        <Transition appear="horizontal" transitionInSharedLayer>
+        <Transition appear="horizontal">
           <View style={styles.headerContainer2}>
             <Text style={styles.header2}>THE TEN</Text>
             <Text style={styles.subHeader2}>AIR JORDAN I</Text>
