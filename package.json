@@ -15,7 +15,7 @@
     "react-native": "0.56.0",
     "react-native-screens": "^1.0.0-alpha.12",
     "react-native-vector-icons": "^5.0.0",
-    "react-navigation": "2.16.0"
+    "react-navigation": "^3.0.0"
   },
   "devDependencies": {
     "@babel/core": "7.0.0-beta.40",
