@@ -54,6 +54,9 @@ The `anchor` property of the `Transition` element can be used to bind the transi
 ### Animated
 The `animated` property of the `Transition` element can be used to bind the interpolation driving the main transition to a property on the inner element you are rendering. This can be used to create animated components with custom animations, imagine an animated SVG transforming from one path to another, or a shape changing its apperance as the navigation transition is performed. 
 
+### Inline
+The `inline` property will run the defined transition inline and not create a duplicate version of the Transition View in the Transition Overlay.
+
 To use this functionality in your own components, create a property that expects an interpolation (Animated.Value).
 
 You can see an example of this in the [Animated Property example](https://github.com/fram-x/FluidTransitions/blob/develop/Examples/AnimatedProperty.js). 
