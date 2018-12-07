@@ -45,6 +45,9 @@ The `appear` property defines either a name of a predefined transition or a func
 ### Disappear
 The `disappear` property of the `Transition` element is used (if not set the appear property is used) when the screen for the element is navigated from. You can use the same predefined transitions as for the `appear` property or a custom transition function.
 
+### Inline
+The `inline` property will run the defined transition inline and not create a duplicate version of the Transition View in the Transition Overlay.
+
 ### Delay
 The `delay` property of the `Transition` element is used to specify that the element should be delayed when in transition. When one or more elements are delayed, their transition will start sequentially to give the impression that the different elements appear at a different time. The delay property is a true/false property.
 
@@ -53,9 +56,6 @@ The `anchor` property of the `Transition` element can be used to bind the transi
 
 ### Animated
 The `animated` property of the `Transition` element can be used to bind the interpolation driving the main transition to a property on the inner element you are rendering. This can be used to create animated components with custom animations, imagine an animated SVG transforming from one path to another, or a shape changing its apperance as the navigation transition is performed. 
-
-### Inline
-The `inline` property will run the defined transition inline and not create a duplicate version of the Transition View in the Transition Overlay.
 
 To use this functionality in your own components, create a property that expects an interpolation (Animated.Value).
 
