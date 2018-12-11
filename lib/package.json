@@ -31,6 +31,7 @@
     "prop-types": "*"
   },
   "peerDependencies": {
+    "react-navigation-stack": "*",
     "react": "*",
     "react-native": "*",
     "react-navigation": "*",
