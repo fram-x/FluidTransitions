@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { createStackNavigator } from 'react-navigation';
+import { createStackNavigator, createNavigationContainer } from 'react-navigation';
 import { useScreens } from 'react-native-screens';
 
 import HomeScreen from './Examples/HomeScreen';
@@ -33,12 +33,4 @@ const ExampleNavigator = createStackNavigator({
   animatedProperty: { screen: AnimatedProperty },
 });
 
-class MyApp extends React.Component<any> {
-  render() {
-    return (
-      <ExampleNavigator />
-    );
-  }
-}
-
-export default MyApp;
+export default createNavigationContainer(ExampleNavigator);
