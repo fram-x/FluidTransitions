@@ -64,23 +64,23 @@ const Square = (props) => (
 const Screen1 = (props) => (
   <View style={styles.container}>
     <View style={[styles.top, { backgroundColor: '#AA3939' }]}>
-      <Transition appear="horizontal">
+      <Transition inline appear="horizontal">
         <Circle background="#D46A6A" size={140} />
       </Transition>
       <View style={styles.circlesContainer}>
-        <Transition appear="horizontal" delay>
+        <Transition inline appear="horizontal" delay>
           <Circle background="#550000" size={40} />
         </Transition>
-        <Transition appear="horizontal" delay>
+        <Transition inline appear="horizontal" delay>
           <Circle background="#550000" size={40} />
         </Transition>
-        <Transition appear="horizontal" delay>
+        <Transition inline appear="horizontal" delay>
           <Circle background="#550000" size={40} />
         </Transition>
       </View>
     </View>
     <View style={styles.content}>
-      <Transition appear="horizontal">
+      <Transition inline appear="horizontal">
         <View>
           <Text style={styles.textBold}>Welcome to this demo!</Text>
           <Text style={styles.text}>
@@ -91,7 +91,7 @@ const Screen1 = (props) => (
       </Transition>
     </View>
     <View style={styles.footer}>
-      <Transition appear="horizontal">
+      <Transition inline appear="horizontal">
         <Button title="Next" onPress={() => props.navigation.navigate('screen2')} />
       </Transition>
     </View>
@@ -101,23 +101,23 @@ const Screen1 = (props) => (
 const Screen2 = (props) => (
   <View style={styles.container}>
     <View style={[styles.top, { backgroundColor: '#2E4272' }]}>
-      <Transition appear="horizontal">
+      <Transition inline appear="horizontal">
         <Square background="#4F628E" size={140} />
       </Transition>
       <View style={styles.circlesContainer}>
-        <Transition appear="horizontal" delay>
+        <Transition inline appear="horizontal" delay>
           <Square background="#061539" size={40} />
         </Transition>
-        <Transition appear="horizontal" delay>
+        <Transition inline appear="horizontal" delay>
           <Square background="#061539" size={40} />
         </Transition>
-        <Transition appear="horizontal" delay>
+        <Transition inline appear="horizontal" delay>
           <Square background="#061539" size={40} />
         </Transition>
       </View>
     </View>
     <View style={styles.content}>
-      <Transition appear="horizontal">
+      <Transition inline appear="horizontal">
         <View>
           <Text style={styles.textBold}>This is the second page</Text>
           <Text style={styles.text}>
@@ -127,11 +127,11 @@ const Screen2 = (props) => (
       </Transition>
     </View>
     <View style={styles.footer}>
-      <Transition appear="horizontal">
+      <Transition inline appear="horizontal">
         <Button title="Back" onPress={() => props.navigation.goBack()} />
       </Transition>
       <View style={{ width: 20 }} />
-      <Transition appear="horizontal">
+      <Transition inline appear="horizontal">
         <Button title="Next" onPress={() => props.navigation.navigate('screen3')} />
       </Transition>
     </View>
@@ -141,23 +141,23 @@ const Screen2 = (props) => (
 const Screen3 = (props) => (
   <View style={styles.container}>
     <View style={[styles.top, { backgroundColor: '#88CC88' }]}>
-      <Transition appear="horizontal">
+      <Transition inline appear="horizontal">
         <Circle background="#2D882D" size={140} />
       </Transition>
       <View style={styles.circlesContainer}>
-        <Transition appear="horizontal" delay>
+        <Transition inline appear="horizontal" delay>
           <Circle background="#550000" size={40} />
         </Transition>
-        <Transition appear="horizontal" delay>
+        <Transition inline appear="horizontal" delay>
           <Circle background="#550000" size={40} />
         </Transition>
-        <Transition appear="horizontal" delay>
+        <Transition inline appear="horizontal" delay>
           <Circle background="#550000" size={40} />
         </Transition>
       </View>
     </View>
     <View style={styles.content}>
-      <Transition appear="horizontal">
+      <Transition inline appear="horizontal">
         <View>
           <Text style={styles.textBold}>This is the last page</Text>
           <Text style={styles.text}>Navigate back to see the reversed transitions.</Text>
@@ -165,7 +165,7 @@ const Screen3 = (props) => (
       </Transition>
     </View>
     <View style={styles.footer}>
-      <Transition appear="horizontal">
+      <Transition inline appear="horizontal">
         <Button title="Back" onPress={() => props.navigation.goBack()} />
       </Transition>
     </View>

@@ -45,6 +45,9 @@ The `appear` property defines either a name of a predefined transition or a func
 ### Disappear
 The `disappear` property of the `Transition` element is used (if not set the appear property is used) when the screen for the element is navigated from. You can use the same predefined transitions as for the `appear` property or a custom transition function.
 
+### Inline
+The `inline` property will run the defined transition inline and not create a duplicate version of the Transition View in the Transition Overlay.
+
 ### Delay
 The `delay` property of the `Transition` element is used to specify that the element should be delayed when in transition. When one or more elements are delayed, their transition will start sequentially to give the impression that the different elements appear at a different time. The delay property is a true/false property.
 
