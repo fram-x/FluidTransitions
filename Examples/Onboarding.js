@@ -178,7 +178,7 @@ const Navigator = FluidNavigator({
   screen3: { screen: Screen3 },
 }, {
   mode: 'card',
-  navigationOptions: {
+  defaultNavigationOptions: {
     gesturesEnabled: true,
     gestureResponseDistance: {
       horizontal: Dimensions.get('window').width,

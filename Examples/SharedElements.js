@@ -163,7 +163,7 @@ const Navigator = createFluidNavigator({
   screen2: { screen: Screen2 },
   screen3: { screen: Screen3 },
 }, {
-  navigationOptions: { gesturesEnabled: true },
+  defaultNavigationOptions: { gesturesEnabled: false },
 });
 
 class SharedElements extends React.Component {
