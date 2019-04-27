@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NavigationRouteConfigMap, StackNavigatorConfig } from 'react-navigation';
+import { NavigationRouteConfigMap, StackNavigatorConfig, NavigationContainer  } from 'react-navigation';
 
 export { RouteDirection, Metrics, TransitionSpecification } from './Types';
 
