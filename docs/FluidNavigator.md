@@ -15,7 +15,7 @@ const Navigator = FluidNavigator({
 Where each screen is a component to render.
 
 ## Configuring Transitions
-You can configure transitions for the navigator just like with the StackNavigator.
+You can configure transitions for the navigator similar to StackNavigator.
 
 ```javascript
 const transitionConfig = {
@@ -27,8 +27,12 @@ const transitionConfig = {
 const Navigator = FluidNavigator({ Screens }, { transitionConfig });
 ```
 
+However, a custom transition (using screenInterpolator) will not work, as Fluid Navigator uses its own transition to the shared element and appear/disappear transitions.
+
+
+
 ## Gesture Support
-`FluidNavigator` supports gestures. To configure gesture support, add navigation options to the navigator or to individual screens:
+`FluidNavigator` supports gestures. To configure gesture support, add `defaultNavigationOptions` to the navigator or `navigationOptions` to individual screens:
 
 ```javascript
 const Navigator = FluidNavigator({
@@ -36,7 +40,7 @@ const Navigator = FluidNavigator({
   screen2: { screen: Screen2, navigationOptions: { gesturesEnabled: false } },
   screen3: { screen: Screen3 },
 }, {
-  navigationOptions: { gesturesEnabled: true },
+  defaultNavigationOptions: { gesturesEnabled: true },
 });
 ```
 

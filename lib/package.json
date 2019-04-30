@@ -3,6 +3,7 @@
   "version": "0.3.1",
   "description": "An extension to react-navigation providing transitions and shared element transitions.",
   "main": "./index.js",
+  "types": "./index.d.ts",
   "scripts": {
     "test": "jest --watchAll"
   },

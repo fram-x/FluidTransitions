@@ -144,7 +144,7 @@ const Navigator = FluidNavigator({
   list: { screen: ListScreen },
   details: { screen: DetailsScreen },
 }, {
-  navigationOptions: {
+  defaultNavigationOptions: {
     gesturesEnabled: true,
   },
 });
