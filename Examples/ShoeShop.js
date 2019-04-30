@@ -187,7 +187,7 @@ const Navigator = FluidNavigator({
   screen2: { screen: Screen2 },
 }, {
   style: { backgroundColor: '#C14534' },
-  navigationOptions: {
+  defaultNavigationOptions: {
     gesturesEnabled: true,
   },
 });

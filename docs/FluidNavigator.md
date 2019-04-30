@@ -32,7 +32,7 @@ However, a custom transition (using screenInterpolator) will not work, as Fluid 
 
 
 ## Gesture Support
-`FluidNavigator` supports gestures. To configure gesture support, add navigation options to the navigator or to individual screens:
+`FluidNavigator` supports gestures. To configure gesture support, add `defaultNavigationOptions` to the navigator or `navigationOptions` to individual screens:
 
 ```javascript
 const Navigator = FluidNavigator({
@@ -40,7 +40,7 @@ const Navigator = FluidNavigator({
   screen2: { screen: Screen2, navigationOptions: { gesturesEnabled: false } },
   screen3: { screen: Screen3 },
 }, {
-  navigationOptions: { gesturesEnabled: true },
+  defaultNavigationOptions: { gesturesEnabled: true },
 });
 ```
 

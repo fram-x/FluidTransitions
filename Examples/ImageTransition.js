@@ -174,7 +174,7 @@ const Navigator = FluidNavigator({
   imageList: { screen: ImageListScreen },
   imageDetails: { screen: ImageDetailsScreen },
 }, {
-  navigationOptions: {
+  defaultNavigationOptions: {
     gesturesEnabled: true,
   },
 });
