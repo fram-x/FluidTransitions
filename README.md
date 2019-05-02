@@ -30,7 +30,15 @@ or
 
 `npm i -S react-navigation-fluid-transitions`
 
-> Note on versions: react-navigation-fluid-transitions@0.2.x is compatible with react-navigation@2.0.x, while react-navigation-fluid-transitions@0.1.x is compatible with react-navigation@1.x. Future improvements and development will be on react-navigation-fluid-transitions@0.2.x.
+Compatible versions with `react-navigation`:
+
+| react-navigation-fluid-transitions        | react-navigation |
+| ----------------------------------------- |:----------------:|
+| 0.3.x                                     | 3.x              |
+| 0.2.x                                     | 2.x              |
+| 0.1.x                                     | 1.x              |
+
+> Future improvements and development will be on react-navigation-fluid-transitions@0.3.x.
 
 ## Examples
 Examples are included in the project and should be runnable from the root of the project folder.
