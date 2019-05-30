@@ -87,7 +87,7 @@ const Screen2 = (props) => (
   </View>
 );
 
-const Navigator = FluidNavigator({
+const Navigator = createFluidNavigator({
   screen1: { screen: Screen1 },
   screen2: { screen: Screen2 },
 });
