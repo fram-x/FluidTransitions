@@ -139,7 +139,7 @@ myCustomTransitionFunction = (transitionInfo) => {
 Read more about the parameters and functionality for building [custom transitions](./docs/CustomTransition.md).
 
 ### Native driver support
-For achieving the best experience it's vital to get rid of JS evaluation during animation run. React-native Animated API allows for scaling in both axis using native drivers, but it's not possible to resize width and height. Thus the native driver is used only when the ratio of source and target component are the same and it's recommended for the best quality of animations. 
+For achieving the best experience it's vital to get rid of JS evaluation during animation run. React-native Animated API allows for scaling in both axis using native drivers, but it's not possible to resize width and height (which calls for a layout computation). Thus the native driver is used only when the ratio of source and target component are the same and it's recommended for the best quality of animations. 
 
 ### API
 
