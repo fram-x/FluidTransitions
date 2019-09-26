@@ -1,5 +1,6 @@
 {
-  "name": "react-navigation-fluid-transitions",
+  "name": "@reactrondev/react-navigation-fluid-transitions",
+  "private": false,
   "version": "0.3.2",
   "description": "An extension to react-navigation providing transitions and shared element transitions.",
   "main": "./index.js",
@@ -9,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fram-x/FluidTransitions.git"
+    "url": "git+https://github.com/reactrondev/FluidTransitions.git"
   },
   "keywords": [
     "navigation",
@@ -22,9 +23,9 @@
   "author": "Christian Falch",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/fram-x/FluidTransitions/issues"
+    "url": "https://github.com/reactrondev/FluidTransitions/issues"
   },
-  "homepage": "https://github.com/fram-x/FluidTransitions#readme",
+  "homepage": "https://github.com/reactrondev/FluidTransitions#readme",
   "dependencies": {
     "lodash.sortby": "*",
     "lodash.chunk": "*",
