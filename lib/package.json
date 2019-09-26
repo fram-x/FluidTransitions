@@ -1,7 +1,7 @@
 {
   "name": "@reactrondev/react-navigation-fluid-transitions",
   "private": false,
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "An extension to react-navigation providing transitions and shared element transitions.",
   "main": "./index.js",
   "types": "./index.d.ts",
@@ -27,16 +27,16 @@
   },
   "homepage": "https://github.com/reactrondev/FluidTransitions#readme",
   "dependencies": {
-    "lodash.sortby": "*",
     "lodash.chunk": "*",
     "lodash.clamp": "*",
+    "lodash.sortby": "*",
     "prop-types": "*"
   },
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
-    "react-navigation": "^3.0.0",
     "react-native-screens": "*",
+    "react-navigation": "^3.0.0",
     "react-navigation-stack": "*"
   }
 }
