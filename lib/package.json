@@ -1,7 +1,7 @@
 {
   "name": "@reactrondev/react-navigation-fluid-transitions",
   "private": false,
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "An extension to react-navigation providing transitions and shared element transitions.",
   "main": "./index.js",
   "types": "./index.d.ts",
