@@ -1,71 +1,83 @@
 import React, { Component } from 'react';
-import { View, Text, Dimensions, Button, TouchableOpacity, FlatList, Image, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  Dimensions,
+  Button,
+  TouchableOpacity,
+  FlatList,
+  Image,
+  StyleSheet
+} from 'react-native';
 import chunk from 'lodash.chunk';
 import { FluidNavigator, Transition } from '../lib';
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1
   },
   detailsImage: {
     width: Dimensions.get('window').width,
-    height: Dimensions.get('window').width * 0.5,
+    height: Dimensions.get('window').width * 0.5
   },
   detailsView: {
     padding: 10,
     backgroundColor: '#ECECEC',
-    flex: 1,
+    flex: 1
   },
   buttonContainer: {
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-end'
   },
   text: {
-    paddingBottom: 40,
+    paddingBottom: 40
   },
   row: {
-    flexDirection: 'row',
+    flexDirection: 'row'
   },
   cell: {
-    margin: 2,
+    margin: 2
   },
   header: {
     height: 65,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#0000FA',
+    backgroundColor: '#0000FA'
   },
   headerText: {
     fontWeight: 'bold',
     fontSize: 18,
-    color: '#FFF',
+    color: '#FFF'
   },
   imageContainer: {
-    flexDirection: 'row',
-  },
+    flexDirection: 'row'
+  }
 });
 
 class ImageListScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      items: [],
+      items: []
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const items = [];
     const size = Dimensions.get('window').width;
     const max = 39;
     const randMax = 100;
     for (let i = 0; i < max; i++) {
-      let randomNumber = Math.floor((Math.random() * randMax) + 1);
-      const idExists = (e) => e.id === randomNumber;
+      let randomNumber = Math.floor(Math.random() * randMax + 1);
+      const idExists = e => e.id === randomNumber;
       while (items.findIndex(idExists) > -1) {
-        randomNumber = Math.floor((Math.random() * randMax) + 1);
+        randomNumber = Math.floor(Math.random() * randMax + 1);
       }
 
-      items.push({ url: `https://picsum.photos/${size}/${size}?image=${randomNumber}`, id: randomNumber });
+      items.push({
+        url: `https://picsum.photos/${size}/${size}?image=${randomNumber}`,
+        id: randomNumber
+      });
     }
     this.setState({ ...this.state, items });
   }
@@ -75,9 +87,12 @@ class ImageListScreen extends React.Component {
       <View style={styles.container}>
         <ImageGrid
           images={this.state.items}
-          imageSelected={(image) => this.props.navigation.navigate('imageDetails', { url: image.url })}
+          imageSelected={image =>
+            this.props.navigation.navigate('imageDetails', { url: image.url })
+          }
         />
-      </View>);
+      </View>
+    );
   }
 }
 
@@ -101,7 +116,7 @@ class ImageDetailsScreen extends React.Component {
           <View style={styles.detailsView}>
             <Text style={styles.text}>{uri}</Text>
             <View style={styles.buttonContainer}>
-              <Button title="Back" onPress={() => navigation.goBack()} />
+              <Button title='Back' onPress={() => navigation.goBack()} />
             </View>
           </View>
         </Transition>
@@ -116,20 +131,24 @@ class ImageGrid extends Component {
     this._colCount = 3;
     const { width: windowWidth } = Dimensions.get('window');
     this._margin = 2;
-    this._photoSize = (windowWidth - this._margin * this._colCount * 2) / this._colCount;
+    this._photoSize =
+      (windowWidth - this._margin * this._colCount * 2) / this._colCount;
     this.state = { chunkedImages: chunk(props.images, this._colCount) };
   }
 
-  _colCount
+  _colCount;
 
-  _photoSize
+  _photoSize;
 
-  _margin
+  _margin;
 
-  _chunkedImages
+  _chunkedImages;
 
-  componentWillReceiveProps(nextProps) {
-    this.setState({ ...this.state, chunkedImages: chunk(nextProps.images, this._colCount) });
+  static getDerivedStateFromProps(nextProps, prevState) {
+    this.setState({
+      ...prevState,
+      chunkedImages: chunk(nextProps.images, this._colCount)
+    });
   }
 
   render() {
@@ -138,7 +157,8 @@ class ImageGrid extends Component {
         data={this.state.chunkedImages}
         keyExtractor={this.keyExtractor}
         renderItem={this.renderItem.bind(this)}
-      />);
+      />
+    );
   }
 
   keyExtractor(item, index) {
@@ -155,11 +175,14 @@ class ImageGrid extends Component {
 
   renderCell(image) {
     return (
-      <TouchableOpacity onPress={() => this.props.imageSelected(image)} key={image.url}>
+      <TouchableOpacity
+        onPress={() => this.props.imageSelected(image)}
+        key={image.url}
+      >
         <View style={styles.cell}>
           <Transition shared={image.url}>
             <Image
-              resizeMode="cover"
+              resizeMode='cover'
               source={{ uri: image.url }}
               style={{ width: this._photoSize, height: this._photoSize }}
             />
@@ -170,23 +193,24 @@ class ImageGrid extends Component {
   }
 }
 
-const Navigator = FluidNavigator({
-  imageList: { screen: ImageListScreen },
-  imageDetails: { screen: ImageDetailsScreen },
-}, {
-  defaultNavigationOptions: {
-    gesturesEnabled: true,
+const Navigator = FluidNavigator(
+  {
+    imageList: { screen: ImageListScreen },
+    imageDetails: { screen: ImageDetailsScreen }
   },
-});
+  {
+    defaultNavigationOptions: {
+      gesturesEnabled: true
+    }
+  }
+);
 
 class ImageTransitions extends React.Component {
   static router = Navigator.router;
 
   render() {
     const { navigation } = this.props;
-    return (
-      <Navigator navigation={navigation} />
-    );
+    return <Navigator navigation={navigation} />;
   }
 }
 

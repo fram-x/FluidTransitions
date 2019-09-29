@@ -6,7 +6,7 @@ import {
   Image,
   TouchableOpacity,
   FlatList,
-  Dimensions,
+  Dimensions
 } from 'react-native';
 
 import { Transition, FluidNavigator } from '../lib';
@@ -15,23 +15,26 @@ class ListScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      items: [],
+      items: []
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const items = [];
     const imageSize = 80;
     const numberOfImages = 40;
     const randMax = 100;
     for (let i = 0; i < numberOfImages; i++) {
-      let randomNumber = Math.floor((Math.random() * randMax) + 1);
-      const idExists = (e) => e.id === randomNumber;
+      let randomNumber = Math.floor(Math.random() * randMax + 1);
+      const idExists = e => e.id === randomNumber;
       while (items.findIndex(idExists) > -1) {
-        randomNumber = Math.floor((Math.random() * randMax) + 1);
+        randomNumber = Math.floor(Math.random() * randMax + 1);
       }
 
-      items.push({ url: `https://picsum.photos/${imageSize}/${imageSize}?image=${randomNumber}`, id: randomNumber });
+      items.push({
+        url: `https://picsum.photos/${imageSize}/${imageSize}?image=${randomNumber}`,
+        id: randomNumber
+      });
     }
     this.setState({ ...this.state, items });
   }
@@ -51,7 +54,9 @@ class ListScreen extends React.Component {
   renderItem = ({ item, index }) => (
     <TouchableOpacity
       style={styles.row}
-      onPress={() => { this.props.navigation.navigate('details', { item, index }); }}
+      onPress={() => {
+        this.props.navigation.navigate('details', { item, index });
+      }}
     >
       <Transition shared={`image${index}`}>
         <Image style={styles.image} source={{ uri: item.url }} />
@@ -61,8 +66,7 @@ class ListScreen extends React.Component {
         <Text>{item.url}</Text>
       </View>
     </TouchableOpacity>
-
-  )
+  );
 }
 
 class DetailsScreen extends React.Component {
@@ -81,7 +85,10 @@ class DetailsScreen extends React.Component {
               <Text style={styles.caption}>Image URI:</Text>
               <Text>{this.props.navigation.state.params.item.url}</Text>
             </View>
-            <TouchableOpacity style={styles.button} onPress={() => this.props.navigation.goBack()}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => this.props.navigation.goBack()}
+            >
               <Text>Back</Text>
             </TouchableOpacity>
           </View>
@@ -93,7 +100,7 @@ class DetailsScreen extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1
   },
   row: {
     margin: 10,
@@ -106,57 +113,58 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.4,
     flexDirection: 'row',
-    elevation: 3,
+    elevation: 3
   },
   textContainer: {
     flexDirection: 'column',
     marginLeft: 18,
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   image: {
     width: 80,
     height: 80,
-    borderRadius: 40,
+    borderRadius: 40
   },
   caption: {
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 14
   },
   largeImage: {
     width: Dimensions.get('window').width,
-    height: Dimensions.get('window').width,
+    height: Dimensions.get('window').width
   },
   bottomContainer: {
     backgroundColor: '#ECECEC',
     flex: 1,
-    padding: 20,
+    padding: 20
   },
   button: {
     padding: 12,
     backgroundColor: '#CECECE',
     justifyContent: 'center',
-    alignItems: 'center',
-  },
+    alignItems: 'center'
+  }
 });
 
-const Navigator = FluidNavigator({
-  list: { screen: ListScreen },
-  details: { screen: DetailsScreen },
-}, {
-  defaultNavigationOptions: {
-    gesturesEnabled: true,
+const Navigator = FluidNavigator(
+  {
+    list: { screen: ListScreen },
+    details: { screen: DetailsScreen }
   },
-});
+  {
+    defaultNavigationOptions: {
+      gesturesEnabled: true
+    }
+  }
+);
 
 class FlatListScreen extends React.Component {
   static router = Navigator.router;
 
   render() {
     const { navigation } = this.props;
-    return (
-      <Navigator navigation={navigation} />
-    );
+    return <Navigator navigation={navigation} />;
   }
 }
 
